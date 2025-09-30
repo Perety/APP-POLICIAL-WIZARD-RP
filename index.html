@@ -65,7 +65,7 @@
         <div class="logo">WZRD</div>
         <div>
           <h1>Wizard RP — PDA / CAD</h1>
-          <div class="subtitle"> BETA APP POLICIAL </div>
+          <div class="subtitle">Simulador offline — comparte `index.html`</div>
         </div>
       </div>
 
@@ -73,7 +73,7 @@
         <div class="pill small" id="userDisplay">No conectado</div>
         <div class="pill small" id="dutyStatus">En servicio: 0</div>
         <button id="btnExport" class="btn">Exportar</button>
-        <button id="btnLogin" class="btn-ghost">Iniciar Sesión </button>
+        <button id="btnLogin" class="btn-ghost">Iniciar</button>
       </div>
     </header>
 
@@ -81,7 +81,7 @@
 
     <div id="expandedRoot"></div>
 
-    <footer> Hecho por Perety - Wizard RP • Datos en localStorage <code>pda_v4_</code></footer>
+    <footer>Hecho para Wizard RP • Datos en localStorage con prefijo <code>pda_v4_</code></footer>
   </div>
 
   <!-- LOGIN / REGISTER modal (tu sistema original) -->
@@ -108,19 +108,15 @@
         <label class="muted small">Nombre visible</label>
         <input id="regName" placeholder="Ej: Ofc. Pérez"/>
         <label class="muted small">Usuario</label>
-        <input id="regUser" placeholder="usuario (ej: Isidoro4)"/>
+        <input id="regUser" placeholder="usuario (ej: perety04)"/>
         <label class="muted small">Contraseña</label>
         <input id="regPass" type="password" placeholder="contraseña"/>
         <div style="display:flex;gap:8px;margin-top:8px">
           <select id="regRole">
-            <option value="officer">Central </option>
-            <option value="officer"> Cadete </option>
-            <option value="officer">Officer I </option>
-            <option value="officer">Officer II </option>
-            <option value="officer">Officer III </option>
+            <option value="officer">Officer</option>
             <option value="sergeant">Sergeant</option>
             <option value="dispatcher">Dispatcher</option>
-            <option value="officer">Admin </option>
+            <option value="admin">Admin</option>
           </select>
           <button id="regCreate" class="btn">Crear</button>
           <button id="regCancel" class="btn-ghost">Cancelar</button>
@@ -655,8 +651,86 @@ function exportAll(){
     users: lsGet('users',[]), roles: lsGet('roles',{}), templates: lsGet('templates',{}),
     reports: lsGet('reports',[]), wanted: lsGet('wanted',[]), calls: lsGet('calls',[]),
     pda: lsGet('pda',[]), fines: lsGet('fines',[]), logs: lsGet('logs',[])
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = 'pda_export_'+Date.now()+'.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  pushLog('Datos exportados');
+}
+function importFile(e){
+  const f = e.target.files[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(!confirm('Importar reemplazará datos locales. Continuar?')) return;
+      if(data.users) lsSet('users', data.users);
+      if(data.roles) lsSet('roles', data.roles);
+      if(data.templates) lsSet('templates', data.templates);
+      if(data.reports) lsSet('reports', data.reports);
+      if(data.wanted) lsSet('wanted', data.wanted);
+      if(data.calls) lsSet('calls', data.calls);
+      if(data.pda) lsSet('pda', data.pda);
+      if(data.fines) lsSet('fines', data.fines);
+      if(data.logs) lsSet('logs', data.logs);
+      pushLog('Datos importados');
+      alert('Importación completa. Recargando UI.');
+      location.reload();
+    } catch(err){ modalAlert('Error','JSON inválido'); }
+  };
+  reader.readAsText(f);
+}
 
-  
+/* ========== Login/Register original logic ========== */
+document.getElementById('btnLogin').onclick = ()=> openLoginModal();
+document.getElementById('btnExport').onclick = ()=> exportAll();
+
+function openLoginModal(){ loginModal.style.display='flex'; document.getElementById('loginUser').focus(); }
+function closeLoginModal(){ loginModal.style.display='none'; document.getElementById('loginPass').value=''; document.getElementById('loginUser').value=''; document.getElementById('loginError').style.display='none'; }
+
+document.getElementById('guestBtn').onclick = ()=> { STATE.currentUser = null; lsSet('currentUser', null); updateHeader(); closeLoginModal(); pushLog('Entró como invitado'); };
+document.getElementById('showReg').onclick = ()=> { const b = document.getElementById('registerBlock'); b.style.display = b.style.display==='none' ? 'block' : 'none'; };
+document.getElementById('regCancel').onclick = ()=> { document.getElementById('registerBlock').style.display='none'; };
+
+document.getElementById('loginBtn').onclick = ()=>{
+  const u = document.getElementById('loginUser').value.trim(); const p = document.getElementById('loginPass').value.trim();
+  const users = lsGet('users', []);
+  const found = users.find(x=>x.username === u && x.password === p);
+  if(found){ STATE.currentUser = {...found}; lsSet('currentUser', STATE.currentUser); updateHeader(); closeLoginModal(); pushLog(`Sesión iniciada: ${found.username}`); modalAlert('OK','Sesión iniciada: ' + found.display); }
+  else { document.getElementById('loginError').style.display='block'; document.getElementById('loginError').textContent='Usuario o contraseña incorrectos'; }
+};
+
+document.getElementById('regCreate').onclick = ()=>{
+  const username = document.getElementById('regUser').value.trim();
+  const display = document.getElementById('regName').value.trim() || username;
+  const pass = document.getElementById('regPass').value.trim() || '1234';
+  const role = document.getElementById('regRole').value;
+  if(!username){ document.getElementById('regMsg').textContent='Usuario requerido'; return; }
+  const users = lsGet('users', []);
+  if(users.find(u=>u.username===username)){ document.getElementById('regMsg').textContent='Usuario ya existe'; return; }
+  const u = {id:uid('u'), username, display, badge:'', password:pass, role};
+  users.unshift(u); lsSet('users', users); document.getElementById('regMsg').textContent='Cuenta creada. Inicia sesión.'; pushLog(`Cuenta creada: ${username}`);
+  document.getElementById('regUser').value=''; document.getElementById('regName').value=''; document.getElementById('regPass').value='';
+};
+
+/* ========== UI helpers ========== */
+function closeExpanded(){ STATE.expanded=null; expandedRoot.innerHTML=''; window.scrollTo({top:0,behavior:'smooth'}); }
+function updateHeader(){ STATE.currentUser = lsGet('currentUser', STATE.currentUser); const u = STATE.currentUser; userDisplay.textContent = u? `${u.display} (${u.role})` : 'No conectado'; const on = lsGet('onDuty', {}); const users = lsGet('users', []); const active = Object.keys(on).filter(k=>on[k]).map(id=> users.find(u=>u.id===id)?.display || id); dutyStatus.textContent = `En servicio: ${active.length}`; }
+btnLogin.addEventListener('click', ()=>{
+  if(STATE.currentUser){ if(confirm('Cerrar sesión?')){ lsSet('currentUser', null); STATE.currentUser=null; updateHeader(); pushLog('Sesión cerrada'); } } else openLoginModal();
+});
+
+/* ========== Init ========== */
+function initUI(){
+  seedIfNeeded();
+  renderCards();
+  STATE.currentUser = lsGet('currentUser', STATE.currentUser);
+  updateHeader();
+  renderLogsMini();
+}
+function renderLogsMini(){ const onMap = lsGet('onDuty', {}); const users = lsGet('users', []); const active = Object.keys(onMap).filter(k=>onMap[k]).map(id=> users.find(u=>u.id===id)?.display || id); dutyStatus.textContent = `En servicio: ${active.length}`; userDisplay.textContent = STATE.currentUser ? `${STATE.currentUser.display} (${STATE.currentUser.role})` : 'No conectado'; }
+initUI();
+
 </script>
 </body>
 </html>
