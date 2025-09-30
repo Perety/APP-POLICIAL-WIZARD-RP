@@ -73,7 +73,7 @@
         <div class="pill small" id="userDisplay">No conectado</div>
         <div class="pill small" id="dutyStatus">En servicio: 0</div>
         <button id="btnExport" class="btn">Exportar</button>
-        <button id="btnLogin" class="btn-ghost">Iniciar</button>
+        <button id="btnLogin" class="btn-ghost">Iniciar Sesión </button>
       </div>
     </header>
 
@@ -81,7 +81,7 @@
 
     <div id="expandedRoot"></div>
 
-    <footer>Hecho para Wizard RP • Datos en localStorage con prefijo <code>pda_v4_</code></footer>
+    <footer> Hecho por Perety - Wizard RP • Datos en localStorage <code>pda_v4_</code></footer>
   </div>
 
   <!-- LOGIN / REGISTER modal (tu sistema original) -->
@@ -108,15 +108,19 @@
         <label class="muted small">Nombre visible</label>
         <input id="regName" placeholder="Ej: Ofc. Pérez"/>
         <label class="muted small">Usuario</label>
-        <input id="regUser" placeholder="usuario (ej: perety04)"/>
+        <input id="regUser" placeholder="usuario (ej: Isidoro4)"/>
         <label class="muted small">Contraseña</label>
         <input id="regPass" type="password" placeholder="contraseña"/>
         <div style="display:flex;gap:8px;margin-top:8px">
           <select id="regRole">
-            <option value="officer">Officer</option>
+            <option value="officer">Central </option>
+            <option value="officer"> Cadete </option>
+            <option value="officer">Officer I </option>
+            <option value="officer">Officer II </option>
+            <option value="officer">Officer III </option>
             <option value="sergeant">Sergeant</option>
             <option value="dispatcher">Dispatcher</option>
-            <option value="admin">Admin</option>
+            <option value="officer">Admin </option>
           </select>
           <button id="regCreate" class="btn">Crear</button>
           <button id="regCancel" class="btn-ghost">Cancelar</button>
