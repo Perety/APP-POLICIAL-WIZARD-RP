@@ -3,191 +3,1078 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Wizard RP — PDA Policial</title>
+<title>Wizard RP — PDA Policial (Online Firestore)</title>
 <style>
+  /* ================= Theme / layout ================= */
   :root{
-    --bg:#071018; --muted:#98a8b0; --accent:#844ffc;
-    --card:linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.01));
-    --glass: rgba(255,255,255,0.05);
-    --radius:12px;
+    --bg:#071018; --muted:#98a8b0; --accent:#844ffc; --accent-2:#6ee7b7;
+    --card:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    --glass: rgba(255,255,255,0.03);
+    --radius:14px; --danger:#ff6b6b;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
   }
-  body{margin:0;background:#03121a;color:#e7eef6}
-  header{display:flex;align-items:center;justify-content:space-between;padding:12px;background:#041018}
-  .brand{display:flex;align-items:center;gap:12px}
-  .brand img{height:56px;border-radius:12px}
-  .pill{background:rgba(255,255,255,0.08);padding:6px 12px;border-radius:999px;font-size:13px}
-  .btn{background:var(--accent);border:none;padding:8px 12px;border-radius:8px;cursor:pointer;font-weight:700;color:#fff}
-  .btn:hover{opacity:0.9}
-  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.2);color:#ccc;padding:7px 12px;border-radius:8px;cursor:pointer}
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;padding:20px}
-  .card{background:var(--card);padding:18px;border-radius:12px;cursor:pointer;transition:.2s}
-  .card:hover{transform:translateY(-4px);box-shadow:0 10px 30px rgba(0,0,0,.5)}
-  .expanded{margin:20px;padding:18px;background:var(--card);border-radius:12px;min-height:400px}
-  textarea,input{width:100%;margin-top:8px;padding:8px;border-radius:6px;background:#0b1a28;color:#fff;border:1px solid rgba(255,255,255,0.1)}
-  .list{margin-top:12px;display:flex;flex-direction:column;gap:10px}
-  .item{background:rgba(255,255,255,0.05);padding:10px;border-radius:8px;display:flex;justify-content:space-between;align-items:center}
-  .overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:1000}
-  .modal{background:#061421;padding:18px;border-radius:12px;width:400px;max-width:90%}
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    background:
+      radial-gradient(900px 350px at 10% 10%, rgba(132,79,252,0.06), transparent),
+      linear-gradient(180deg, #03121a 0%, var(--bg) 60%);
+    color:#e6eef3; -webkit-font-smoothing:antialiased;
+  }
+
+  .wrap{max-width:1180px;margin:18px auto;padding:18px;display:grid;grid-template-rows:auto 1fr;gap:14px}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:72px;height:72px;border-radius:12px;background:linear-gradient(135deg,var(--accent-2),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:900;color:#041018;overflow:hidden}
+  .logo img{width:100%;height:100%;object-fit:cover;border-radius:12px}
+  h1{margin:0;font-size:18px}
+  .subtitle{color:var(--muted);font-size:13px}
+  .top-right{display:flex;gap:8px;align-items:center}
+  .pill{background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:999px;font-weight:700}
+  .small{font-size:12px;color:var(--muted)}
+  .btn{background:var(--accent);color:#fff;padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:800;box-shadow:0 6px 18px rgba(132,79,252,0.14)}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:7px 10px;border-radius:10px;cursor:pointer}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .card{
+    background:var(--card);border-radius:var(--radius);padding:18px;border:1px solid rgba(255,255,255,0.03);
+    box-shadow:0 10px 30px rgba(2,6,10,0.6);cursor:pointer;overflow:hidden;position:relative;transition:transform .28s, box-shadow .28s;
+    display:flex;flex-direction:column;gap:12px;min-height:140px;
+  }
+  .card:hover{transform:translateY(-8px);box-shadow:0 18px 40px rgba(2,6,10,0.75)}
+  .card .title{font-weight:900;font-size:16px}
+  .card .desc{color:var(--muted);font-size:13px}
+  .card .cta{margin-top:auto;display:flex;justify-content:space-between;align-items:center}
+  .icon {
+    width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));
+    display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;
+    transition:transform .35s;
+  }
+  .card:hover .icon{transform:rotate(8deg) scale(1.06)}
+  .expanded{margin-top:14px;border-radius:var(--radius);padding:18px;background:var(--card);border:1px solid rgba(255,255,255,0.03)}
+  .form-row{display:flex;gap:8px;align-items:center}
+  input, textarea, select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+  textarea{min-height:120px;resize:vertical}
+  .list{display:flex;flex-direction:column;gap:10px}
+  .item{padding:10px;border-radius:10px;background:var(--glass);display:flex;justify-content:space-between;align-items:center}
+  .muted{color:var(--muted)}
+  .danger{background:linear-gradient(90deg,#ff8a80,#ff5252);color:#041018;padding:6px 8px;border-radius:8px}
+  .ok{background:linear-gradient(90deg,#48c774,#34d399);color:#041018;padding:6px 8px;border-radius:8px}
+  .tiny{font-size:12px}
+  footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
+  .overlay{position:fixed;inset:0;background:linear-gradient(rgba(2,6,10,0.6),rgba(2,6,10,0.8));display:flex;align-items:center;justify-content:center;z-index:9999}
+  .modal{width:680px;max-width:94%;background:linear-gradient(180deg,#071729,#061421);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+  .link-like{color:var(--accent);cursor:pointer;text-decoration:underline}
+  .role-chip{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.02);margin-right:6px;margin-bottom:6px}
+  .btn-small{padding:6px 8px;font-size:13px;border-radius:8px}
+  .btn-open{background:#844ffc;border:none;padding:8px 10px;border-radius:8px;color:white;font-weight:800;cursor:pointer}
+  .full-screen-panel{position:fixed;inset:6% 6% auto 6%;height:80%;background:var(--card);border-radius:12px;padding:18px;overflow:auto;z-index:999;}
+  @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:640px){ .grid{grid-template-columns:1fr} .form-row{flex-direction:column} .modal{width:94%} .full-screen-panel{inset:6% 4% 6% 4%;height:88%} }
+
+  /* micro animations */
+  .fade-in{animation:fadeIn .36s ease both}
+  @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
 </style>
 </head>
 <body>
-  <header>
-    <div class="brand">
-      <img src="https://cdn.discordapp.com/attachments/1421898595271180360/1422217488145453219/LOGO_WIZARD_FONDO.png.png" alt="Wizard RP Logo">
-      <div>
-        <h2>Wizard RP — PDA / CAD</h2>
-        <div style="font-size:13px;color:#aaa">Conectado a Firestore</div>
+  <div class="wrap">
+    <header>
+      <div class="brand">
+        <div class="logo"><img id="logoImg" src="https://cdn.discordapp.com/attachments/1421898595271180360/1422217488145453219/LOGO_WIZARD_FONDO.png.png" alt="Wizard RP"></div>
+        <div>
+          <h1>Wizard RP — PDA / CAD</h1>
+          <div class="subtitle">En línea — Firestore realtime • Comparte el index.html</div>
+        </div>
       </div>
-    </div>
-    <div style="display:flex;gap:10px;align-items:center">
-      <div id="userDisplay" class="pill">No conectado</div>
-      <div id="dutyStatus" class="pill">Servicio: 0</div>
-      <button id="btnLogin" class="btn-ghost">Iniciar</button>
-    </div>
-  </header>
 
-  <section class="grid" id="cardsRoot"></section>
-  <div id="expandedRoot"></div>
+      <div class="top-right">
+        <div class="pill small" id="userDisplay">No conectado</div>
+        <div class="pill small" id="dutyStatus">En servicio: 0</div>
+        <button id="btnExport" class="btn">Exportar</button>
+        <button id="btnLogin" class="btn-ghost">Iniciar sesión</button>
+      </div>
+    </header>
 
-  <!-- Modal Login -->
+    <!-- Grid of main action cards -->
+    <section class="grid fade-in" id="cardsRoot">
+      <!-- cards rendered by JS -->
+    </section>
+
+    <!-- Expanded root will hold full screen panels -->
+    <div id="expandedRoot"></div>
+
+    <footer>Hecho para Wizard RP • Datos en Firestore • Mantén tu firebaseConfig actualizado</footer>
+  </div>
+
+  <!-- Login / Register modal (tu sistema original preserved) -->
   <div id="loginModal" class="overlay" style="display:none">
     <div class="modal">
       <h3>Entrar / Registrarse</h3>
-      <input id="loginUser" placeholder="Usuario"/>
-      <input id="loginPass" type="password" placeholder="Contraseña"/>
-      <div style="margin-top:10px;display:flex;gap:8px">
-        <button id="loginBtn" class="btn">Entrar</button>
-        <button id="guestBtn" class="btn-ghost">Invitado</button>
-        <button id="showReg" class="btn-ghost">Crear cuenta</button>
+      <div class="muted small">Usa tu cuenta o crea una. Los datos se guardan en Firestore.</div>
+      <div style="margin-top:12px">
+        <label class="muted small">Usuario</label>
+        <input id="loginUser" placeholder="usuario (ej: perety04)"/>
+        <label class="muted small" style="margin-top:8px">Contraseña</label>
+        <input id="loginPass" type="password" placeholder="contraseña"/>
+        <div style="display:flex;gap:8px;margin-top:12px">
+          <button id="loginBtn" class="btn">Entrar</button>
+          <button id="guestBtn" class="btn-ghost">Invitado</button>
+          <div style="margin-left:auto" class="small muted">¿Sin cuenta? <span id="showReg" class="link-like">Crear</span></div>
+        </div>
+        <div id="loginError" class="muted small" style="margin-top:8px;color:#ff9b9b;display:none"></div>
       </div>
-      <div id="loginError" style="color:#f77;margin-top:8px;display:none"></div>
-      <div id="registerBlock" style="display:none;margin-top:12px;border-top:1px solid rgba(255,255,255,.1);padding-top:12px">
-        <h4>Crear cuenta</h4>
-        <input id="regName" placeholder="Nombre visible"/>
-        <input id="regUser" placeholder="Usuario"/>
-        <input id="regPass" type="password" placeholder="Contraseña"/>
-        <select id="regRole">
-          <option value="officer">Oficial</option>
-          <option value="dispatcher">Dispatcher</option>
-          <option value="admin">Admin</option>
-        </select>
-        <button id="regCreate" class="btn" style="margin-top:10px">Crear</button>
-        <div id="regMsg" style="margin-top:6px;font-size:13px;color:#aaa"></div>
+
+      <div id="registerBlock" style="display:none;margin-top:12px;border-top:1px dashed rgba(255,255,255,0.03);padding-top:12px">
+        <h4 style="margin:0 0 8px 0">Crear cuenta</h4>
+        <label class="muted small">Nombre visible</label>
+        <input id="regName" placeholder="Ej: Ofc. Pérez"/>
+        <label class="muted small">Usuario</label>
+        <input id="regUser" placeholder="usuario (ej: perety04)"/>
+        <label class="muted small">Contraseña</label>
+        <input id="regPass" type="password" placeholder="contraseña"/>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <select id="regRole">
+            <option value="officer">Officer</option>
+            <option value="sergeant">Sergeant</option>
+            <option value="dispatcher">Dispatcher</option>
+            <option value="admin">Admin</option>
+          </select>
+          <button id="regCreate" class="btn">Crear</button>
+          <button id="regCancel" class="btn-ghost">Cancelar</button>
+        </div>
+        <div id="regMsg" class="muted small" style="margin-top:8px"></div>
       </div>
     </div>
   </div>
 
 <script type="module">
-/* ========== Firebase Config ========== */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import { getFirestore, collection, getDocs, addDoc, setDoc, doc, updateDoc, deleteDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+/* =========================================================
+   Wizard RP — PDA Online (single-file)
+   - Realtime via Firestore
+   - Keep your original login/registration modal flow
+   - Replace firebaseConfig below with YOUR project's values
+   - IMPORTANT: This code stores plaintext passwords in Firestore
+     (keeps parity with your offline approach). For production,
+     consider using Firebase Authentication.
+   ========================================================= */
 
+/* ----------------- Firebase imports ----------------- */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, updateDoc, deleteDoc, doc, getDocs, onSnapshot, query, where, setDoc
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+/* ----------------- CONFIG - REEMPLAZA AQUÍ ----------------- */
 const firebaseConfig = {
   apiKey: "TU_API_KEY",
   authDomain: "TU_PROJECT_ID.firebaseapp.com",
   projectId: "TU_PROJECT_ID",
   storageBucket: "TU_PROJECT_ID.appspot.com",
-  messagingSenderId: "XXX",
-  appId: "XXX"
+  messagingSenderId: "SENDER_ID",
+  appId: "APP_ID"
 };
+/* -------------------------------------------------------- */
+
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-/* ========== Estado ========== */
-let currentUser = null;
+/* ================= Storage abstraction =================
+   We keep localStorage helpers (for fallback and offline),
+   but main source of truth is Firestore collections.
+*/
+function lsGet(k, fallback){ try{const v = localStorage.getItem(k); return v?JSON.parse(v):fallback;}catch(e){return fallback}}
+function lsSet(k,v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 
-/* ========== Tarjetas ========== */
+/* ================= Global state ================= */
+let STATE = {
+  currentUser: lsGet('pda_currentUser', null), // cached user object
+  users: [],
+  roles: {},
+  reports: [],
+  pda: [],
+  calls: [],
+  fines: [],
+  wanted: [],
+  logs: [],
+  onDuty: {} // map userId => boolean
+};
+
+/* ================= UI refs ================= */
+const cardsRoot = document.getElementById('cardsRoot');
+const expandedRoot = document.getElementById('expandedRoot');
+const userDisplay = document.getElementById('userDisplay');
+const dutyStatus = document.getElementById('dutyStatus');
+const loginModal = document.getElementById('loginModal');
+const btnLogin = document.getElementById('btnLogin');
+const btnExport = document.getElementById('btnExport');
+const logoImg = document.getElementById('logoImg');
+
+/* update logo if you later want to allow upload */
+logoImg.src = logoImg.src;
+
+/* ================= Perms helper ================= */
+function hasPerm(perm){
+  if(!STATE.currentUser) return perm === 'create_call' ? true : false; // guests can create calls
+  const roles = STATE.roles || {};
+  const roleKey = STATE.currentUser.role;
+  if(!roleKey) return false;
+  const role = roles[roleKey];
+  if(!role) return false;
+  if(Array.isArray(role.permissions) && role.permissions.includes('all')) return true;
+  return Array.isArray(role.permissions) && role.permissions.includes(perm);
+}
+
+/* ================= Cards definition ================= */
 const CARDS = [
-  {id:'pda', title:'PDA', desc:'Buscar y crear fichas', icon:'🚓'},
-  {id:'calls', title:'Llamadas', desc:'Gestión de alertas', icon:'📞'},
-  {id:'reports', title:'Informes', desc:'Crear y consultar', icon:'📑'},
-  {id:'fines', title:'Multas', desc:'Registrar sanciones', icon:'💸'},
-  {id:'wanted', title:'Wanted', desc:'BOLO / Buscados', icon:'🚨'},
-  {id:'admin', title:'Administración', desc:'Roles y usuarios', icon:'⚙️'},
-  {id:'logs', title:'Auditoría', desc:'Historial de acciones', icon:'📜'}
+  {id:'pda', title:'PDA / Fichas', desc:'Buscar personas / crear fichas', icon:'🔍'},
+  {id:'calls', title:'Dispatch / Llamadas', desc:'Crear y asignar llamadas', icon:'📞'},
+  {id:'reports', title:'Informes', desc:'Crear / ver informes', icon:'📑'},
+  {id:'wanted', title:'BOLO / Wanted', desc:'Fichas de buscados', icon:'🚨'},
+  {id:'fines', title:'Multas', desc:'Emitir sanciones', icon:'💸'},
+  {id:'service', title:'Servicio', desc:'Ponerse en servicio / salir', icon:'🟢'},
+  {id:'admin', title:'Administración', desc:'Usuarios y roles', icon:'⚙️'},
+  {id:'logs', title:'Auditoría', desc:'Historial de acciones', icon:'📜'},
+  {id:'tools', title:'Herramientas', desc:'Export / Import', icon:'🧰'}
 ];
+
+/* ================= Render cards ================= */
 function renderCards(){
-  const root=document.getElementById('cardsRoot'); root.innerHTML='';
+  cardsRoot.innerHTML = '';
   CARDS.forEach(c=>{
-    const el=document.createElement('div'); el.className='card';
-    el.innerHTML=`<h3>${c.icon} ${c.title}</h3><div>${c.desc}</div><button class="btn" style="margin-top:10px;background:#844ffc">Abrir</button>`;
-    el.onclick=()=>openCard(c.id); root.appendChild(el);
+    const el = document.createElement('div'); el.className='card fade-in';
+    el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+      <div><div class="title">${c.title}</div><div class="desc">${c.desc}</div></div>
+      <div class="icon">${c.icon}</div>
+    </div>
+    <div class="cta"><div class="muted tiny">Acción rápida</div><button class="btn-open" data-open="${c.id}">Abrir</button></div>`;
+    el.querySelector('button[data-open]').onclick = (e)=>{ e.stopPropagation(); openCard(c.id); };
+    el.onclick = ()=> openCard(c.id);
+    cardsRoot.appendChild(el);
   });
 }
 
-/* ========== Abrir módulos ========== */
+/* ================= Open card = full screen panel ================= */
 function openCard(id){
-  const root=document.getElementById('expandedRoot'); root.innerHTML='';
-  const box=document.createElement('div'); box.className='expanded';
-  if(id==='reports') renderReports(box);
-  else if(id==='pda') renderPDA(box);
-  else if(id==='calls') renderCalls(box);
-  else if(id==='admin' && currentUser?.role==='admin') renderAdmin(box);
-  else if(id==='logs' && currentUser?.role==='admin') renderLogs(box);
-  else if(id==='fines') renderFines(box);
-  else if(id==='wanted') renderWanted(box);
-  root.appendChild(box);
+  STATE.expanded = id;
+  expandedRoot.innerHTML = '';
+  const panel = document.createElement('div'); panel.className='full-screen-panel fade-in';
+  // header
+  panel.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+    <div><strong>${CARDS.find(x=>x.id===id)?.title || id}</strong><div class="muted small">${CARDS.find(x=>x.id===id)?.desc || ''}</div></div>
+    <div><button id="closePanel" class="btn-ghost">Cerrar</button></div>
+  </div>
+  <div id="panelBody" style="margin-top:12px"></div>`;
+  expandedRoot.appendChild(panel);
+  panel.querySelector('#closePanel').onclick = ()=> closeExpanded();
+  const body = panel.querySelector('#panelBody');
+  // render content by id
+  if(id==='pda') renderPDA(body);
+  else if(id==='calls') renderCalls(body);
+  else if(id==='reports') renderReports(body);
+  else if(id==='wanted') renderWanted(body);
+  else if(id==='fines') renderFines(body);
+  else if(id==='service') renderService(body);
+  else if(id==='admin') renderAdmin(body);
+  else if(id==='logs') renderLogs(body);
+  else if(id==='tools') renderTools(body);
+  window.scrollTo({ top: panel.offsetTop-20, behavior:'smooth' });
 }
 
-/* ========== Ejemplo completo: Informes ========== */
-function renderReports(c){
-  c.innerHTML=`<h3>Informes</h3>
-    <input id="repTitle" placeholder="Título"/>
-    <textarea id="repDesc" placeholder="Hechos y acciones..."></textarea>
-    <button id="saveRep" class="btn" style="margin-top:8px">Guardar</button>
-    <div id="reportsList" class="list"></div>`;
-  document.getElementById('saveRep').onclick=async()=>{
-    if(!currentUser){return alert("Debes iniciar sesión");}
-    const t=document.getElementById('repTitle').value.trim();
-    const d=document.getElementById('repDesc').value.trim();
-    if(!t||!d) return alert("Faltan campos");
-    await addDoc(collection(db,"reports"),{title:t,desc:d,author:currentUser.display,created:Date.now()});
-  };
-  onSnapshot(collection(db,"reports"),snap=>{
-    const list=document.getElementById('reportsList'); list.innerHTML='';
-    snap.forEach(docu=>{
-      const r=docu.data();
-      const div=document.createElement('div'); div.className='item';
-      div.innerHTML=`<div><b>${r.title}</b><div style="font-size:13px;color:#aaa">${r.desc}</div></div><div>${r.author}</div>`;
-      list.appendChild(div);
-    });
+/* =================== Firestore realtime wiring ===================
+   We'll create onSnapshot listeners for all the collections we need.
+   Each snapshot updates STATE.* and triggers UI refreshes.
+*/
+function listenCollectionsRealtime(){
+  // users
+  const usersCol = collection(db,'users');
+  onSnapshot(usersCol, snap=>{
+    const arr = [];
+    snap.forEach(d=>{ const obj = d.data(); obj._id = d.id; arr.push(obj); });
+    STATE.users = arr;
+    // cache
+    lsSet('pda_users', arr);
+    renderUsersMini();
+    renderAdminIfOpen(); // refresh admin UI if open
+  });
+
+  // roles
+  const rolesCol = collection(db,'roles');
+  onSnapshot(rolesCol, snap=>{
+    const map = {};
+    snap.forEach(d=>{ map[d.id] = d.data(); });
+    STATE.roles = map;
+    lsSet('pda_roles', map);
+    renderAdminIfOpen();
+  });
+
+  // reports
+  const reportsCol = collection(db,'reports');
+  onSnapshot(reportsCol, snap=>{
+    const arr = [];
+    snap.forEach(d=>{ const o=d.data(); o._id=d.id; arr.push(o); });
+    STATE.reports = arr.sort((a,b)=>b.created_at - a.created_at);
+    lsSet('pda_reports', STATE.reports);
+    if(STATE.expanded === 'reports') refreshReportsList();
+  });
+
+  // pda
+  const pdaCol = collection(db,'pda');
+  onSnapshot(pdaCol, snap=>{
+    const arr = [];
+    snap.forEach(d=>{ const o=d.data(); o._id=d.id; arr.push(o); });
+    STATE.pda = arr.sort((a,b)=>b.created_at - a.created_at);
+    lsSet('pda_pda', STATE.pda);
+    if(STATE.expanded === 'pda') renderPDA(document.getElementById('panelBody') || document.querySelector('.full-screen-panel #panelBody'));
+  });
+
+  // calls
+  const callsCol = collection(db,'calls');
+  onSnapshot(callsCol, snap=>{
+    const arr = [];
+    snap.forEach(d=>{ const o=d.data(); o._id=d.id; arr.push(o); });
+    STATE.calls = arr.sort((a,b)=>b.created_at - a.created_at);
+    lsSet('pda_calls', STATE.calls);
+    if(STATE.expanded === 'calls') renderCalls(document.getElementById('panelBody') || document.querySelector('.full-screen-panel #panelBody'));
+  });
+
+  // fines
+  const finesCol = collection(db,'fines');
+  onSnapshot(finesCol, snap=>{
+    const arr = [];
+    snap.forEach(d=>{ const o=d.data(); o._id=d.id; arr.push(o); });
+    STATE.fines = arr.sort((a,b)=>b.created_at - a.created_at);
+    lsSet('pda_fines', STATE.fines);
+    if(STATE.expanded === 'fines') renderFines(document.getElementById('panelBody') || document.querySelector('.full-screen-panel #panelBody'));
+  });
+
+  // wanted
+  const wantedCol = collection(db,'wanted');
+  onSnapshot(wantedCol, snap=>{
+    const arr = [];
+    snap.forEach(d=>{ const o=d.data(); o._id=d.id; arr.push(o); });
+    STATE.wanted = arr.sort((a,b)=>b.created_at - a.created_at);
+    lsSet('pda_wanted', STATE.wanted);
+    if(STATE.expanded === 'wanted') renderWanted(document.getElementById('panelBody') || document.querySelector('.full-screen-panel #panelBody'));
+  });
+
+  // logs
+  const logsCol = collection(db,'logs');
+  onSnapshot(logsCol, snap=>{
+    const arr = [];
+    snap.forEach(d=>{ const o=d.data(); o._id=d.id; arr.push(o); });
+    STATE.logs = arr.sort((a,b)=>b.t - a.t);
+    lsSet('pda_logs', STATE.logs);
+    if(STATE.expanded === 'logs') renderLogs(document.getElementById('panelBody') || document.querySelector('.full-screen-panel #panelBody'));
+  });
+
+  // onDuty (we'll store as collection with doc per user ID to be simpler)
+  const onDutyCol = collection(db,'onDuty');
+  onSnapshot(onDutyCol, snap=>{
+    const map = {};
+    snap.forEach(d=>{ const o=d.data(); map[d.id] = o.on; });
+    STATE.onDuty = map;
+    lsSet('pda_onDuty', map);
+    updateHeader();
+    if(STATE.expanded === 'service') renderService(document.getElementById('panelBody') || document.querySelector('.full-screen-panel #panelBody'));
   });
 }
 
-/* ========== Otros módulos (similares a informes, usando sus colecciones) ========== */
-function renderPDA(c){ c.innerHTML=`<h3>PDA</h3><div style="color:#aaa">Colección "pda"</div>`;}
-function renderCalls(c){ c.innerHTML=`<h3>Llamadas</h3><div style="color:#aaa">Colección "calls"</div>`;}
-function renderFines(c){ c.innerHTML=`<h3>Multas</h3><div style="color:#aaa">Colección "fines"</div>`;}
-function renderWanted(c){ c.innerHTML=`<h3>Wanted</h3><div style="color:#aaa">Colección "wanted"</div>`;}
-function renderAdmin(c){ c.innerHTML=`<h3>Administración</h3><div style="color:#aaa">Colección "users" y "roles"</div>`;}
-function renderLogs(c){ c.innerHTML=`<h3>Logs</h3><div style="color:#aaa">Colección "logs"</div>`;}
+/* ================= Utility helpers ================= */
+function uid(pref='id'){ return pref + '_' + Math.random().toString(36).slice(2,9); }
+function now(){ return Date.now(); }
 
-/* ========== Login ========== */
-document.getElementById('btnLogin').onclick=()=>{document.getElementById('loginModal').style.display='flex';};
-document.getElementById('guestBtn').onclick=()=>{currentUser=null;document.getElementById('userDisplay').textContent="Invitado";document.getElementById('loginModal').style.display='none';};
-document.getElementById('loginBtn').onclick=async()=>{
-  const u=document.getElementById('loginUser').value.trim();
-  const p=document.getElementById('loginPass').value.trim();
-  const snap=await getDocs(collection(db,"users"));
-  let found=null;
-  snap.forEach(d=>{const user=d.data(); if(user.username===u && user.password===p) found=user;});
-  if(found){currentUser=found;document.getElementById('userDisplay').textContent=`${found.display} (${found.role})`;document.getElementById('loginModal').style.display='none';}
-  else {document.getElementById('loginError').style.display='block';document.getElementById('loginError').textContent="Usuario o contraseña incorrectos";}
-};
-document.getElementById('showReg').onclick=()=>{document.getElementById('registerBlock').style.display='block';};
-document.getElementById('regCreate').onclick=async()=>{
-  const name=document.getElementById('regName').value.trim();
-  const user=document.getElementById('regUser').value.trim();
-  const pass=document.getElementById('regPass').value.trim();
-  const role=document.getElementById('regRole').value;
-  if(!user||!pass){document.getElementById('regMsg').textContent="Usuario y contraseña obligatorios";return;}
-  await addDoc(collection(db,"users"),{username:user,display:name||user,password:pass,role});
-  document.getElementById('regMsg').textContent="Cuenta creada, ya puedes iniciar sesión.";
+/* pushLog: only add to Firestore logs collection if user is admin or sergeant
+   (requirement: "registro de auditoria solo sea para cuentas creadas por admin o comisarios")
+*/
+async function pushLog(msg){
+  const allowedRoles = ['admin','sergeant'];
+  if(STATE.currentUser && allowedRoles.includes(STATE.currentUser.role)){
+    try{
+      await addDoc(collection(db,'logs'), { msg, t: now(), by: STATE.currentUser.username || STATE.currentUser.display });
+    }catch(e){ console.error('pushLog error',e); }
+  } else {
+    // still keep in local cache for convenience
+    const logs = lsGet('pda_logs', []);
+    logs.unshift({msg, t: now(), by: STATE.currentUser?STATE.currentUser.username:'guest'});
+    lsSet('pda_logs', logs);
+  }
+}
+
+/* ================= Render small header pieces ================= */
+function updateHeader(){
+  STATE.currentUser = lsGet('pda_currentUser', STATE.currentUser) || STATE.currentUser;
+  if(STATE.currentUser){ userDisplay.textContent = `${STATE.currentUser.display} (${STATE.currentUser.role})`; btnLogin.textContent = 'Cerrar sesión'; }
+  else { userDisplay.textContent = 'No conectado'; btnLogin.textContent = 'Iniciar sesión'; }
+  const active = Object.keys(STATE.onDuty || {}).filter(k => STATE.onDuty[k]);
+  dutyStatus.textContent = `En servicio: ${active.length}`;
+}
+
+/* ================= Render helpers for admin mini refresh ================= */
+function renderAdminIfOpen(){
+  if(!STATE.expanded) return;
+  if(STATE.expanded === 'admin'){
+    const panel = document.querySelector('.full-screen-panel #panelBody');
+    if(panel) renderAdmin(panel);
+  } else if(STATE.expanded === 'logs'){
+    const panel = document.querySelector('.full-screen-panel #panelBody');
+    if(panel) renderLogs(panel);
+  }
+}
+
+/* ===================== PDA module ===================== */
+function renderPDA(container){
+  const templates = lsGet('pda_templates', {
+    pda: "Nombre: {{name}}\nAlias: {{alias}}\nNotas: {{notes}}"
+  });
+  container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+    <div><strong>PDA / Fichas</strong><div class="muted small">Buscar y crear fichas</div></div>
+    <div><button class="btn btn-small" id="closeP">Cerrar</button></div>
+  </div>
+  <div style="margin-top:12px;display:grid;grid-template-columns:1fr 320px;gap:12px">
+    <div>
+      <div class="muted small">Buscar</div>
+      <input id="pdaQ" placeholder="Buscar por nombre, alias o texto..." />
+      <div id="pdaResults" style="margin-top:12px"></div>
+    </div>
+    <div>
+      <div class="muted small">Crear nueva ficha (plantilla editable)</div>
+      <textarea id="pdaTpl">${templates.pda}</textarea>
+      <div style="display:flex;gap:8px;margin-top:8px"><button id="createPDA" class="btn">Crear ficha</button><button id="clearPDA" class="btn-ghost">Limpiar</button></div>
+    </div>
+  </div>`;
+  container.querySelector('#closeP').onclick = ()=> closeExpanded();
+  container.querySelector('#pdaQ').oninput = ()=> searchPDA(document.getElementById('pdaQ').value);
+  container.querySelector('#createPDA').onclick = createPDA;
+  loadPDAResults();
+}
+
+async function createPDA(){
+  if(!hasPerm('create_pda')){ alert('No tienes permiso para crear fichas PDA'); return; }
+  const txt = document.getElementById('pdaTpl').value.trim();
+  if(!txt){ alert('Rellena la plantilla'); return; }
+  const title = (txt.split('\n')[0]||'Ficha').replace('Nombre:','').trim();
+  try{
+    await addDoc(collection(db,'pda'), { title, text: txt, created_at: now(), author: STATE.currentUser?STATE.currentUser.username:'Invitado' });
+    pushLog(`Ficha PDA creada: ${title}`);
+    document.getElementById('pdaTpl').value = '';
+  }catch(e){ console.error('createPDA',e); alert('Error creando PDA'); }
+}
+
+function loadPDAResults(){
+  const arr = STATE.pda || [];
+  const res = document.getElementById('pdaResults');
+  if(!res) return;
+  res.innerHTML = arr.map(p=>`<div class="item"><div style="flex:1"><b>${(p.title||'Ficha')}</b><div class="muted small">${(p.text||'').slice(0,140)}</div></div>
+    <div><button class="btn-ghost" onclick="viewPDA('${p._id}')">Ver</button> <button class="btn-ghost" onclick="delPDA('${p._id}')">Borrar</button></div></div>`).join('') || '<div class="muted small">Sin fichas</div>';
+}
+
+window.viewPDA = async function(id){
+  const docRef = doc(db,'pda',id);
+  try{
+    const snap = await getDocs(query(collection(db,'pda'), where('__name__','==',id)));
+    // we have STATE.pda so find locally
+    const p = (STATE.pda || []).find(x=>x._id===id);
+    if(!p) return alert('Ficha no encontrada');
+    alert(`Título: ${p.title}\n\n${p.text}\n\nCreada: ${new Date(p.created_at).toLocaleString()}\nAutor: ${p.author}`);
+  }catch(e){ console.error('viewPDA',e); alert('Error leyendo PDA'); }
 };
 
-/* ========== Init ========== */
-renderCards();
+window.delPDA = async function(id){
+  if(!confirm('Borrar ficha PDA?')) return;
+  try{ await deleteDoc(doc(db,'pda',id)); pushLog(`Ficha PDA borrada: ${id}`); }catch(e){ console.error(e); alert('Error borrando'); }
+};
+
+/* ===================== Calls (Dispatch) ===================== */
+function renderCalls(container){
+  container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+    <div><strong>Dispatch / Llamadas</strong><div class="muted small">Crear llamadas y asignar unidades</div></div>
+    <div><button class="btn btn-small" id="closeC">Cerrar</button></div>
+  </div>
+  <div style="margin-top:12px;display:flex;gap:8px">
+    <input id="callFrom" placeholder="Remitente (opcional)"/>
+    <input id="callMsg" placeholder="Mensaje"/>
+    <button id="callCreate" class="btn">Crear llamada</button>
+  </div>
+  <div style="margin-top:12px"><strong>Llamadas</strong><div id="callsList" class="list" style="margin-top:8px"></div></div>`;
+  container.querySelector('#closeC').onclick = ()=> closeExpanded();
+  container.querySelector('#callCreate').onclick = createCall;
+  loadCalls();
+}
+
+async function createCall(){
+  const caller = document.getElementById('callFrom').value.trim() || 'Anonimo';
+  const message = document.getElementById('callMsg').value.trim();
+  if(!message){ alert('Introduce un mensaje'); return; }
+  try{
+    await addDoc(collection(db,'calls'), { caller, message, status:'pending', assigned_to:null, created_at: now() });
+    pushLog(`Llamada creada por ${caller}`);
+    document.getElementById('callMsg').value=''; document.getElementById('callFrom').value='';
+  }catch(e){ console.error('createCall',e); alert('Error creando llamada'); }
+}
+
+function loadCalls(){
+  const list = document.getElementById('callsList'); if(!list) return;
+  const calls = STATE.calls || [];
+  list.innerHTML = '';
+  if(!calls.length){ list.innerHTML = '<div class="muted small">No hay llamadas</div>'; return; }
+  calls.forEach(c=>{
+    const assignee = c.assigned_to ? ( (STATE.users.find(u=>u._id===c.assigned_to)?.display) || '—') : '—';
+    const it = document.createElement('div'); it.className='item';
+    it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${c.caller}</div><div class="muted small">${c.message}</div></div>
+      <div style="text-align:right"><div class="muted tiny">${new Date(c.created_at).toLocaleString()}</div><div style="margin-top:8px" class="muted small">Asig: ${assignee}</div></div>`;
+    const btns = document.createElement('div'); btns.style.marginLeft='12px';
+    // assign to any user who is currently onDuty (requirement)
+    const onDutyUserIds = Object.keys(STATE.onDuty || {}).filter(k=>STATE.onDuty[k]);
+    if(onDutyUserIds.length && STATE.currentUser && hasPerm('assign_call')){
+      const sel = document.createElement('select'); sel.className='btn-ghost'; sel.style.padding='6px 8px'; sel.style.borderRadius='8px';
+      sel.innerHTML = `<option value="">Asignar a...</option>` + onDutyUserIds.map(id=>`<option value="${id}">${(STATE.users.find(u=>u._id===id)?.display)||id}</option>`).join('');
+      sel.onchange = async (e)=>{ const to = e.target.value; if(!to) return; await assignCallTo(c._id,to); };
+      btns.appendChild(sel);
+    } else if(hasPerm('assign_call') && STATE.currentUser){
+      // allow assign to self if no one is on duty list found but assign_call perm exists
+      const assignSelf = document.createElement('button'); assignSelf.className='btn-ghost'; assignSelf.textContent='Asignar a mí';
+      assignSelf.onclick = ()=> assignCallTo(c._id, STATE.currentUser._id || STATE.currentUser.id);
+      btns.appendChild(assignSelf);
+    }
+    // delete button: admin or assigned user
+    if(STATE.currentUser && (STATE.currentUser.role==='admin' || (c.assigned_to && STATE.currentUser._id === c.assigned_to))){
+      const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
+      del.onclick = ()=>{ if(confirm('Borrar llamada?')) deleteCall(c._id); };
+      btns.appendChild(del);
+    }
+    it.appendChild(btns);
+    list.appendChild(it);
+  });
+}
+
+async function assignCallTo(callId, userId){
+  try{
+    await updateDoc(doc(db,'calls',callId), { status:'assigned', assigned_to: userId });
+    pushLog(`Llamada ${callId} asignada a ${userId}`);
+  }catch(e){ console.error('assignCallTo',e); alert('Error asignando'); }
+}
+
+async function deleteCall(id){
+  try{ await deleteDoc(doc(db,'calls',id)); pushLog(`Llamada ${id} borrada`); }catch(e){ console.error(e); alert('Error'); }
+}
+
+/* ===================== Reports ===================== */
+function renderReports(container){
+  container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+    <div><strong>Informes</strong><div class="muted small">Crear y consultar informes</div></div>
+    <div><button class="btn btn-small" id="closeR">Cerrar</button></div>
+  </div>
+  <div style="margin-top:12px">
+    <div class="muted small">Plantilla (editable)</div>
+    <textarea id="tplReport" style="min-height:80px"></textarea>
+  </div>
+  <div style="margin-top:8px" class="form-row">
+    <input id="repTitle" placeholder="Título" />
+    <input id="repAuthor" placeholder="Autor (auto)" />
+  </div>
+  <div style="margin-top:8px"><textarea id="repDesc" placeholder="Descripción..."></textarea></div>
+  <div style="margin-top:8px;display:flex;gap:8px"><button id="saveRep" class="btn">Guardar informe</button><button id="clearRep" class="btn-ghost">Limpiar</button></div>
+  <div style="margin-top:12px"><strong>Últimos informes</strong><div id="reportsList" class="list" style="margin-top:8px"></div></div>`;
+  container.querySelector('#closeR').onclick = ()=> closeExpanded();
+  const templates = lsGet('pda_templates', {});
+  document.getElementById('tplReport').value = templates.report || "Título: {{title}}\nHechos: {{facts}}\nAcciones: {{actions}}\nOficial: {{author}}";
+  document.getElementById('repAuthor').value = STATE.currentUser ? STATE.currentUser.display : 'Invitado';
+  document.getElementById('saveRep').onclick = saveReport;
+  document.getElementById('clearRep').onclick = ()=>{ document.getElementById('repTitle').value=''; document.getElementById('repDesc').value=''; };
+  refreshReportsList();
+}
+
+async function saveReport(){
+  if(!hasPerm('create_reports')){ alert('No tienes permiso para crear informes'); return; }
+  const title = document.getElementById('repTitle').value.trim();
+  const desc = document.getElementById('repDesc').value.trim();
+  if(!title || !desc){ alert('Título y descripción obligatorios'); return; }
+  try{
+    await addDoc(collection(db,'reports'), { id: uid('rep'), title, description: desc, author: STATE.currentUser?STATE.currentUser.display:'Invitado', created_at: now() });
+    const templates = lsGet('pda_templates', {}); templates.report = document.getElementById('tplReport').value; lsSet('pda_templates', templates);
+    pushLog(`Informe creado: ${title}`);
+    // clear fields
+    document.getElementById('repTitle').value=''; document.getElementById('repDesc').value='';
+  }catch(e){ console.error('saveReport',e); alert('Error guardando informe'); }
+}
+
+function refreshReportsList(){
+  const list = document.getElementById('reportsList'); if(!list) return;
+  const reports = STATE.reports || [];
+  list.innerHTML = '';
+  if(!reports.length){ list.innerHTML = '<div class="muted small">No hay informes</div>'; return; }
+  reports.forEach(r=>{
+    const it = document.createElement('div'); it.className='item';
+    it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${r.title}</div><div class="muted small">${(r.description||'').slice(0,160)}</div></div>
+      <div style="text-align:right"><div class="muted tiny">${new Date(r.created_at).toLocaleString()}</div><div style="margin-top:6px" class="muted tiny">${r.author||''}</div></div>`;
+    const btns = document.createElement('div'); btns.style.marginLeft='12px';
+    const view = document.createElement('button'); view.className='btn-ghost btn-small'; view.textContent='Ver';
+    view.onclick = ()=> { alert(`Informe — ${r.title}\n\n${r.description}\n\nAutor: ${r.author}\nFecha: ${new Date(r.created_at).toLocaleString()}`); };
+    btns.appendChild(view);
+    if(STATE.currentUser && (STATE.currentUser.role==='admin' || STATE.currentUser.role==='sergeant' || hasPerm('delete_reports'))){
+      const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
+      del.onclick = ()=>{ if(confirm('Borrar informe?')) deleteReport(r._id); };
+      btns.appendChild(del);
+    }
+    it.appendChild(btns);
+    list.appendChild(it);
+  });
+}
+
+async function deleteReport(id){
+  try{ await deleteDoc(doc(db,'reports',id)); pushLog(`Informe ${id} borrado`); }catch(e){ console.error('deleteReport',e); alert('Error'); }
+}
+
+/* ===================== Wanted ===================== */
+function renderWanted(container){
+  container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+    <div><strong>BOLO / Wanted</strong><div class="muted small">Crear fichas buscadas</div></div>
+    <div><button class="btn btn-small" id="closeW">Cerrar</button></div>
+  </div>
+  <div style="margin-top:12px" class="form-row">
+    <input id="wName" placeholder="Nombre / Alias" />
+    <input id="wBounty" placeholder="Recompensa" />
+  </div>
+  <div style="margin-top:8px"><textarea id="wDesc" placeholder="Descripción"></textarea></div>
+  <div style="margin-top:8px;display:flex;gap:8px"><button id="saveW" class="btn">Crear ficha</button></div>
+  <div style="margin-top:12px"><strong>Fichas</strong><div id="wantedList" class="list" style="margin-top:8px"></div></div>`;
+  container.querySelector('#closeW').onclick = ()=> closeExpanded();
+  container.querySelector('#saveW').onclick = createWanted;
+  loadWanted();
+}
+
+async function createWanted(){
+  if(!hasPerm('create_bolo')){ alert('No tienes permiso'); return; }
+  const name=document.getElementById('wName').value.trim(); const desc=document.getElementById('wDesc').value.trim(); const bounty=parseInt(document.getElementById('wBounty').value||'0',10);
+  if(!name){ alert('Nombre requerido'); return; }
+  try{
+    await addDoc(collection(db,'wanted'), { id: uid('w'), name, description: desc, bounty, created_at: now() });
+    pushLog(`Wanted creado: ${name}`);
+    document.getElementById('wName').value=''; document.getElementById('wDesc').value=''; document.getElementById('wBounty').value='';
+  }catch(e){ console.error('createWanted',e); alert('Error'); }
+}
+
+function loadWanted(){
+  const out = document.getElementById('wantedList'); if(!out) return;
+  const arr = STATE.wanted || [];
+  out.innerHTML = '';
+  if(!arr.length){ out.innerHTML = '<div class="muted small">No hay fichas</div>'; return; }
+  arr.forEach(w=>{
+    const it = document.createElement('div'); it.className='item';
+    it.innerHTML = `<div style="flex:1"><b>${w.name}</b><div class="muted small">${w.description}</div></div><div class="pill">${w.bounty||0}€</div>`;
+    const btns = document.createElement('div'); btns.style.marginLeft='12px';
+    const view = document.createElement('button'); view.className='btn-ghost'; view.textContent='Ver'; view.onclick=()=> alert(`Wanted — ${w.name}\n\n${w.description}\nRecompensa: ${w.bounty}€`);
+    btns.appendChild(view);
+    if(hasPerm('manage_wanted')){
+      const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
+      del.onclick = ()=>{ if(confirm('Borrar ficha?')) deleteWanted(w._id); };
+      btns.appendChild(del);
+    }
+    it.appendChild(btns);
+    out.appendChild(it);
+  });
+}
+
+async function deleteWanted(id){
+  try{ await deleteDoc(doc(db,'wanted',id)); pushLog(`Wanted ${id} borrado`); }catch(e){ console.error(e); alert('Error'); }
+}
+
+/* ===================== Fines ===================== */
+function renderFines(container){
+  container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+    <div><strong>Multas</strong><div class="muted small">Genera sanciones y multas</div></div>
+    <div><button class="btn btn-small" id="closeF">Cerrar</button></div>
+  </div>
+  <div style="margin-top:12px" class="form-row"><input id="fineOff" placeholder="Infractor (nombre/vehículo)"/><input id="fineAmt" placeholder="Importe"/></div>
+  <div style="margin-top:8px"><textarea id="fineReason" placeholder="Motivo..."></textarea></div>
+  <div style="margin-top:8px;display:flex;gap:8px"><button id="saveFine" class="btn">Emitir multa</button></div>
+  <div style="margin-top:12px"><strong>Multas</strong><div id="finesList" class="list" style="margin-top:8px"></div></div>`;
+  container.querySelector('#closeF').onclick = ()=> closeExpanded();
+  container.querySelector('#saveFine').onclick = saveFine; loadFines();
+}
+
+async function saveFine(){
+  if(!hasPerm('create_fine')){ alert('No tienes permiso para multar'); return; }
+  const off=document.getElementById('fineOff').value.trim(); const amt=parseInt(document.getElementById('fineAmt').value||'0',10); const reason=document.getElementById('fineReason').value.trim();
+  if(!off || !amt){ alert('Infractor e importe requeridos'); return; }
+  try{
+    await addDoc(collection(db,'fines'), { id: uid('f'), offender: off, amount: amt, reason, author: STATE.currentUser?STATE.currentUser.display:'Invitado', created_at: now() });
+    pushLog(`Multa creada: ${off} ${amt}€`);
+    document.getElementById('fineOff').value=''; document.getElementById('fineAmt').value=''; document.getElementById('fineReason').value='';
+  }catch(e){ console.error('saveFine',e); alert('Error'); }
+}
+
+function loadFines(){
+  const list=document.getElementById('finesList'); if(!list) return;
+  const arr = STATE.fines || [];
+  list.innerHTML = '';
+  if(!arr.length){ list.innerHTML = '<div class="muted small">No hay multas</div>'; return; }
+  arr.forEach(f=>{
+    const it=document.createElement('div'); it.className='item';
+    it.innerHTML = `<div style="flex:1"><b>${f.offender} • ${f.amount}€</b><div class="muted small">${f.reason}</div></div><div class="muted tiny">${new Date(f.created_at).toLocaleString()}</div>`;
+    const btns=document.createElement('div'); btns.style.marginLeft='12px';
+    if(STATE.currentUser && (STATE.currentUser.role==='admin' || STATE.currentUser.display===f.author || hasPerm('delete_reports'))){
+      const del=document.createElement('button'); del.className='btn'; del.textContent='Borrar';
+      del.onclick = ()=> { if(confirm('Borrar multa?')) deleteFine(f._id); };
+      btns.appendChild(del);
+    }
+    it.appendChild(btns);
+    list.appendChild(it);
+  });
+}
+
+async function deleteFine(id){
+  try{ await deleteDoc(doc(db,'fines',id)); pushLog(`Multa ${id} borrada`); }catch(e){ console.error(e); alert('Error'); }
+}
+
+/* ================= Service (on duty) ================= */
+function renderService(container){
+  container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+    <div><strong>Servicio</strong><div class="muted small">Ponte en servicio o sal</div></div>
+    <div><button class="btn btn-small" id="closeS">Cerrar</button></div>
+  </div>
+  <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+    <div class="muted small">Tu estado:</div><div id="serviceBox" class="pill">Desconocido</div>
+    <div style="margin-left:auto"><button id="toggleDuty" class="btn">Cambiar estado</button></div>
+  </div>
+  <div style="margin-top:12px"><strong>Policías en servicio</strong><div id="dutyList" class="list" style="margin-top:8px"></div></div>`;
+  container.querySelector('#closeS').onclick = ()=> closeExpanded();
+  const box = container.querySelector('#serviceBox'); const on = STATE.onDuty || {}; const uId = STATE.currentUser ? STATE.currentUser._id : null;
+  box.textContent = (uId && on[uId]) ? 'En servicio' : 'Fuera de servicio';
+  container.querySelector('#toggleDuty').onclick = async ()=>{
+    if(!STATE.currentUser){ alert('Inicia sesión'); return; }
+    const userDocId = STATE.currentUser._id;
+    try{
+      // set / update doc in onDuty collection with id = userDocId
+      await setDoc(doc(db,'onDuty',userDocId), { on: !(STATE.onDuty[userDocId] || false) });
+      pushLog(`${STATE.currentUser.display} ${!(STATE.onDuty[userDocId]||false) ? 'entró' : 'salió'} de servicio`);
+    }catch(e){ console.error('toggleDuty',e); alert('Error'); }
+  };
+  loadDutyList();
+}
+
+function loadDutyList(){
+  const list=document.getElementById('dutyList'); if(!list) return;
+  const activeIds = Object.keys(STATE.onDuty || {}).filter(k=>STATE.onDuty[k]);
+  const users = STATE.users || [];
+  list.innerHTML = activeIds.map(id=>`<div class="item">${(users.find(u=>u._id===id)?.display) || id}</div>`).join('') || '<div class="muted small">Nadie en servicio</div>';
+  updateHeader();
+}
+
+/* ================= Admin: Roles & Users ================= */
+function renderAdmin(container){
+  // only admin can see
+  if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){
+    container.innerHTML = '<div class="muted">Acceso denegado. Inicia sesión como admin.</div>'; return;
+  }
+  const users = STATE.users || [];
+  const roles = STATE.roles || {};
+  container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+    <div><strong>Administración</strong><div class="muted small">Gestiona roles, permisos y usuarios</div></div>
+    <div><button class="btn btn-small" id="closeA">Cerrar</button></div>
+  </div>
+  <div style="margin-top:12px;display:flex;gap:12px">
+    <div style="flex:1">
+      <h4>Usuarios</h4>
+      <div id="usersAdminList" class="list"></div>
+    </div>
+    <div style="width:360px">
+      <h4>Crear usuario</h4>
+      <input id="adm_newUser" placeholder="username"><input id="adm_newDisplay" placeholder="display"><input id="adm_newPass" placeholder="password">
+      <select id="adm_newRole">${Object.keys(roles).map(r=>`<option value="${r}">${r}</option>`).join('')}</select>
+      <div style="display:flex;gap:8px;margin-top:8px"><button id="adm_createUser" class="btn">Crear</button><button id="adm_refresh" class="btn-ghost">Refrescar</button></div>
+
+      <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+      <h4>Roles</h4>
+      <div style="display:flex;gap:8px"><input id="adm_newRoleName" placeholder="nuevo rol"><button id="adm_createRole" class="btn">Crear rol</button></div>
+      <div id="rolesAdminList" style="margin-top:12px"></div>
+    </div>
+  </div>`;
+  container.querySelector('#closeA').onclick = ()=> closeExpanded();
+  container.querySelector('#adm_createUser').onclick = adminCreateUser;
+  container.querySelector('#adm_refresh').onclick = ()=> renderAdmin(container);
+  container.querySelector('#adm_createRole').onclick = adminCreateRole;
+  loadUsersAdmin();
+  loadRolesAdmin();
+}
+
+function loadUsersAdmin(){
+  const users = STATE.users || []; const roles = STATE.roles || {};
+  const ul = document.getElementById('usersAdminList'); ul.innerHTML = '';
+  if(!users.length){ ul.innerHTML = '<div class="muted small">No hay usuarios</div>'; return; }
+  users.forEach((u)=>{
+    const div = document.createElement('div'); div.className='item';
+    div.innerHTML = `<div><b>${u.display} (${u.username})</b><div class="muted small">Rol: <span class="role-chip">${u.role}</span> • Badge: ${u.badge||'—'}</div></div>
+      <div style="text-align:right">
+        <select data-uid="${u._id}" class="adm_role_sel">${Object.keys(roles).map(r=>`<option value="${r}" ${u.role===r?'selected':''}>${r}</option>`).join('')}</select>
+        <div style="margin-top:6px"><button class="btn-ghost btn-small" data-uid="${u._id}" data-act="del">Borrar</button> <button class="btn btn-small" data-uid="${u._id}" data-act="imp">Impersonar</button></div>
+      </div>`;
+    ul.appendChild(div);
+  });
+  // attach events
+  ul.querySelectorAll('.adm_role_sel').forEach(sel=>{
+    sel.onchange = async (e)=>{ const uid = e.target.dataset.uid; changeUserRole(uid, e.target.value); };
+  });
+  ul.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=>{
+    const uid = b.dataset.uid;
+    if(!confirm('Borrar usuario?')) return;
+    const user = STATE.users.find(x=>x._id===uid);
+    if(user && user.username==='admin'){ alert('No puedes borrar admin seed'); return; }
+    try{ await deleteDoc(doc(db,'users',uid)); pushLog(`Usuario borrado: ${uid}`); }catch(e){ console.error(e); alert('Error borrando'); }
+  });
+  ul.querySelectorAll('button[data-act="imp"]').forEach(b=> b.onclick = ()=>{
+    const uid = b.dataset.uid; const u = STATE.users.find(x=>x._id===uid); if(!u) return; // impersonate by setting local currentUser
+    STATE.currentUser = u; lsSet('pda_currentUser', u); updateHeader(); pushLog(`Impersonación: ${u.username}`); alert('Ahora eres: '+u.display);
+  });
+}
+
+async function changeUserRole(uid,newRole){
+  try{
+    await updateDoc(doc(db,'users',uid), { role: newRole });
+    pushLog(`Rol cambiado: ${uid} -> ${newRole}`);
+  }catch(e){ console.error('changeUserRole',e); alert('Error'); }
+}
+
+async function adminCreateUser(){
+  if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){ alert('Solo admin puede crear usuarios aquí'); return; }
+  const username=document.getElementById('adm_newUser').value.trim(); const display=document.getElementById('adm_newDisplay').value.trim()||username; const pass=document.getElementById('adm_newPass').value.trim()||'1234'; const role=document.getElementById('adm_newRole').value;
+  if(!username){ alert('username requerido'); return; }
+  // check duplicates
+  if(STATE.users.find(u=>u.username===username)){ alert('Usuario ya existe'); return; }
+  try{
+    await addDoc(collection(db,'users'), { username, display, badge:'', password: pass, role });
+    pushLog(`Usuario admin creado: ${username}`);
+    loadUsersAdmin();
+  }catch(e){ console.error(e); alert('Error'); }
+}
+
+async function adminCreateRole(){
+  if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){ alert('Solo admin puede crear roles'); return; }
+  const name=document.getElementById('adm_newRoleName').value.trim(); if(!name){ alert('Nombre rol requerido'); return; }
+  if(STATE.roles[name]){ alert('Rol ya existe'); return; }
+  try{
+    await setDoc(doc(db,'roles',name), { name, color:'#999999', permissions: [] });
+    pushLog(`Rol creado: ${name}`); loadRolesAdmin(); loadUsersAdmin();
+  }catch(e){ console.error('adminCreateRole',e); alert('Error'); }
+}
+
+function loadRolesAdmin(){
+  const roles = STATE.roles || {}; const out = document.getElementById('rolesAdminList'); out.innerHTML = '';
+  for(const key in roles){
+    const r = roles[key];
+    const div = document.createElement('div'); div.className='item';
+    div.innerHTML = `<div style="flex:1"><b>${key}</b><div class="muted small">Permisos:</div><div id="permBox_${key}" style="margin-top:6px"></div></div>
+      <div style="text-align:right"><button class="btn-ghost" data-role="${key}" data-act="edit">Editar</button> <button class="btn" data-role="${key}" data-act="del">Borrar</button></div>`;
+    out.appendChild(div);
+    const box = div.querySelector(`#permBox_${key}`);
+    box.innerHTML = (r.permissions && r.permissions.length) ? r.permissions.map(p=>`<span class="role-chip">${p}</span>`).join('') : '<span class="muted tiny">Sin permisos</span>';
+  }
+  // attach events
+  out.querySelectorAll('button[data-act="edit"]').forEach(b=> b.onclick = ()=> openRoleEditor(b.dataset.role));
+  out.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=>{
+    const roleKey = b.dataset.role; if(!confirm('Borrar rol? (Los usuarios con este rol quedarán con rol vacío)')) return;
+    try{
+      await deleteDoc(doc(db,'roles',roleKey));
+      // remove role from users that had it
+      const updates = STATE.users.filter(u=>u.role===roleKey).map(u=> updateDoc(doc(db,'users',u._id), { role: '' }) );
+      await Promise.all(updates);
+      pushLog(`Rol borrado: ${roleKey}`); loadRolesAdmin(); loadUsersAdmin();
+    }catch(e){ console.error(e); alert('Error'); }
+  });
+}
+
+function openRoleEditor(roleKey){
+  const role = STATE.roles[roleKey];
+  if(!role){ alert('Rol no existe'); return; }
+  const modal = document.createElement('div'); modal.className='overlay';
+  modal.innerHTML = `<div class="modal">
+    <h3>Editar rol: ${roleKey}</h3>
+    <div class="muted small">Marca los permisos que tendrá este rol</div>
+    <div style="margin-top:12px" id="permChecks"></div>
+    <div style="display:flex;gap:8px;margin-top:12px"><button id="saveRole" class="btn">Guardar</button><button id="cancelRole" class="btn-ghost">Cancelar</button></div>
+  </div>`;
+  document.body.appendChild(modal);
+  const permsList = ['create_reports','delete_reports','create_pda','create_call','assign_call','create_bolo','manage_wanted','create_fine','export','all'];
+  const box = modal.querySelector('#permChecks');
+  box.innerHTML = permsList.map(p=>`<div style="margin-bottom:6px"><label><input type="checkbox" data-perm="${p}" ${role.permissions && role.permissions.includes(p)?'checked':''}/> ${p}</label></div>`).join('');
+  modal.querySelector('#cancelRole').onclick = ()=> modal.remove();
+  modal.querySelector('#saveRole').onclick = async ()=>{
+    const checked = Array.from(box.querySelectorAll('input[type=checkbox]:checked')).map(c=>c.dataset.perm);
+    try{
+      await updateDoc(doc(db,'roles',roleKey), { permissions: checked });
+      pushLog(`Rol editado: ${roleKey}`);
+      modal.remove(); loadRolesAdmin(); loadUsersAdmin();
+    }catch(e){ console.error('saveRole',e); alert('Error'); }
+  };
+}
+
+/* ================= Logs & Tools ================= */
+function renderLogs(container){
+  if(!STATE.currentUser || (STATE.currentUser.role !== 'admin' && STATE.currentUser.role !== 'sergeant')){
+    container.innerHTML = '<div class="muted">Acceso denegado. Auditoría sólo para admin o comisarios.</div>'; return;
+  }
+  container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+    <div><strong>Auditoría</strong><div class="muted small">Últimas acciones</div></div>
+    <div><button class="btn btn-small" id="closeL">Cerrar</button></div>
+  </div>
+  <div style="margin-top:12px" id="logsList" class="list"></div>`;
+  container.querySelector('#closeL').onclick = ()=> closeExpanded();
+  const list = container.querySelector('#logsList'); list.innerHTML = '';
+  const logs = STATE.logs || [];
+  if(!logs.length){ list.innerHTML = '<div class="muted small">Sin logs</div>'; return; }
+  logs.slice(0,200).forEach(l=>{ const it = document.createElement('div'); it.className='item'; it.innerHTML = `<div><div style="font-weight:700">${l.msg}</div><div class="muted small">${new Date(l.t).toLocaleString()} • ${l.by||''}</div></div>`; list.appendChild(it); });
+}
+
+function renderTools(container){
+  container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+    <div><strong>Herramientas</strong><div class="muted small">Exportar / Importar datos</div></div>
+    <div><button class="btn btn-small" id="closeT">Cerrar</button></div>
+  </div>
+  <div style="margin-top:12px;display:flex;gap:8px">
+    <button id="doExport" class="btn">Exportar JSON</button>
+    <button id="doImport" class="btn-ghost">Importar (JSON)</button>
+    <button id="doClear" class="btn-ghost">Borrar todo</button>
+  </div>
+  <input id="importFile" type="file" style="display:none" accept=".json" />`;
+  container.querySelector('#closeT').onclick = ()=> closeExpanded();
+  container.querySelector('#doExport').onclick = exportAll;
+  container.querySelector('#doImport').onclick = ()=> document.getElementById('importFile').click();
+  container.querySelector('#doClear').onclick = ()=>{ if(confirm('Borrar todos los datos locales?')){ /* only local */ localStorage.clear(); alert('Local cleared. Firestore unchanged.'); } };
+  document.getElementById('importFile').onchange = importFile;
+}
+
+async function exportAll(){
+  if(!hasPerm('export')){ alert('No tienes permiso para exportar'); return; }
+  const data = {
+    users: STATE.users, roles: STATE.roles, templates: lsGet('pda_templates',{}),
+    reports: STATE.reports, wanted: STATE.wanted, calls: STATE.calls, pda: STATE.pda, fines: STATE.fines, logs: STATE.logs
+  };
+  const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'pda_export_'+Date.now()+'.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  pushLog('Datos exportados');
+}
+
+function importFile(e){
+  const f = e.target.files[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = async (ev)=>{
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(!confirm('Importar reemplazará datos locales. Continuar?')) return;
+      // We will import only into Firestore where appropriate (cautious)
+      if(data.roles){
+        for(const key in data.roles){
+          await setDoc(doc(db,'roles',key), data.roles[key]);
+        }
+      }
+      if(data.users){
+        for(const u of data.users){
+          // create with provided id if it exists, else add
+          if(u._id) await setDoc(doc(db,'users',u._id), u); else await addDoc(collection(db,'users'), u);
+        }
+      }
+      if(data.reports){
+        for(const r of data.reports){ if(r._id) await setDoc(doc(db,'reports',r._id), r); else await addDoc(collection(db,'reports'), r); }
+      }
+      if(data.pda){
+        for(const p of data.pda){ if(p._id) await setDoc(doc(db,'pda',p._id), p); else await addDoc(collection(db,'pda'), p); }
+      }
+      if(data.calls){
+        for(const c of data.calls){ if(c._id) await setDoc(doc(db,'calls',c._id), c); else await addDoc(collection(db,'calls'), c); }
+      }
+      if(data.wanted){
+        for(const w of data.wanted){ if(w._id) await setDoc(doc(db,'wanted',w._id), w); else await addDoc(collection(db,'wanted'), w); }
+      }
+      if(data.fines){
+        for(const fz of data.fines){ if(fz._id) await setDoc(doc(db,'fines',fz._id), fz); else await addDoc(collection(db,'fines'), fz); }
+      }
+      pushLog('Datos importados');
+      alert('Importación finalizada.');
+    }catch(err){ console.error('importFile',err); alert('JSON inválido o error al importar'); }
+  };
+  reader.readAsText(f);
+}
+
+/* ================= Login/Register (original preserved) ================= */
+document.getElementById('btnLogin').onclick = ()=> openLoginModal();
+document.getElementById('btnExport').onclick = ()=> { if(hasPerm('export')) exportAll(); else alert('No autorizado'); };
+
+function openLoginModal(){ loginModal.style.display='flex'; document.getElementById('loginUser').focus(); }
+function closeLoginModal(){ loginModal.style.display='none'; document.getElementById('loginPass').value=''; document.getElementById('loginUser').value=''; document.getElementById('loginError').style.display='none'; }
+
+document.getElementById('guestBtn').onclick = ()=> { STATE.currentUser = null; lsSet('pda_currentUser', null); updateHeader(); closeLoginModal(); pushLog('Entró como invitado'); };
+document.getElementById('showReg').onclick = ()=> { const b = document.getElementById('registerBlock'); b.style.display = b.style.display==='none' ? 'block' : 'none'; };
+document.getElementById('regCancel').onclick = ()=> { document.getElementById('registerBlock').style.display='none'; };
+
+document.getElementById('loginBtn').onclick = async ()=>{
+  const u = document.getElementById('loginUser').value.trim(); const p = document.getElementById('loginPass').value.trim();
+  if(!u || !p){ document.getElementById('loginError').style.display='block'; document.getElementById('loginError').textContent='Rellena usuario y contraseña'; return; }
+  // direct lookup on STATE.users (kept in sync from Firestore)
+  const found = (STATE.users || []).find(x=>x.username === u && x.password === p);
+  if(found){
+    STATE.currentUser = {...found}; lsSet('pda_currentUser', STATE.currentUser); updateHeader(); closeLoginModal(); pushLog(`Sesión iniciada: ${found.username}`); alert('Sesión iniciada: ' + found.display);
+  } else {
+    document.getElementById('loginError').style.display='block'; document.getElementById('loginError').textContent='Usuario o contraseña incorrectos';
+  }
+};
+
+document.getElementById('regCreate').onclick = async ()=>{
+  const username = document.getElementById('regUser').value.trim();
+  const display = document.getElementById('regName').value.trim() || username;
+  const pass = document.getElementById('regPass').value.trim() || '1234';
+  const role = document.getElementById('regRole').value;
+  if(!username){ document.getElementById('regMsg').textContent='Usuario requerido'; return; }
+  if((STATE.users || []).find(u=>u.username===username)){ document.getElementById('regMsg').textContent='Usuario ya existe'; return; }
+  try{
+    await addDoc(collection(db,'users'), { username, display, badge:'', password:pass, role });
+    document.getElementById('regMsg').textContent='Cuenta creada. Inicia sesión.';
+    pushLog(`Cuenta creada: ${username}`);
+  }catch(e){ console.error('regCreate',e); document.getElementById('regMsg').textContent='Error creando cuenta'; }
+};
+
+/* ================= Small helpers & init ================= */
+function closeExpanded(){ STATE.expanded=null; expandedRoot.innerHTML=''; window.scrollTo({top:0,behavior:'smooth'}); }
+function renderUsersMini(){ /* update small header or other micro UIs */ updateHeader(); }
+function renderLogsMini(){ /* nothing extra for now */ }
+
+/* ================= Init Firestore listeners and UI ================= */
+async function init(){
+  // Start listening realtime
+  listenCollectionsRealtime();
+  // If there are no roles or users in Firestore, seed default roles & admin user (only if users empty)
+  // We'll check STATE.users and STATE.roles after a small delay (allow first snapshot)
+  setTimeout(async ()=>{
+    if(!(STATE.users && STATE.users.length)){
+      // create seed user admin only if collection empty
+      try{
+        await addDoc(collection(db,'users'), { username:'admin', display:'Admin', badge:'ADM-001', password:'admin123', role:'admin' });
+        console.log('Seed admin created in Firestore (username admin / password admin123).');
+      }catch(e){ console.warn('seed admin error',e); }
+    }
+    if(!(STATE.roles && Object.keys(STATE.roles).length)){
+      try{
+        await setDoc(doc(db,'roles','officer'), { name:'Officer', color:'#7c3aed', permissions:['create_reports','create_pda','create_call'] });
+        await setDoc(doc(db,'roles','sergeant'), { name:'Sergeant', color:'#3b82f6', permissions:['create_reports','create_pda','create_call','delete_reports'] });
+        await setDoc(doc(db,'roles','dispatcher'), { name:'Dispatcher', color:'#f97316', permissions:['create_call','assign_call'] });
+        await setDoc(doc(db,'roles','admin'), { name:'Admin', color:'#10b981', permissions:['all'] });
+        console.log('Seed roles created.');
+      }catch(e){ console.warn('seed roles error',e); }
+    }
+  }, 1200);
+
+  renderCards();
+  // restore last current user from local
+  STATE.currentUser = lsGet('pda_currentUser', STATE.currentUser);
+  updateHeader();
+}
+
+init();
+
+/* expose a global function to help debugging in console if needed */
+window._STATE = STATE;
+
 </script>
 </body>
 </html>
