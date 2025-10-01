@@ -3,28 +3,22 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Wizard RP — PDA Policial (v4)</title>
+<title>Wizard RP — PDA Policial (Online)</title>
 <style>
   :root{
-    --bg:#071018; --muted:#98a8b0; --accent:#7c3aed; --accent2:#6ee7b7;
-    --card:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    --glass: rgba(255,255,255,0.03);
-    --radius:12px;
-    --danger:#ff6b6b;
+    --bg:#071018; --card:#0e2633; --muted:#98a8b0; --accent:#f7b731; --accent-2:#7c3aed;
+    --glass: rgba(255,255,255,0.03); --radius:14px;
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
   }
   *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;background:
-      radial-gradient(900px 350px at 10% 10%, rgba(124,58,237,0.04), transparent),
-      linear-gradient(180deg, #03121a 0%, var(--bg) 60%);
-    color:#e7eef6; -webkit-font-smoothing:antialiased;
-  }
+  html,body{height:100%;margin:0;background:
+    radial-gradient(900px 350px at 10% 10%, rgba(124,58,237,0.04), transparent),
+    linear-gradient(180deg, #03121a 0%, var(--bg) 60%); color:#e7eef6}
   .wrap{max-width:1100px;margin:18px auto;padding:18px;display:grid;grid-template-rows:auto 1fr;gap:14px}
   header{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:900;color:#041018}
+  .logo-img{width:56px;height:56px;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#071729}
+  .logo-img img{width:100%;height:100%;object-fit:cover}
   h1{margin:0;font-size:18px}
   .subtitle{color:var(--muted);font-size:13px}
   .top-right{display:flex;gap:8px;align-items:center}
@@ -33,27 +27,27 @@
   .btn{background:var(--accent);color:#041018;padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:800}
   .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:7px 10px;border-radius:10px;cursor:pointer}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-  .card{background:var(--card);border-radius:var(--radius);padding:18px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(2,6,10,0.6);cursor:pointer;overflow:hidden;position:relative;display:flex;flex-direction:column;gap:12px;min-height:120px;transition:transform .22s,box-shadow .22s}
-  .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,6,10,0.75)}
-  .title{font-weight:900;font-size:16px}
-  .desc{color:var(--muted);font-size:13px}
-  .icon{width:56px;height:56px;border-radius:10px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-size:22px}
-  .expanded{margin-top:14px;border-radius:var(--radius);padding:18px;background:var(--card);border:1px solid rgba(255,255,255,0.03)}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border-radius:var(--radius);padding:18px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(2,6,10,0.6);cursor:pointer;overflow:hidden;position:relative;transition:transform .28s, box-shadow .28s;display:flex;flex-direction:column;gap:12px;min-height:120px;}
+  .card:hover{transform:translateY(-8px);box-shadow:0 18px 40px rgba(2,6,10,0.75)}
+  .card .title{font-weight:900;font-size:16px}
+  .card .desc{color:var(--muted);font-size:13px}
+  .icon{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,rgba(255,255,255,0.03),rgba(255,255,255,0.01));display:flex;align-items:center;justify-content:center;font-weight:900;font-size:20px;transition:transform .35s}
+  .card:hover .icon{transform:rotate(8deg) scale(1.06)}
+  .expanded{margin-top:14px;border-radius:var(--radius);padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03)}
   .form-row{display:flex;gap:8px}
-  input,textarea,select,button{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
-  textarea{min-height:110px;resize:vertical}
+  input, textarea, select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+  textarea{min-height:100px;resize:vertical}
   .list{display:flex;flex-direction:column;gap:10px}
   .item{padding:10px;border-radius:10px;background:var(--glass);display:flex;justify-content:space-between;align-items:center}
   .muted{color:var(--muted)}
   .danger{background:linear-gradient(90deg,#ff8a80,#ff5252);color:#041018;padding:6px 8px;border-radius:8px}
-  .ok{background:linear-gradient(90deg,#48c774,#34d399);color:#041018;padding:6px 8px;border-radius:8px}
-  .tiny{font-size:12px}
   footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
   .overlay{position:fixed;inset:0;background:linear-gradient(rgba(2,6,10,0.6),rgba(2,6,10,0.8));display:flex;align-items:center;justify-content:center;z-index:9999}
   .modal{width:720px;max-width:94%;background:linear-gradient(180deg,#071729,#061421);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
   .link-like{color:var(--accent);cursor:pointer;text-decoration:underline}
   .grid-2{display:grid;grid-template-columns:1fr 320px;gap:12px}
   .role-chip{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.02);margin-right:6px;margin-bottom:6px}
+  .hidden{display:none}
   @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} .grid-2{grid-template-columns:1fr} }
   @media (max-width:640px){ .grid{grid-template-columns:1fr} .form-row{flex-direction:column} .modal{width:94%} }
 </style>
@@ -62,10 +56,10 @@
   <div class="wrap">
     <header>
       <div class="brand">
-        <div class="logo">WZRD</div>
+        <div class="logo-img"><img id="logoImg" src="https://cdn.discordapp.com/attachments/1421898595271180360/1422217488145453219/LOGO_WIZARD_FONDO.png.png" alt="Wizard"></div>
         <div>
           <h1>Wizard RP — PDA / CAD</h1>
-          <div class="subtitle">Simulador offline — comparte `index.html`</div>
+          <div class="subtitle">Simulador online — sincronizado con Firestore</div>
         </div>
       </div>
 
@@ -77,18 +71,20 @@
       </div>
     </header>
 
-    <section class="grid" id="cardsRoot"></section>
+    <section class="grid" id="cardsRoot">
+      <!-- JS insert -->
+    </section>
 
     <div id="expandedRoot"></div>
 
-    <footer>Hecho para Wizard RP • Datos en localStorage con prefijo <code>pda_v4_</code></footer>
+    <footer>Hecho para Wizard RP • Datos en Firestore • Sustituye firebaseConfig por los tuyos</footer>
   </div>
 
-  <!-- LOGIN / REGISTER modal (tu sistema original) -->
-  <div id="loginModal" class="overlay" style="display:none">
+  <!-- LOGIN modal (tu flow original) -->
+  <div id="loginModal" class="overlay hidden">
     <div class="modal">
       <h3>Entrar / Registrarse</h3>
-      <div class="muted small">Usa tu cuenta o crea una. Los datos se guardan localmente en tu navegador.</div>
+      <div class="muted small">Usa tu cuenta o crea una. Los datos se guardan en la nube (Firestore).</div>
 
       <div style="margin-top:12px">
         <label class="muted small">Usuario</label>
@@ -103,7 +99,7 @@
         <div id="loginError" class="muted small" style="margin-top:8px;color:#ff9b9b;display:none"></div>
       </div>
 
-      <div id="registerBlock" style="display:none;margin-top:12px;border-top:1px dashed rgba(255,255,255,0.03);padding-top:12px">
+      <div id="registerBlock" class="hidden" style="margin-top:12px;border-top:1px dashed rgba(255,255,255,0.03);padding-top:12px">
         <h4 style="margin:0 0 8px 0">Crear cuenta</h4>
         <label class="muted small">Nombre visible</label>
         <input id="regName" placeholder="Ej: Ofc. Pérez"/>
@@ -126,67 +122,61 @@
     </div>
   </div>
 
-<script>
-/* PDA v4 - All-in-one single file
-   - LocalStorage prefix: pda_v4_
-   - Login/Register modal uses your original flow
-   - Admin role editor with checkboxes
-*/
+<script type="module">
+/* ================= FIREBASE SETUP =================
+   Replace the firebaseConfig object below with your project's config (Firebase Console > Project settings > Your apps)
+   Note: We use Firestore (no Firebase Auth). The UI enforces "only logged-in users can write".
+   If you later enable Firebase Auth, update security rules to require auth.
+================================================== */
 
-/* ---------- Storage helpers ---------- */
-const PREFIX = 'pda_v4_';
-function lsGet(k, fallback){ try{const v=localStorage.getItem(PREFIX+k); return v?JSON.parse(v):fallback;}catch(e){return fallback} }
-function lsSet(k,v){ try{ localStorage.setItem(PREFIX+k, JSON.stringify(v)) }catch(e){} }
-function lsRm(k){ try{ localStorage.removeItem(PREFIX+k) }catch(e){} }
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+import {
+  getFirestore, collection, doc, getDoc, getDocs, addDoc, setDoc, updateDoc, deleteDoc,
+  onSnapshot, query, where, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-/* ---------- Utils ---------- */
-function uid(pref='id'){ return pref+'_'+Math.random().toString(36).slice(2,9); }
-function now(){ return Date.now(); }
-function modalAlert(title,msg){ alert(title + "\n\n" + msg); }
+const firebaseConfig = {
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_PROJECT_ID.firebaseapp.com",
+  projectId: "TU_PROJECT_ID",
+  storageBucket: "TU_PROJECT_ID.appspot.com",
+  messagingSenderId: "TU_MSG_SENDER",
+  appId: "TU_APP_ID"
+};
 
-/* ---------- Seed initial data if first run ---------- */
-function seedIfNeeded(){
-  if(!lsGet('inited', false)){
-    const users = [
-      {id:uid('u'), username:'admin', display:'Admin', badge:'ADM-001', password:'admin123', role:'admin'},
-      {id:uid('u'), username:'dispatcher', display:'Dispatch', badge:'DISP', password:'dispatch', role:'dispatcher'},
-      {id:uid('u'), username:'perety04', display:'Perety 04', badge:'PD-314', password:'peretypass', role:'officer'}
-    ];
-    const templates = {
-      report: "Título: {{title}}\\nHechos: {{facts}}\\nAcciones: {{actions}}\\nOficial: {{author}}",
-      pda: "Nombre: {{name}}\\nAlias: {{alias}}\\nNotas: {{notes}}",
-      call: "Remitente: {{caller}}\\nMensaje: {{message}}\\nUbicación: {{location}}",
-      fine: "Offender: {{offender}}\\nImporte: {{amount}}\\nMotivo: {{reason}}"
-    };
-    const reports = [{id:uid('rep'), title:'Robo en tienda', description:'Robo con arma blanco. Sospechoso huyó.', author:'Admin', created_at:now()-3600*1000}];
-    const wanted = [{id:uid('w'), name:'Mario Rata', description:'Robo coches', bounty:500, created_at:now()-20000}];
-    const calls = [{id:uid('c'), caller:'Civ. X', message:'Disparo', status:'pending', assigned_to:null, created_at:now()-5000}];
-    const pda = [{id:uid('p'), text:'Nombre: Juan Pérez\\nAlias: rata\\nDelitos: robo', created_at:now()-2000}];
-    const fines = [{id:uid('f'), offender:'Veh LSF-021', amount:200, reason:'Exceso velocidad', author:'Admin', created_at:now()-8000}];
-    const roles = {
-      officer: {name:'Officer', color:'#7c3aed', permissions:['create_reports','create_pda','create_call']},
-      sergeant: {name:'Sergeant', color:'#3b82f6', permissions:['create_reports','create_pda','create_call','delete_reports']},
-      dispatcher: {name:'Dispatcher', color:'#f97316', permissions:['create_call','assign_call']},
-      admin: {name:'Admin', color:'#10b981', permissions:['all']}
-    };
-    lsSet('users', users);
-    lsSet('templates', templates);
-    lsSet('reports', reports);
-    lsSet('wanted', wanted);
-    lsSet('calls', calls);
-    lsSet('pda', pda);
-    lsSet('fines', fines);
-    lsSet('roles', roles);
-    lsSet('logs', [{id:uid('log'), t:now(), msg:'Seed inicial creada'}]);
-    lsSet('onDuty', {});
-    lsSet('inited', true);
-  }
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+/* =================== App state =================== */
+let STATE = {
+  currentUser: null, // {id, username, display, role, badge}
+  expanded: null
+};
+
+/* ============== Helper: Firestore wrappers ============== */
+// Collections used: users, roles, reports, pda, calls, fines, wanted, logs, onDuty
+const COL = name => collection(db, name);
+
+async function fsAdd(colName, obj){
+  // ensure only logged in can write in UI
+  if(!STATE.currentUser){ alert('Inicia sesión para realizar esta acción'); throw 'not-auth'; }
+  obj._created = Date.now();
+  return await addDoc(COL(colName), obj);
+}
+async function fsSet(docRef, obj){
+  if(!STATE.currentUser){ alert('Inicia sesión'); throw 'not-auth'; }
+  return await setDoc(docRef, obj);
+}
+async function fsUpdate(docRef, partial){
+  if(!STATE.currentUser){ alert('Inicia sesión'); throw 'not-auth'; }
+  return await updateDoc(docRef, partial);
+}
+async function fsDelete(docRef){
+  if(!STATE.currentUser){ alert('Inicia sesión'); throw 'not-auth'; }
+  return await deleteDoc(docRef);
 }
 
-/* ---------- App state ---------- */
-const STATE = { currentUser: lsGet('currentUser', null), expanded: null };
-
-/* ---------- DOM refs ---------- */
+/* =============== UI refs =============== */
 const cardsRoot = document.getElementById('cardsRoot');
 const expandedRoot = document.getElementById('expandedRoot');
 const userDisplay = document.getElementById('userDisplay');
@@ -195,26 +185,52 @@ const loginModal = document.getElementById('loginModal');
 const btnLogin = document.getElementById('btnLogin');
 const btnExport = document.getElementById('btnExport');
 
-/* ---------- Permission helpers ---------- */
-function hasPerm(perm){
-  if(!STATE.currentUser) return perm === 'create_call' ? true : false; // guests can create calls
-  const roles = lsGet('roles', {});
-  const roleKey = STATE.currentUser.role;
-  const role = roles[roleKey];
-  if(!role) return false;
-  if(role.permissions.includes('all')) return true;
-  return role.permissions.includes(perm);
+/* =============== Seed if empty (first-time friendly) =============== */
+async function seedIfNeeded(){
+  // Check users collection quickly; if empty, seed default
+  const snap = await getDocs(COL('users'));
+  if(snap.empty){
+    // seed default users and roles
+    await addDoc(COL('roles'), { key:'officer', name:'Officer', permissions:['create_reports','create_pda','create_call'] });
+    await addDoc(COL('roles'), { key:'sergeant', name:'Sergeant', permissions:['create_reports','create_pda','create_call','delete_reports'] });
+    await addDoc(COL('roles'), { key:'dispatcher', name:'Dispatcher', permissions:['create_call','assign_call'] });
+    await addDoc(COL('roles'), { key:'admin', name:'Admin', permissions:['all'] });
+
+    await addDoc(COL('users'), { username:'admin', display:'Admin', badge:'ADM-001', password:'admin123', role:'admin', _created:Date.now() });
+    await addDoc(COL('users'), { username:'dispatcher', display:'Dispatch', badge:'DISP', password:'dispatch', role:'dispatcher', _created:Date.now() });
+    await addDoc(COL('users'), { username:'perety04', display:'Perety 04', badge:'PD-314', password:'peretypass', role:'officer', _created:Date.now() });
+
+    // sample collections
+    await addDoc(COL('reports'), { title:'Robo en tienda', description:'Robo con arma blanca. Sospechoso huyó.', author:'Admin', _created:Date.now() });
+    await addDoc(COL('pda'), { title:'Juan Pérez', text:'Nombre: Juan Pérez\nAlias: rata\nDelitos: robo', author:'Admin', _created:Date.now() });
+    await addDoc(COL('wanted'), { name:'Mario Rata', description:'Robo coches', bounty:500, _created:Date.now() });
+    await addDoc(COL('calls'), { caller:'Civ. X', message:'Disparo', status:'pending', assigned_to:null, _created:Date.now() });
+    await addDoc(COL('fines'), { offender:'Veh LSF-021', amount:200, reason:'Exceso velocidad', author:'Admin', _created:Date.now() });
+    await addDoc(COL('logs'), { msg:'Seed inicial creada', t:Date.now() });
+    console.log('Seed done');
+  }
 }
 
-/* ---------- Main cards ---------- */
+/* =============== Utility UI helpers =============== */
+function uid(short='id'){ return short+'_'+Math.random().toString(36).slice(2,9); }
+function formatDate(ts){ try{ return new Date(ts).toLocaleString(); }catch(e){ return ''; } }
+function pushLog(msg){
+  // push to logs collection (only if logged in)
+  const payload = { msg: msg, t: Date.now(), actor: STATE.currentUser ? STATE.currentUser.username : 'Invitado' };
+  // If not logged, still allow adding logs? We'll require logged in
+  if(!STATE.currentUser) return;
+  addDoc(COL('logs'), payload).catch(()=>{ /* ignore */ });
+}
+
+/* =============== Render main cards =============== */
 const CARDS = [
-  {id:'pda', title:'PDA / Fichas', desc:'Buscar y crear fichas PDA', icon:'🚓'},
-  {id:'calls', title:'Dispatch / Llamadas', desc:'Crear/Asignar llamadas', icon:'📞'},
-  {id:'reports', title:'Informes', desc:'Crear / Editar informes', icon:'📑'},
-  {id:'wanted', title:'BOLO / Wanted', desc:'Fichas buscados', icon:'🚨'},
+  {id:'pda', title:'PDA / Fichas', desc:'Buscar y crear fichas PDA', icon:'🔍'},
+  {id:'calls', title:'Dispatch / Llamadas', desc:'Crear/Asignar llamadas 911', icon:'📞'},
+  {id:'reports', title:'Informes', desc:'Crear informes oficiales', icon:'📑'},
+  {id:'wanted', title:'BOLO / Wanted', desc:'Fichas de buscados', icon:'🚨'},
   {id:'fines', title:'Multas', desc:'Generar sanciones', icon:'💸'},
-  {id:'service', title:'Servicio', desc:'Entrar / Salir de servicio', icon:'🟢'},
-  {id:'admin', title:'Administración', desc:'Roles y usuarios (avanzado)', icon:'⚙️'},
+  {id:'service', title:'Servicio', desc:'Ponerse en servicio / Fuera', icon:'🟢'},
+  {id:'admin', title:'Administración', desc:'Usuarios y roles (admin)', icon:'⚙️'},
   {id:'logs', title:'Auditoría', desc:'Historial de acciones', icon:'📜'},
   {id:'tools', title:'Herramientas', desc:'Exportar / Importar datos', icon:'🧰'}
 ];
@@ -222,22 +238,22 @@ const CARDS = [
 function renderCards(){
   cardsRoot.innerHTML = '';
   CARDS.forEach(c=>{
-    const el = document.createElement('div'); el.className='card'; el.dataset.id=c.id;
+    const el = document.createElement('div'); el.className='card'; el.dataset.id = c.id;
     el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
       <div><div class="title">${c.title}</div><div class="desc">${c.desc}</div></div>
       <div class="icon">${c.icon}</div>
     </div>
-    <div style="display:flex;justify-content:space-between;align-items:center">
+    <div class="cta" style="display:flex;justify-content:space-between;align-items:center">
       <div class="muted tiny">Acción rápida</div>
       <div><button class="btn-ghost" data-open="${c.id}">Abrir</button></div>
     </div>`;
-    el.onclick = ()=>openCard(c.id);
+    el.onclick = ()=> openCard(c.id);
     el.querySelector('button[data-open]').onclick = (e)=>{ e.stopPropagation(); openCard(c.id); };
     cardsRoot.appendChild(el);
   });
 }
 
-/* ---------- Open card ---------- */
+/* =============== Open card => render expanded content =============== */
 function openCard(id){
   STATE.expanded = id;
   expandedRoot.innerHTML = '';
@@ -255,70 +271,76 @@ function openCard(id){
   window.scrollTo({ top: panel.offsetTop-20, behavior:'smooth' });
 }
 
-/* ========== PDA module (search + create) ========== */
-function renderPDA(container){
-  const templates = lsGet('templates', {});
+/* ================= PDA ================= */
+async function renderPDA(container){
+  const templatesSnap = await getDocs(COL('templates').withConverter?.()); // just try to avoid errors if no templates collection
   container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>PDA / Fichas</strong><div class="muted small">Buscar y crear fichas</div></div>
-    <div><button class="btn btn-small" id="closeP">Cerrar</button></div>
+    <div><strong>PDA / Lookup</strong><div class="muted small">Buscar personas, placas y fichas</div></div>
+    <div><button class="btn btn-small" id="closeX">Cerrar</button></div>
   </div>
-  <div style="margin-top:12px" class="grid-2">
+  <div style="margin-top:12px;display:grid;grid-template-columns:1fr 360px;gap:12px">
     <div>
-      <div class="muted small">Buscar</div>
-      <input id="pdaQ" placeholder="Buscar por nombre, alias o texto..." />
-      <div id="pdaResults" style="margin-top:12px"></div>
+      <input id="pdaQ" placeholder="Buscar por nombre, usuario o placa..." />
+      <div id="pdaRes" style="margin-top:12px"></div>
     </div>
     <div>
-      <div class="muted small">Crear nueva ficha (plantilla editable)</div>
-      <textarea id="pdaTpl">${templates.pda||''}</textarea>
+      <div class="muted small">Crear nueva ficha (plantilla)</div>
+      <textarea id="pdaTpl" placeholder="Plantilla...">Nombre: {{name}}\nAlias: {{alias}}\nNotas: {{notes}}</textarea>
       <div style="display:flex;gap:8px;margin-top:8px"><button id="createPDA" class="btn">Crear ficha</button><button id="clearPDA" class="btn-ghost">Limpiar</button></div>
     </div>
   </div>`;
-  container.querySelector('#closeP').onclick = ()=> closeExpanded();
+  container.querySelector('#closeX').onclick = ()=> closeExpanded();
   container.querySelector('#pdaQ').oninput = ()=> searchPDA(document.getElementById('pdaQ').value);
   container.querySelector('#createPDA').onclick = createPDA;
   loadPDAResults();
+
+  // realtime listener
+  onSnapshot(COL('pda'), snap => loadPDAResults());
 }
 function loadPDAResults(){
-  const arr = lsGet('pda', []);
-  const res = document.getElementById('pdaResults');
+  const res = document.getElementById('pdaRes');
   if(!res) return;
-  res.innerHTML = arr.map(p=>`<div class="item"><div style="flex:1"><b>${(p.title||'Ficha')}</b><div class="muted small">${(p.text||'').slice(0,140)}</div></div>
-    <div><button class="btn-ghost" onclick="viewPDA('${p.id}')">Ver</button> <button class="btn-ghost" onclick="delPDA('${p.id}')">Borrar</button></div></div>`).join('') || '<div class="muted small">Sin fichas</div>';
+  getDocs(COL('pda')).then(snap=>{
+    const arr = []; snap.forEach(d=> arr.push({id:d.id, ...d.data()}));
+    if(!arr.length){ res.innerHTML = '<div class="muted small">Sin fichas</div>'; return; }
+    res.innerHTML = arr.map(p=>`<div class="item"><div style="flex:1"><b>${p.title||'Ficha'}</b><div class="muted small">${(p.text||'').slice(0,140)}</div></div>
+      <div><button class="btn-ghost" data-id="${p.id}" data-act="view">Ver</button> <button class="btn-ghost" data-id="${p.id}" data-act="del">Borrar</button></div></div>`).join('');
+    // attach
+    res.querySelectorAll('button[data-act="view"]').forEach(b=> b.onclick = (e)=>{ const id=b.dataset.id; viewPDA(id); });
+    res.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async (e)=>{ if(!confirm('Borrar ficha?')) return; if(!STATE.currentUser){ alert('Inicia sesión'); return; } await deleteDoc(doc(db,'pda',b.dataset.id)); pushLog(`Ficha PDA ${b.dataset.id} borrada`); loadPDAResults(); });
+  });
 }
-function searchPDA(q){
-  q = (q||'').toLowerCase().trim();
-  const arr = lsGet('pda', []);
-  const out = arr.filter(p => ((p.text||'').toLowerCase().includes(q) || (p.title||'').toLowerCase().includes(q)));
-  const res = document.getElementById('pdaResults');
+async function searchPDA(q){
+  q=(q||'').toLowerCase().trim();
+  const res = document.getElementById('pdaRes');
   if(!res) return;
-  res.innerHTML = out.map(p=>`<div class="item"><div style="flex:1"><b>${p.title||'Ficha'}</b><div class="muted small">${(p.text||'').slice(0,140)}</div></div>
-    <div><button class="btn-ghost" onclick="viewPDA('${p.id}')">Ver</button> <button class="btn-ghost" onclick="delPDA('${p.id}')">Borrar</button></div></div>`).join('') || '<div class="muted small">No hay resultados</div>';
+  const snap = await getDocs(COL('pda'));
+  const arr = []; snap.forEach(d=>{ const data=d.data(); if((data.text||'').toLowerCase().includes(q) || (data.title||'').toLowerCase().includes(q)) arr.push({id:d.id,...data}); });
+  if(!arr.length){ res.innerHTML = '<div class="muted small">No hay resultados</div>'; return; }
+  res.innerHTML = arr.map(p=>`<div class="item"><div style="flex:1"><b>${p.title||'Ficha'}</b><div class="muted small">${(p.text||'').slice(0,140)}</div></div>
+    <div><button class="btn-ghost" data-id="${p.id}" data-act="view">Ver</button> <button class="btn-ghost" data-id="${p.id}" data-act="del">Borrar</button></div></div>`).join('');
+  res.querySelectorAll('button[data-act="view"]').forEach(b=> b.onclick = ()=> viewPDA(b.dataset.id));
+  res.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=>{ if(!confirm('Borrar ficha?')) return; if(!STATE.currentUser){ alert('Inicia sesión'); return; } await deleteDoc(doc(db,'pda',b.dataset.id)); pushLog(`Ficha PDA ${b.dataset.id} borrada`); loadPDAResults(); });
 }
-function createPDA(){
-  if(!hasPerm('create_pda')){ modalAlert('Error','No tienes permiso para crear fichas PDA'); return; }
+async function createPDA(){
+  if(!STATE.currentUser){ alert('Inicia sesión'); return; }
   const txt = document.getElementById('pdaTpl').value.trim();
-  if(!txt){ modalAlert('Error','Rellena la plantilla'); return; }
-  const arr = lsGet('pda', []);
-  const item = {id:uid('pda'), title: (txt.split('\\n')[0]||'Ficha').replace('Nombre:','').trim(), text:txt, created_at:now(), author: STATE.currentUser?STATE.currentUser.username:'Invitado'};
-  arr.unshift(item); lsSet('pda', arr);
-  pushLog(`Ficha PDA creada: ${item.title}`);
-  document.getElementById('pdaTpl').value = ''; loadPDAResults();
+  if(!txt) return alert('Plantilla vacía');
+  const title = (txt.split('\n')[0]||'Ficha').replace('Nombre:','').trim();
+  await addDoc(COL('pda'), { title, text:txt, author: STATE.currentUser.display, created_at:Date.now() });
+  pushLog(`Ficha PDA creada: ${title}`);
+  document.getElementById('pdaTpl').value='';
+  loadPDAResults();
 }
-function viewPDA(id){
-  const arr = lsGet('pda', []);
-  const p = arr.find(x=>x.id===id);
-  if(!p) return;
-  modalAlert('Ficha PDA', `Título: ${p.title}\n\n${p.text}\n\nCreada: ${new Date(p.created_at).toLocaleString()}\nAutor: ${p.author}`);
-}
-function delPDA(id){
-  if(!confirm('Borrar ficha PDA?')) return;
-  let arr = lsGet('pda', []);
-  arr = arr.filter(x=>x.id!==id); lsSet('pda', arr); pushLog(`Ficha PDA borrada: ${id}`); loadPDAResults();
+async function viewPDA(id){
+  const d = await getDoc(doc(db,'pda',id));
+  if(!d.exists()) return alert('No encontrado');
+  const p = d.data();
+  alert(`Ficha: ${p.title}\n\n${p.text}\n\nAutor: ${p.author}\nCreada: ${formatDate(p.created_at)}`);
 }
 
-/* ========== Calls (Dispatch) ========== */
-function renderCalls(container){
+/* ================= Calls / Dispatch ================= */
+async function renderCalls(container){
   container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
     <div><strong>Dispatch / Llamadas</strong><div class="muted small">Crear llamadas y asignar unidades</div></div>
     <div><button class="btn btn-small" id="closeC">Cerrar</button></div>
@@ -326,179 +348,243 @@ function renderCalls(container){
   <div style="margin-top:12px;display:flex;gap:8px">
     <input id="callFrom" placeholder="Remitente (opcional)"/>
     <input id="callMsg" placeholder="Mensaje"/>
+    <select id="assignTo"><option value="">Asignar a...</option></select>
     <button id="callCreate" class="btn">Crear llamada</button>
   </div>
   <div style="margin-top:12px"><strong>Llamadas</strong><div id="callsList" class="list" style="margin-top:8px"></div></div>`;
   container.querySelector('#closeC').onclick = ()=> closeExpanded();
   container.querySelector('#callCreate').onclick = createCall;
+  // update assignTo with users in service
+  onSnapshot(COL('onDuty'), snap=> loadAssignOptions());
+  onSnapshot(COL('calls'), snap=> loadCalls());
+  loadAssignOptions();
   loadCalls();
 }
-function createCall(){
+async function loadAssignOptions(){
+  const sel = document.getElementById('assignTo');
+  if(!sel) return;
+  sel.innerHTML = '<option value="">Sin asignar</option>';
+  // onDuty is stored as documents where id==userid with {active:true, name}
+  const s = await getDocs(COL('onDuty'));
+  s.forEach(d=>{
+    const data = d.data();
+    if(data.active) sel.innerHTML += `<option value="${d.id}">${data.display||d.id}</option>`;
+  });
+}
+async function createCall(){
+  if(!STATE.currentUser){ alert('Inicia sesión para crear llamadas'); return; }
   const caller = document.getElementById('callFrom').value.trim() || 'Anonimo';
   const message = document.getElementById('callMsg').value.trim();
-  if(!message){ modalAlert('Error','Introduce un mensaje'); return; }
-  const calls = lsGet('calls', []);
-  const c = {id:uid('c'), caller, message, status:'pending', assigned_to:null, created_at:now()};
-  calls.unshift(c); lsSet('calls', calls); pushLog(`Llamada creada por ${caller}`);
+  const assign = document.getElementById('assignTo').value || null;
+  if(!message) return alert('Introduce un mensaje');
+  await addDoc(COL('calls'), { caller, message, status:'pending', assigned_to: assign, created_at:Date.now(), author: STATE.currentUser.display });
+  pushLog(`Llamada creada por ${caller}`);
   document.getElementById('callMsg').value=''; document.getElementById('callFrom').value='';
-  loadCalls();
 }
-function loadCalls(){
+async function loadCalls(){
   const list = document.getElementById('callsList'); if(!list) return;
-  const calls = lsGet('calls', []);
+  const snap = await getDocs(COL('calls'));
+  const arr=[]; snap.forEach(d=> arr.push({id:d.id,...d.data()}));
+  if(!arr.length){ list.innerHTML = '<div class="muted small">No hay llamadas</div>'; return; }
   list.innerHTML = '';
-  if(!calls.length){ list.innerHTML = '<div class="muted small">No hay llamadas</div>'; return; }
-  const users = lsGet('users', []);
-  calls.forEach(c=>{
-    const assignee = c.assigned_to ? (users.find(u=>u.id===c.assigned_to)?.display || '—') : '—';
+  arr.sort((a,b)=> b.created_at - a.created_at);
+  arr.forEach(c=>{
     const el = document.createElement('div'); el.className='item';
-    el.innerHTML = `<div style="flex:1"><b>${c.caller}</b><div class="muted small">${c.message}</div></div>
-      <div style="text-align:right"><div class="muted tiny">${new Date(c.created_at).toLocaleString()}</div><div style="margin-top:8px" class="muted tiny">Asig: ${assignee}</div></div>`;
+    el.innerHTML = `<div style="flex:1"><div style="font-weight:700">${c.caller}</div><div class="muted small">${c.message}</div></div>
+      <div style="text-align:right"><div class="muted tiny">${formatDate(c.created_at)}</div><div style="margin-top:8px" class="muted tiny">Asig: ${c.assigned_to || '—'}</div></div>`;
     const btns = document.createElement('div'); btns.style.marginLeft='12px';
-    if(hasPerm('assign_call') && STATE.currentUser){
-      const assign = document.createElement('button'); assign.className='btn-ghost'; assign.textContent='Asignar a mí';
-      assign.onclick = ()=>{ assignCall(c.id); };
-      btns.appendChild(assign);
+    // If dispatcher/admin allow assigning to any on-duty user
+    if(STATE.currentUser && (STATE.currentUser.role==='dispatcher' || STATE.currentUser.role==='admin')){
+      const assignBtn = document.createElement('button'); assignBtn.className='btn-ghost'; assignBtn.textContent='Asignar';
+      assignBtn.onclick = ()=> openAssignDialog(c.id);
+      btns.appendChild(assignBtn);
     }
     if(STATE.currentUser && (STATE.currentUser.role==='admin' || (c.assigned_to && STATE.currentUser.id===c.assigned_to))){
       const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
-      del.onclick = ()=>{ if(confirm('Borrar llamada?')) deleteCall(c.id); };
+      del.onclick = async ()=>{ if(confirm('Borrar llamada?')){ await deleteDoc(doc(db,'calls',c.id)); pushLog(`Llamada ${c.id} borrada`); loadCalls(); } };
       btns.appendChild(del);
     }
     el.appendChild(btns);
     list.appendChild(el);
   });
 }
-function assignCall(id){
-  if(!STATE.currentUser){ modalAlert('Error','Inicia sesión para asignar'); return; }
-  let calls = lsGet('calls', []);
-  const c = calls.find(x=>x.id===id); if(!c) return;
-  c.status='assigned'; c.assigned_to = STATE.currentUser.id; lsSet('calls', calls); pushLog(`Llamada ${id} asignada a ${STATE.currentUser.display}`); loadCalls();
+function openAssignDialog(callId){
+  // simple prompt listing on-duty users
+  getDocs(COL('onDuty')).then(snap=>{
+    const options = []; snap.forEach(d=>{ const data=d.data(); if(data.active) options.push({id:d.id, display:data.display||d.id}); });
+    if(!options.length) return alert('No hay unidades en servicio');
+    const names = options.map(o=>`${o.id}: ${o.display}`).join('\n');
+    const pick = prompt('Elige ID de unidad en servicio:\n'+names);
+    if(!pick) return;
+    updateDoc(doc(db,'calls',callId), { assigned_to: pick, status:'assigned' }).then(()=>{ pushLog(`Llamada ${callId} asignada a ${pick}`); });
+  });
 }
-function deleteCall(id){ let calls=lsGet('calls',[]); calls = calls.filter(c=>c.id!==id); lsSet('calls', calls); pushLog(`Llamada ${id} borrada`); loadCalls(); }
 
-/* ========== Reports ========== */
-function renderReports(container){
+/* ================= Reports (informes) - full panel ================= */
+async function renderReports(container){
   container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
     <div><strong>Informes</strong><div class="muted small">Crear y consultar informes</div></div>
     <div><button class="btn btn-small" id="closeR">Cerrar</button></div>
   </div>
-  <div style="margin-top:12px">
-    <div class="muted small">Plantilla (editable)</div>
-    <textarea id="tplReport" style="min-height:80px"></textarea>
-  </div>
-  <div style="margin-top:8px" class="form-row">
-    <input id="repTitle" placeholder="Título" />
-    <input id="repAuthor" placeholder="Autor (auto)" />
-  </div>
-  <div style="margin-top:8px"><textarea id="repDesc" placeholder="Descripción..."></textarea></div>
-  <div style="margin-top:8px;display:flex;gap:8px"><button id="saveRep" class="btn">Guardar informe</button><button id="clearRep" class="btn-ghost">Limpiar</button></div>
-  <div style="margin-top:12px"><strong>Últimos informes</strong><div id="reportsList" class="list" style="margin-top:8px"></div></div>`;
+  <div style="margin-top:12px;display:grid;grid-template-columns:1fr 360px;gap:12px">
+    <div>
+      <div class="muted small">Buscar</div>
+      <input id="repQ" placeholder="Buscar por título..." />
+      <div id="reportsList" class="list" style="margin-top:8px"></div>
+    </div>
+    <div>
+      <div class="muted small">Plantilla (editable)</div>
+      <textarea id="tplReport">Título: {{title}}\nHechos: {{facts}}\nAcciones: {{actions}}\nOficial: {{author}}</textarea>
+      <input id="repTitle" placeholder="Título" style="margin-top:8px"/>
+      <input id="repAuthor" placeholder="Autor (auto)" />
+      <textarea id="repDesc" placeholder="Descripción..." style="margin-top:8px"></textarea>
+      <div style="display:flex;gap:8px;margin-top:8px"><button id="saveRep" class="btn">Guardar informe</button><button id="clearRep" class="btn-ghost">Limpiar</button></div>
+    </div>
+  </div>`;
   container.querySelector('#closeR').onclick = ()=> closeExpanded();
-  const templates = lsGet('templates', {}); document.getElementById('tplReport').value = templates.report || '';
   document.getElementById('repAuthor').value = STATE.currentUser ? STATE.currentUser.display : 'Invitado';
   document.getElementById('saveRep').onclick = saveReport;
   document.getElementById('clearRep').onclick = ()=>{ document.getElementById('repTitle').value=''; document.getElementById('repDesc').value=''; };
-  loadReports();
+  document.getElementById('repQ').oninput = ()=> loadReports(document.getElementById('repQ').value);
+  onSnapshot(COL('reports'), snap=> loadReports(document.getElementById('repQ').value));
+  loadReports('');
 }
-function saveReport(){
-  if(!hasPerm('create_reports')){ modalAlert('Error','No tienes permiso para crear informes'); return; }
+async function saveReport(){
+  if(!STATE.currentUser){ alert('Inicia sesión para crear informes'); return; }
   const title = document.getElementById('repTitle').value.trim();
   const desc = document.getElementById('repDesc').value.trim();
-  if(!title || !desc){ modalAlert('Error','Título y descripción obligatorios'); return; }
-  const reports = lsGet('reports', []);
-  const r = {id:uid('rep'), title, description:desc, author: STATE.currentUser?STATE.currentUser.display:'Invitado', created_at:now()};
-  reports.unshift(r); lsSet('reports', reports);
-  const templates = lsGet('templates', {}); templates.report = document.getElementById('tplReport').value; lsSet('templates', templates);
+  if(!title || !desc){ alert('Título y descripción obligatorios'); return; }
+  await addDoc(COL('reports'), { title, description: desc, author: STATE.currentUser.display, created_at:Date.now() });
+  // optionally save template
   pushLog(`Informe creado: ${title}`);
-  loadReports();
+  document.getElementById('repTitle').value=''; document.getElementById('repDesc').value='';
 }
-function loadReports(){
+async function loadReports(q){
   const list = document.getElementById('reportsList'); if(!list) return;
-  const reports = lsGet('reports', []);
-  list.innerHTML = '';
-  if(!reports.length){ list.innerHTML = '<div class="muted small">No hay informes</div>'; return; }
-  reports.forEach(r=>{
+  const snap = await getDocs(COL('reports'));
+  const arr=[]; snap.forEach(d=> arr.push({id:d.id, ...d.data()}));
+  const filtered = (q||'').trim() ? arr.filter(r=> (r.title||'').toLowerCase().includes(q.toLowerCase())) : arr;
+  if(!filtered.length){ list.innerHTML='<div class="muted small">No hay informes</div>'; return; }
+  list.innerHTML='';
+  filtered.sort((a,b)=> b.created_at - a.created_at);
+  filtered.forEach(r=>{
     const it = document.createElement('div'); it.className='item';
     it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${r.title}</div><div class="muted small">${(r.description||'').slice(0,160)}</div></div>
-      <div style="text-align:right"><div class="muted tiny">${new Date(r.created_at).toLocaleString()}</div><div style="margin-top:6px" class="muted tiny">${r.author||''}</div></div>`;
+      <div style="text-align:right"><div class="muted tiny">${formatDate(r.created_at)}</div><div style="margin-top:6px" class="muted tiny">${r.author||''}</div></div>`;
     const btns = document.createElement('div'); btns.style.marginLeft='12px';
     const view = document.createElement('button'); view.className='btn-ghost'; view.textContent='Ver';
-    view.onclick = ()=> modalAlert(`Informe — ${r.title}`, `${r.description}\n\nAutor: ${r.author}\nFecha: ${new Date(r.created_at).toLocaleString()}`);
+    view.onclick = ()=> alert(`Informe — ${r.title}\n\n${r.description}\n\nAutor: ${r.author}\nFecha: ${formatDate(r.created_at)}`);
     btns.appendChild(view);
-    if(STATE.currentUser && (STATE.currentUser.role==='admin' || STATE.currentUser.role==='sergeant' || hasPerm('delete_reports'))){
-      const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar'; del.onclick = ()=>{ if(confirm('Borrar informe?')) deleteReport(r.id); };
+    if(STATE.currentUser && (STATE.currentUser.role==='admin' || STATE.currentUser.role==='sergeant')){
+      const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar'; del.onclick = async ()=>{ if(confirm('Borrar informe?')){ await deleteDoc(doc(db,'reports',r.id)); pushLog(`Informe ${r.id} borrado`); } };
       btns.appendChild(del);
     }
     it.appendChild(btns);
     list.appendChild(it);
   });
 }
-function deleteReport(id){ let arr=lsGet('reports',[]); arr=arr.filter(r=>r.id!==id); lsSet('reports',arr); pushLog(`Informe ${id} borrado`); loadReports(); }
 
-/* ========== Wanted ========== */
-function renderWanted(container){
+/* ================= Wanted / BOLO ================= */
+async function renderWanted(container){
   container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>BOLO / Wanted</strong><div class="muted small">Crear fichas buscadas</div></div>
+    <div><strong>BOLO / Wanted</strong><div class="muted small">Crear y gestionar fichas buscadas</div></div>
     <div><button class="btn btn-small" id="closeW">Cerrar</button></div>
   </div>
-  <div style="margin-top:12px" class="form-row"><input id="wName" placeholder="Nombre / Alias"/><input id="wBounty" placeholder="Recompensa"/></div>
+  <div style="margin-top:12px" class="form-row">
+    <input id="wName" placeholder="Nombre / Alias"/>
+    <input id="wBounty" placeholder="Recompensa"/>
+  </div>
   <div style="margin-top:8px"><textarea id="wDesc" placeholder="Descripción"></textarea></div>
   <div style="margin-top:8px;display:flex;gap:8px"><button id="saveW" class="btn">Crear ficha</button></div>
   <div style="margin-top:12px"><strong>Fichas</strong><div id="wantedList" class="list" style="margin-top:8px"></div></div>`;
   container.querySelector('#closeW').onclick = ()=> closeExpanded();
   container.querySelector('#saveW').onclick = createWanted;
+  onSnapshot(COL('wanted'), snap=> loadWanted());
   loadWanted();
 }
-function createWanted(){ if(!hasPerm('create_bolo')){ modalAlert('Error','No tienes permiso'); return; }
+async function createWanted(){ if(!STATE.currentUser){ alert('Inicia sesión'); return; }
   const name=document.getElementById('wName').value.trim(); const desc=document.getElementById('wDesc').value.trim(); const bounty=parseInt(document.getElementById('wBounty').value||'0',10);
-  if(!name){ modalAlert('Error','Nombre requerido'); return; }
-  const arr=lsGet('wanted',[]); arr.unshift({id:uid('w'), name, description:desc, bounty, created_at:now()}); lsSet('wanted',arr); pushLog(`Wanted creado: ${name}`); loadWanted();
+  if(!name){ alert('Nombre requerido'); return; }
+  await addDoc(COL('wanted'), { name, description:desc, bounty, created_at:Date.now(), author:STATE.currentUser.display });
+  pushLog(`Wanted creado: ${name}`); document.getElementById('wName').value=''; document.getElementById('wDesc').value=''; document.getElementById('wBounty').value=''; 
 }
-function loadWanted(){ const list=document.getElementById('wantedList'); if(!list) return; const arr=lsGet('wanted',[]); list.innerHTML=''; if(!arr.length){ list.innerHTML='<div class="muted small">No hay fichas</div>'; return; } arr.forEach(w=>{ const it=document.createElement('div'); it.className='item'; it.innerHTML=`<div style="flex:1"><b>${w.name}</b><div class="muted small">${w.description}</div></div><div class="pill">${w.bounty||0}€</div>`; const btns=document.createElement('div'); btns.style.marginLeft='12px'; const view=document.createElement('button'); view.className='btn-ghost'; view.textContent='Ver'; view.onclick=()=>modalAlert(`Wanted — ${w.name}`,`${w.description}\nRecompensa: ${w.bounty}€`); btns.appendChild(view); if(hasPerm('manage_wanted')){ const del=document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar'; del.onclick=()=>{ if(confirm('Borrar ficha?')){ deleteWanted(w.id); } }; btns.appendChild(del); } it.appendChild(btns); list.appendChild(it); }); }
-function deleteWanted(id){ let arr=lsGet('wanted',[]); arr=arr.filter(x=>x.id!==id); lsSet('wanted',arr); pushLog(`Wanted ${id} borrado`); loadWanted(); }
+async function loadWanted(){ const list=document.getElementById('wantedList'); if(!list) return; const snap=await getDocs(COL('wanted')); const arr=[]; snap.forEach(d=>arr.push({id:d.id,...d.data()})); if(!arr.length){ list.innerHTML='<div class="muted small">No hay fichas</div>'; return; } list.innerHTML=''; arr.sort((a,b)=> b.created_at - a.created_at); arr.forEach(w=>{ const it=document.createElement('div'); it.className='item'; it.innerHTML = `<div style="flex:1"><b>${w.name}</b><div class="muted small">${w.description}</div></div><div class="pill">${w.bounty||0}€</div>`; const btns=document.createElement('div'); btns.style.marginLeft='12px'; const view=document.createElement('button'); view.className='btn-ghost'; view.textContent='Ver'; view.onclick=()=> alert(`Wanted — ${w.name}\n\n${w.description}\nRecompensa: ${w.bounty}€`); btns.appendChild(view); if(STATE.currentUser && (STATE.currentUser.role==='sergeant' || STATE.currentUser.role==='admin')){ const del=document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar'; del.onclick=async()=>{ if(confirm('Borrar ficha?')){ await deleteDoc(doc(db,'wanted',w.id)); pushLog(`Wanted ${w.id} borrado`); } }; btns.appendChild(del); } it.appendChild(btns); list.appendChild(it); }); }
 
-/* ========== Fines ========== */
-function renderFines(container){
+/* ================= Fines ================= */
+async function renderFines(container){
   container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>Multas</strong><div class="muted small">Generar sanciones</div></div>
+    <div><strong>Multas</strong><div class="muted small">Genera sanciones y multas</div></div>
     <div><button class="btn btn-small" id="closeF">Cerrar</button></div>
   </div>
-  <div style="margin-top:12px" class="form-row"><input id="fineOff" placeholder="Infractor"/><input id="fineAmt" placeholder="Importe"/></div>
+  <div style="margin-top:12px" class="form-row"><input id="fineOff" placeholder="Infractor (nombre/vehículo)"/><input id="fineAmt" placeholder="Importe"/></div>
   <div style="margin-top:8px"><textarea id="fineReason" placeholder="Motivo..."></textarea></div>
   <div style="margin-top:8px;display:flex;gap:8px"><button id="saveFine" class="btn">Emitir multa</button></div>
   <div style="margin-top:12px"><strong>Multas</strong><div id="finesList" class="list" style="margin-top:8px"></div></div>`;
   container.querySelector('#closeF').onclick = ()=> closeExpanded();
-  container.querySelector('#saveFine').onclick = saveFine; loadFines();
+  document.getElementById('saveFine').onclick = saveFine;
+  onSnapshot(COL('fines'), snap=> loadFines());
+  loadFines();
 }
-function saveFine(){ if(!hasPerm('create_fine')){ modalAlert('Error','No tienes permiso para multar'); return; }
+async function saveFine(){ if(!STATE.currentUser){ alert('Inicia sesión'); return; }
   const off=document.getElementById('fineOff').value.trim(); const amt=parseInt(document.getElementById('fineAmt').value||'0',10); const reason=document.getElementById('fineReason').value.trim();
-  if(!off || !amt){ modalAlert('Error','Infractor e importe requeridos'); return; }
-  const arr=lsGet('fines',[]); arr.unshift({id:uid('f'), offender:off, amount:amt, reason, author:STATE.currentUser?STATE.currentUser.display:'Invitado', created_at:now()}); lsSet('fines',arr); pushLog(`Multa creada: ${off} ${amt}€`); loadFines();
+  if(!off || !amt){ alert('Infractor e importe requeridos'); return; }
+  await addDoc(COL('fines'), { offender:off, amount:amt, reason, author:STATE.currentUser.display, created_at:Date.now() });
+  pushLog(`Multa creada: ${off} ${amt}€`);
 }
-function loadFines(){ const list=document.getElementById('finesList'); if(!list) return; const arr=lsGet('fines',[]); list.innerHTML=''; if(!arr.length){ list.innerHTML='<div class="muted small">No hay multas</div>'; return; } arr.forEach(f=>{ const it=document.createElement('div'); it.className='item'; it.innerHTML=`<div style="flex:1"><b>${f.offender} • ${f.amount}€</b><div class="muted small">${f.reason}</div></div><div class="muted tiny">${new Date(f.created_at).toLocaleString()}</div>`; const btns=document.createElement('div'); btns.style.marginLeft='12px'; if(STATE.currentUser && (STATE.currentUser.role==='admin' || STATE.currentUser.display===f.author || hasPerm('delete_reports'))){ const del=document.createElement('button'); del.className='btn'; del.textContent='Borrar'; del.onclick=()=>{ if(confirm('Borrar multa?')){ deleteFine(f.id); } }; btns.appendChild(del); } it.appendChild(btns); list.appendChild(it); }); }
-function deleteFine(id){ let arr=lsGet('fines',[]); arr=arr.filter(x=>x.id!==id); lsSet('fines',arr); pushLog(`Multa ${id} borrada`); loadFines(); }
 
-/* ========== Service (on duty count) ========== */
-function renderService(container){
+/* ================= Service (on duty) ================= */
+async function renderService(container){
   container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
     <div><strong>Servicio</strong><div class="muted small">Ponte en servicio o sal</div></div>
     <div><button class="btn btn-small" id="closeS">Cerrar</button></div>
   </div>
-  <div style="margin-top:12px;display:flex;gap:8px;align-items:center"><div class="muted small">Tu estado:</div><div id="serviceBox" class="pill">Desconocido</div><div style="margin-left:auto"><button id="toggleDuty" class="btn">Cambiar estado</button></div></div>
+  <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+    <div class="muted small">Estado actual:</div><div id="serviceBox" class="pill">Desconocido</div>
+    <div style="margin-left:auto"><button id="toggleDuty" class="btn">Cambiar estado</button></div>
+  </div>
   <div style="margin-top:12px"><strong>Policías en servicio</strong><div id="dutyList" class="list" style="margin-top:8px"></div></div>`;
   container.querySelector('#closeS').onclick = ()=> closeExpanded();
-  const box = container.querySelector('#serviceBox'); const on = lsGet('onDuty', {}); const uId = STATE.currentUser ? STATE.currentUser.id : null;
-  box.textContent = (uId && on[uId]) ? 'En servicio' : 'Fuera de servicio';
-  container.querySelector('#toggleDuty').onclick = ()=>{ if(!STATE.currentUser){ modalAlert('Error','Inicia sesión'); return; } const map = lsGet('onDuty', {}); map[STATE.currentUser.id] = !map[STATE.currentUser.id]; lsSet('onDuty', map); box.textContent = map[STATE.currentUser.id] ? 'En servicio' : 'Fuera de servicio'; pushLog(`${STATE.currentUser.display} ${map[STATE.currentUser.id] ? 'entró' : 'salió'} de servicio`); updateHeader(); loadDutyList(); };
+  const box = container.querySelector('#serviceBox');
+  const on = getDocs(COL('onDuty')).then(snap=>{
+    const map = {};
+  });
+  // set UI initial
+  const uId = STATE.currentUser ? STATE.currentUser.id : null;
+  const serviceBox = container.querySelector('#serviceBox');
+  // toggle duty
+  container.querySelector('#toggleDuty').onclick = async ()=>{
+    if(!STATE.currentUser){ alert('Inicia sesión'); return; }
+    const docRef = doc(db,'onDuty', STATE.currentUser.id);
+    // fetch doc
+    const existing = await getDoc(docRef);
+    if(existing.exists()){
+      const cur = existing.data();
+      await setDoc(docRef, { active: !cur.active, display: STATE.currentUser.display, updated_at: Date.now() });
+    } else {
+      await setDoc(docRef, { active: true, display: STATE.currentUser.display, updated_at: Date.now() });
+    }
+    pushLog(`${STATE.currentUser.display} cambió estado de servicio`);
+    loadDutyList();
+  };
+  onSnapshot(COL('onDuty'), snap=> loadDutyList());
   loadDutyList();
 }
-function loadDutyList(){ const list=document.getElementById('dutyList'); if(!list) return; const on=lsGet('onDuty',{}); const users=lsGet('users',[]); const active = Object.keys(on).filter(k=>on[k]).map(id=> users.find(u=>u.id===id)?.display || id); list.innerHTML = active.map(a=>`<div class="item">${a}</div>`).join('') || '<div class="muted small">Nadie en servicio</div>'; updateHeader(); }
+async function loadDutyList(){
+  const list = document.getElementById('dutyList'); if(!list) return;
+  const snap = await getDocs(COL('onDuty'));
+  const active = [];
+  snap.forEach(d=>{ const data = d.data(); if(data.active) active.push({id:d.id, display:data.display}); });
+  list.innerHTML = active.map(a=>`<div class="item">${a.display}</div>`).join('') || '<div class="muted small">Nadie en servicio</div>';
+  dutyStatus.textContent = `En servicio: ${active.length}`;
+}
 
-/* ========== Admin: Roles & Users (Discord-like) ========== */
-function renderAdmin(container){
-  const users = lsGet('users', []);
-  const roles = lsGet('roles', {});
+/* ================= Admin panel ================= */
+async function renderAdmin(container){
+  // only visible to admin or comisario
+  if(!STATE.currentUser || !(STATE.currentUser.role==='admin' || STATE.currentUser.role==='comisario')){
+    container.innerHTML = `<div><strong>Administración</strong><div class="muted small">Acceso restringido (solo admin/comisario)</div></div>`;
+    return;
+  }
   container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
     <div><strong>Administración</strong><div class="muted small">Gestiona roles, permisos y usuarios</div></div>
     <div><button class="btn btn-small" id="closeA">Cerrar</button></div>
@@ -511,9 +597,8 @@ function renderAdmin(container){
     <div style="width:360px">
       <h4>Crear usuario</h4>
       <input id="adm_newUser" placeholder="username"><input id="adm_newDisplay" placeholder="display"><input id="adm_newPass" placeholder="password">
-      <select id="adm_newRole">${Object.keys(roles).map(r=>`<option value="${r}">${r}</option>`).join('')}</select>
+      <select id="adm_newRole"></select>
       <div style="display:flex;gap:8px;margin-top:8px"><button id="adm_createUser" class="btn">Crear</button><button id="adm_refresh" class="btn-ghost">Refrescar</button></div>
-
       <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
       <h4>Roles</h4>
       <div style="display:flex;gap:8px"><input id="adm_newRoleName" placeholder="nuevo rol"><button id="adm_createRole" class="btn">Crear rol</button></div>
@@ -521,119 +606,153 @@ function renderAdmin(container){
     </div>
   </div>`;
   container.querySelector('#closeA').onclick = ()=> closeExpanded();
-  container.querySelector('#adm_createUser').onclick = adminCreateUser;
-  container.querySelector('#adm_refresh').onclick = ()=>renderAdmin(container);
-  container.querySelector('#adm_createRole').onclick = adminCreateRole;
+  document.getElementById('adm_createUser').onclick = adminCreateUser;
+  document.getElementById('adm_refresh').onclick = ()=> renderAdmin(container);
+  document.getElementById('adm_createRole').onclick = adminCreateRole;
+  loadRolesForSelect();
   loadUsersAdmin();
-  loadRolesAdmin();
+  onSnapshot(COL('users'), snap=> loadUsersAdmin());
+  onSnapshot(COL('roles'), snap=> loadRolesAdmin());
 }
-
-function loadUsersAdmin(){
-  const users = lsGet('users', []); const roles = lsGet('roles', {});
-  const ul = document.getElementById('usersAdminList'); ul.innerHTML = '';
-  if(!users.length){ ul.innerHTML = '<div class="muted small">No hay usuarios</div>'; return; }
-  users.forEach((u,i)=>{
+async function loadRolesForSelect(){
+  const sel = document.getElementById('adm_newRole');
+  if(!sel) return;
+  const snap = await getDocs(COL('roles'));
+  sel.innerHTML = snap.docs.map(d=>`<option value="${d.data().key||d.id}">${d.data().name||d.data().key||d.id}</option>`).join('');
+}
+async function loadUsersAdmin(){
+  const ul = document.getElementById('usersAdminList'); if(!ul) return;
+  const snap = await getDocs(COL('users'));
+  if(!snap.size){ ul.innerHTML = '<div class="muted small">No hay usuarios</div>'; return; }
+  ul.innerHTML = '';
+  snap.forEach(d=>{
+    const u = d.data(); const uid = d.id;
     const div = document.createElement('div'); div.className='item';
-    div.innerHTML = `<div><b>${u.display} (${u.username})</b><div class="muted small">Rol: <span class="role-chip">${u.role}</span> • Badge: ${u.badge||'—'}</div></div>
+    div.innerHTML = `<div><b>${u.display||u.username} (${u.username})</b><div class="muted small">Rol: <span class="role-chip">${u.role||''}</span> • Badge: ${u.badge||'—'}</div></div>
       <div style="text-align:right">
-        <select data-uid="${u.id}" class="adm_role_sel">${Object.keys(lsGet('roles',{})).map(r=>`<option value="${r}" ${u.role===r?'selected':''}>${r}</option>`).join('')}</select>
-        <div style="margin-top:6px"><button class="btn-ghost btn-small" data-uid="${u.id}" data-act="del">Borrar</button> <button class="btn btn-small" data-uid="${u.id}" data-act="imp">Impersonar</button></div>
+        <select data-uid="${uid}" class="adm_role_sel"></select>
+        <div style="margin-top:6px"><button class="btn-ghost btn-small" data-uid="${uid}" data-act="del">Borrar</button> <button class="btn btn-small" data-uid="${uid}" data-act="imp">Impersonar</button></div>
       </div>`;
     ul.appendChild(div);
   });
-  // attach events
-  ul.querySelectorAll('.adm_role_sel').forEach(sel=>{
-    sel.onchange = (e)=>{ const uid = e.target.dataset.uid; changeUserRole(uid, e.target.value); };
+  // fill role selects
+  ul.querySelectorAll('.adm_role_sel').forEach(async sel=>{
+    const uid = sel.dataset.uid;
+    const rolesSnap = await getDocs(COL('roles'));
+    sel.innerHTML = rolesSnap.docs.map(r=>`<option value="${r.data().key||r.id}">${r.data().name||r.data().key||r.id}</option>`).join('');
+    // set value to user's current role
+    const usersSnap = await getDocs(COL('users'));
+    usersSnap.forEach(uDoc=>{
+      if(uDoc.id===sel.dataset.uid){
+        sel.value = uDoc.data().role || '';
+      }
+    });
+    sel.onchange = async (e)=> changeUserRole(uid, e.target.value);
   });
-  ul.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = ()=>{
+  // attach delete/impersonate
+  ul.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=>{
     const uid = b.dataset.uid;
     if(!confirm('Borrar usuario?')) return;
-    let arr = lsGet('users', []); const u = arr.find(x=>x.id===uid);
-    if(u && u.username==='admin'){ modalAlert('Error','No puedes borrar admin seed'); return; }
-    arr = arr.filter(x=>x.id!==uid); lsSet('users', arr); pushLog(`Usuario borrado: ${uid}`); loadUsersAdmin();
+    // prevent deleting seed admin? not necessary
+    await deleteDoc(doc(db,'users',uid));
+    pushLog(`Usuario borrado: ${uid}`);
   });
-  ul.querySelectorAll('button[data-act="imp"]').forEach(b=> b.onclick = ()=>{
-    const uid = b.dataset.uid; const u = lsGet('users',[]).find(x=>x.id===uid); if(!u) return; STATE.currentUser = u; lsSet('currentUser', u); updateHeader(); pushLog(`Impersonación: ${u.username}`); alert('Ahora eres: '+u.display);
+  ul.querySelectorAll('button[data-act="imp"]').forEach(b=> b.onclick = async ()=>{
+    const uid = b.dataset.uid;
+    const ud = await getDoc(doc(db,'users',uid));
+    if(!ud.exists()) return alert('Usuario no existe');
+    const u = ud.data(); // impersonate locally
+    STATE.currentUser = { id: uid, ...u };
+    localStorage.setItem('pda_currentUser', JSON.stringify(STATE.currentUser));
+    updateHeader();
+    pushLog(`Impersonación: ${u.username}`);
+    alert('Ahora eres: '+u.display);
   });
 }
-
-function changeUserRole(uid,newRole){
-  let users=lsGet('users',[]); const u=users.find(x=>x.id===uid); if(!u) return; u.role=newRole; lsSet('users',users); pushLog(`Rol cambiado: ${u.username} -> ${newRole}`); loadUsersAdmin();
+async function changeUserRole(uid,newRole){
+  if(!STATE.currentUser || STATE.currentUser.role!=='admin'){ alert('Solo admin puede cambiar roles'); return; }
+  await updateDoc(doc(db,'users',uid), { role: newRole });
+  pushLog(`Rol cambiado: ${uid} -> ${newRole}`);
 }
-function adminCreateUser(){
-  if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){ modalAlert('Error','Solo admin puede crear usuarios aquí'); return; }
+async function adminCreateUser(){
+  if(!STATE.currentUser || STATE.currentUser.role!=='admin'){ alert('Solo admin puede crear usuarios'); return; }
   const username=document.getElementById('adm_newUser').value.trim(); const display=document.getElementById('adm_newDisplay').value.trim()||username; const pass=document.getElementById('adm_newPass').value.trim()||'1234'; const role=document.getElementById('adm_newRole').value;
-  if(!username){ modalAlert('Error','username requerido'); return; }
-  let users=lsGet('users',[]); if(users.find(u=>u.username===username)){ modalAlert('Error','Usuario ya existe'); return; }
-  const u={id:uid('u'), username, display, badge:'', password:pass, role}; users.unshift(u); lsSet('users',users); pushLog(`Usuario admin creado: ${username}`); loadUsersAdmin();
+  if(!username) return alert('username requerido');
+  await addDoc(COL('users'), { username, display, badge:'', password:pass, role });
+  pushLog(`Usuario admin creado: ${username}`);
 }
-function adminCreateRole(){
-  if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){ modalAlert('Error','Solo admin puede crear roles'); return; }
-  const name=document.getElementById('adm_newRoleName').value.trim(); if(!name){ modalAlert('Error','Nombre rol requerido'); return; }
-  const roles = lsGet('roles', {}); if(roles[name]){ modalAlert('Error','Rol ya existe'); return; }
-  roles[name] = { name, color:'#999999', permissions:[] }; lsSet('roles', roles); pushLog(`Rol creado: ${name}`); loadRolesAdmin(); loadUsersAdmin();
+async function adminCreateRole(){
+  if(!STATE.currentUser || STATE.currentUser.role!=='admin'){ alert('Solo admin puede crear roles'); return; }
+  const name=document.getElementById('adm_newRoleName').value.trim(); if(!name) return alert('Nombre rol requerido');
+  // store with key = name normalized
+  const key = name.toLowerCase().replace(/\s+/g,'_');
+  await addDoc(COL('roles'), { key, name, color:'#999999', permissions:[] });
+  pushLog(`Rol creado: ${key}`);
 }
-function loadRolesAdmin(){
-  const roles = lsGet('roles', {}); const out = document.getElementById('rolesAdminList'); out.innerHTML = '';
-  for(const key in roles){
-    const r = roles[key];
+async function loadRolesAdmin(){
+  const out = document.getElementById('rolesAdminList'); if(!out) return;
+  const snap = await getDocs(COL('roles'));
+  out.innerHTML = '';
+  snap.forEach(d=>{
+    const r = d.data(); const key = r.key||d.id;
     const div = document.createElement('div'); div.className='item';
-    div.innerHTML = `<div style="flex:1"><b>${key}</b><div class="muted small">Permisos:</div><div id="permBox_${key}" style="margin-top:6px"></div></div>
-      <div style="text-align:right"><button class="btn-ghost" data-role="${key}" data-act="edit">Editar</button> <button class="btn" data-role="${key}" data-act="del">Borrar</button></div>`;
+    div.innerHTML = `<div style="flex:1"><b>${key}</b><div class="muted small">Permisos: ${(r.permissions||[]).join(', ') || 'Sin permisos'}</div></div>
+      <div style="text-align:right"><button class="btn-ghost" data-role="${d.id}" data-act="edit">Editar</button> <button class="btn" data-role="${d.id}" data-act="del">Borrar</button></div>`;
     out.appendChild(div);
-    const box = div.querySelector(`#permBox_${key}`);
-    box.innerHTML = (r.permissions && r.permissions.length) ? r.permissions.map(p=>`<span class="role-chip">${p}</span>`).join('') : '<span class="muted tiny">Sin permisos</span>';
-  }
-  // attach events
-  out.querySelectorAll('button[data-act="edit"]').forEach(b=> b.onclick = ()=>{
-    const roleKey = b.dataset.role; openRoleEditor(roleKey);
   });
-  out.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = ()=>{
-    const roleKey = b.dataset.role; if(!confirm('Borrar rol? (Los usuarios con este rol quedarán con rol vacío)')) return;
-    let roles = lsGet('roles', {}); delete roles[roleKey]; lsSet('roles', roles);
-    // remove role from users
-    let users = lsGet('users', []); users.forEach(u=>{ if(u.role===roleKey) u.role=''; }); lsSet('users', users);
-    pushLog(`Rol borrado: ${roleKey}`); loadRolesAdmin(); loadUsersAdmin();
+  // attach edit/del
+  out.querySelectorAll('button[data-act="edit"]').forEach(b=> b.onclick = ()=> openRoleEditor(b.dataset.role));
+  out.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=>{
+    const roleDoc = b.dataset.role;
+    if(!confirm('Borrar rol? (Los usuarios con este rol quedarán sin rol)')) return;
+    await deleteDoc(doc(db,'roles',roleDoc));
+    // strip role from users who had it
+    const usersSnap = await getDocs(COL('users'));
+    usersSnap.forEach(async uDoc=>{ if(uDoc.data().role=== (await getDoc(doc(db,'roles',roleDoc))).data()?.key || roleDoc){ await updateDoc(doc(db,'users',uDoc.id), { role: '' }).catch(()=>{}); }});
+    pushLog(`Rol borrado: ${roleDoc}`);
+  });
+}
+function openRoleEditor(roleDocId){
+  // fetch role data
+  getDoc(doc(db,'roles',roleDocId)).then(rdoc=>{
+    if(!rdoc.exists()) return alert('Rol no encontrado');
+    const r = rdoc.data();
+    const modal = document.createElement('div'); modal.className='overlay';
+    modal.innerHTML = `<div class="modal"><h3>Editar rol: ${r.key||roleDocId}</h3><div class="muted small">Marca los permisos</div><div id="permChecks" style="margin-top:12px"></div><div style="display:flex;gap:8px;margin-top:12px"><button id="saveRole" class="btn">Guardar</button><button id="cancelRole" class="btn-ghost">Cancelar</button></div></div>`;
+    document.body.appendChild(modal);
+    const perms = ['create_reports','delete_reports','create_pda','create_call','assign_call','create_bolo','manage_wanted','create_fine','export','all'];
+    const box = modal.querySelector('#permChecks');
+    box.innerHTML = perms.map(p=>`<div style="margin-bottom:6px"><label><input type="checkbox" data-perm="${p}" ${ (r.permissions||[]).includes(p) ? 'checked' : '' }/> ${p}</label></div>`).join('');
+    modal.querySelector('#cancelRole').onclick = ()=> modal.remove();
+    modal.querySelector('#saveRole').onclick = async ()=>{
+      const checked = Array.from(box.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.dataset.perm);
+      await updateDoc(doc(db,'roles',roleDocId), { permissions: checked });
+      pushLog(`Rol editado: ${r.key||roleDocId}`);
+      modal.remove();
+    };
   });
 }
 
-function openRoleEditor(roleKey){
-  const roles = lsGet('roles', {});
-  const role = roles[roleKey];
-  if(!role){ modalAlert('Error','Rol no existe'); return; }
-  // build modal
-  const modal = document.createElement('div'); modal.className='overlay';
-  modal.innerHTML = `<div class="modal">
-    <h3>Editar rol: ${roleKey}</h3>
-    <div class="muted small">Marca los permisos que tendrá este rol</div>
-    <div style="margin-top:12px" id="permChecks"></div>
-    <div style="display:flex;gap:8px;margin-top:12px"><button id="saveRole" class="btn">Guardar</button><button id="cancelRole" class="btn-ghost">Cancelar</button></div>
-  </div>`;
-  document.body.appendChild(modal);
-  const permsList = ['create_reports','delete_reports','create_pda','create_call','assign_call','create_bolo','manage_wanted','create_fine','export','all'];
-  const box = modal.querySelector('#permChecks');
-  box.innerHTML = permsList.map(p=>`<div style="margin-bottom:6px"><label><input type="checkbox" data-perm="${p}" ${role.permissions.includes(p)?'checked':''}/> ${p}</label></div>`).join('');
-  modal.querySelector('#cancelRole').onclick = ()=> modal.remove();
-  modal.querySelector('#saveRole').onclick = ()=>{
-    const checked = Array.from(box.querySelectorAll('input[type=checkbox]:checked')).map(c=>c.dataset.perm);
-    role.permissions = checked;
-    roles[roleKey] = role; lsSet('roles', roles);
-    pushLog(`Rol editado: ${roleKey}`);
-    modal.remove(); loadRolesAdmin(); loadUsersAdmin();
-  };
-}
-
-/* ========== Logs & Tools ========== */
-function pushLog(msg){ const logs = lsGet('logs', []); logs.unshift({id:uid('log'), t:now(), msg}); lsSet('logs', logs); renderLogsMini(); }
+/* ================= Logs / Tools ================= */
 function renderLogs(container){
   if(!container){ expandedRoot.innerHTML=''; const panel=document.createElement('div'); panel.className='expanded'; renderLogs(panel); expandedRoot.appendChild(panel); return; }
-  const logs = lsGet('logs', []);
   container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>Auditoría</strong><div class="muted small">Últimas acciones</div></div><div><button class="btn btn-small" id="closeL">Cerrar</button></div></div>
     <div style="margin-top:12px" id="logsList" class="list"></div>`;
   container.querySelector('#closeL').onclick = ()=> closeExpanded();
-  const list = container.querySelector('#logsList'); list.innerHTML = '';
-  if(!logs.length){ list.innerHTML = '<div class="muted small">Sin logs</div>'; return; }
-  logs.slice(0,200).forEach(l=>{ const it = document.createElement('div'); it.className='item'; it.innerHTML = `<div><div style="font-weight:700">${l.msg}</div><div class="muted small">${new Date(l.t).toLocaleString()}</div></div>`; list.appendChild(it); });
+  // only show logs if admin or comisario
+  if(!STATE.currentUser || !(STATE.currentUser.role==='admin' || STATE.currentUser.role==='comisario')){
+    container.querySelector('#logsList').innerHTML = '<div class="muted small">Acceso restringido</div>'; return;
+  }
+  onSnapshot(COL('logs'), snap=>{
+    const list = container.querySelector('#logsList'); list.innerHTML = '';
+    const arr = []; snap.forEach(d=> arr.push({id:d.id, ...d.data()}));
+    arr.sort((a,b)=> b.t - a.t);
+    arr.slice(0,200).forEach(l=>{
+      const it = document.createElement('div'); it.className='item';
+      it.innerHTML = `<div><div style="font-weight:700">${l.msg}</div><div class="muted small">${l.actor||''} • ${formatDate(l.t)}</div></div>`;
+      list.appendChild(it);
+    });
+  });
 }
 function renderTools(container){
   container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>Herramientas</strong><div class="muted small">Exportar / Importar</div></div><div><button class="btn btn-small" id="closeT">Cerrar</button></div></div>
@@ -642,95 +761,114 @@ function renderTools(container){
   container.querySelector('#closeT').onclick = ()=> closeExpanded();
   container.querySelector('#doExport').onclick = exportAll;
   container.querySelector('#doImport').onclick = ()=> document.getElementById('importFile').click();
-  container.querySelector('#doClear').onclick = ()=>{ if(confirm('Borrar todos los datos locales?')){ localStorage.clear(); location.reload(); } };
+  container.querySelector('#doClear').onclick = async ()=>{ if(!confirm('Borrar todos los datos de Firestore (colecciones usadas)?')) return; alert('Esta operación debe realizarse manualmente en Firebase Console o con scripts.'); };
   document.getElementById('importFile').onchange = importFile;
 }
-function exportAll(){
-  if(!hasPerm('export')){ modalAlert('Error','No tienes permiso para exportar'); return; }
-  const data = {
-    users: lsGet('users',[]), roles: lsGet('roles',{}), templates: lsGet('templates',{}),
-    reports: lsGet('reports',[]), wanted: lsGet('wanted',[]), calls: lsGet('calls',[]),
-    pda: lsGet('pda',[]), fines: lsGet('fines',[]), logs: lsGet('logs',[])
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+async function exportAll(){
+  if(!STATE.currentUser){ alert('Inicia sesión'); return; }
+  // read all main collections and offer download
+  const collections = ['users','roles','templates','reports','wanted','calls','pda','fines','logs','onDuty'];
+  const out = {};
+  for(const c of collections){
+    const snap = await getDocs(COL(c));
+    out[c] = []; snap.forEach(d=> out[c].push({ id: d.id, ...d.data() }));
+  }
+  const blob = new Blob([JSON.stringify(out,null,2)], { type:'application/json' });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href = url; a.download = 'pda_export_'+Date.now()+'.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-  pushLog('Datos exportados');
+  const a = document.createElement('a'); a.href = url; a.download = `pda_export_${Date.now()}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  pushLog('Exportado datos');
 }
 function importFile(e){
   const f = e.target.files[0]; if(!f) return;
   const reader = new FileReader();
-  reader.onload = (ev)=>{
+  reader.onload = async (ev)=>{
     try{
       const data = JSON.parse(ev.target.result);
-      if(!confirm('Importar reemplazará datos locales. Continuar?')) return;
-      if(data.users) lsSet('users', data.users);
-      if(data.roles) lsSet('roles', data.roles);
-      if(data.templates) lsSet('templates', data.templates);
-      if(data.reports) lsSet('reports', data.reports);
-      if(data.wanted) lsSet('wanted', data.wanted);
-      if(data.calls) lsSet('calls', data.calls);
-      if(data.pda) lsSet('pda', data.pda);
-      if(data.fines) lsSet('fines', data.fines);
-      if(data.logs) lsSet('logs', data.logs);
+      if(!confirm('Importar reemplazará/añadirá datos en Firestore. Continuar?')) return;
+      // Note: import is naive — duplicates possible. Use carefully.
+      for(const colName in data){
+        const arr = data[colName];
+        for(const item of arr){
+          const copy = { ...item }; delete copy.id;
+          await addDoc(COL(colName), copy);
+        }
+      }
+      alert('Importación terminada');
       pushLog('Datos importados');
-      alert('Importación completa. Recargando UI.');
-      location.reload();
-    } catch(err){ modalAlert('Error','JSON inválido'); }
+    }catch(err){ alert('JSON inválido'); }
   };
   reader.readAsText(f);
 }
 
-/* ========== Login/Register original logic ========== */
+/* ============== Login / Register (your modal preserved) ============== */
 document.getElementById('btnLogin').onclick = ()=> openLoginModal();
 document.getElementById('btnExport').onclick = ()=> exportAll();
 
-function openLoginModal(){ loginModal.style.display='flex'; document.getElementById('loginUser').focus(); }
-function closeLoginModal(){ loginModal.style.display='none'; document.getElementById('loginPass').value=''; document.getElementById('loginUser').value=''; document.getElementById('loginError').style.display='none'; }
+function openLoginModal(){ loginModal.classList.remove('hidden'); document.getElementById('loginUser').focus(); }
+function closeLoginModal(){ loginModal.classList.add('hidden'); document.getElementById('loginPass').value=''; document.getElementById('loginUser').value=''; document.getElementById('loginError').style.display='none'; }
 
-document.getElementById('guestBtn').onclick = ()=> { STATE.currentUser = null; lsSet('currentUser', null); updateHeader(); closeLoginModal(); pushLog('Entró como invitado'); };
-document.getElementById('showReg').onclick = ()=> { const b = document.getElementById('registerBlock'); b.style.display = b.style.display==='none' ? 'block' : 'none'; };
-document.getElementById('regCancel').onclick = ()=> { document.getElementById('registerBlock').style.display='none'; };
+document.getElementById('guestBtn').onclick = ()=> { STATE.currentUser = null; localStorage.removeItem('pda_currentUser'); updateHeader(); closeLoginModal(); pushLog('Entró como invitado'); };
+document.getElementById('showReg').onclick = ()=> { const b = document.getElementById('registerBlock'); b.classList.toggle('hidden'); };
+document.getElementById('regCancel').onclick = ()=> { document.getElementById('registerBlock').classList.add('hidden'); };
 
-document.getElementById('loginBtn').onclick = ()=>{
+document.getElementById('loginBtn').onclick = async ()=>{
   const u = document.getElementById('loginUser').value.trim(); const p = document.getElementById('loginPass').value.trim();
-  const users = lsGet('users', []);
-  const found = users.find(x=>x.username === u && x.password === p);
-  if(found){ STATE.currentUser = {...found}; lsSet('currentUser', STATE.currentUser); updateHeader(); closeLoginModal(); pushLog(`Sesión iniciada: ${found.username}`); modalAlert('OK','Sesión iniciada: ' + found.display); }
-  else { document.getElementById('loginError').style.display='block'; document.getElementById('loginError').textContent='Usuario o contraseña incorrectos'; }
+  if(!u || !p) { document.getElementById('loginError').style.display='block'; document.getElementById('loginError').textContent='Usuario y contraseña requeridos'; return; }
+  // find user in Firestore
+  const snap = await getDocs(query(COL('users'), where('username','==',u)));
+  let found = null;
+  snap.forEach(d=> { found = { id: d.id, ...d.data() }; });
+  if(found && found.password === p){
+    STATE.currentUser = { id: found.id, username: found.username, display: found.display, role: found.role, badge: found.badge || '' };
+    localStorage.setItem('pda_currentUser', JSON.stringify(STATE.currentUser));
+    updateHeader(); closeLoginModal(); pushLog(`Sesión iniciada: ${found.username}`); alert('Sesión iniciada: ' + found.display);
+  } else {
+    document.getElementById('loginError').style.display='block'; document.getElementById('loginError').textContent='Usuario o contraseña incorrectos';
+  }
 };
 
-document.getElementById('regCreate').onclick = ()=>{
+document.getElementById('regCreate').onclick = async ()=>{
   const username = document.getElementById('regUser').value.trim();
   const display = document.getElementById('regName').value.trim() || username;
   const pass = document.getElementById('regPass').value.trim() || '1234';
   const role = document.getElementById('regRole').value;
   if(!username){ document.getElementById('regMsg').textContent='Usuario requerido'; return; }
-  const users = lsGet('users', []);
-  if(users.find(u=>u.username===username)){ document.getElementById('regMsg').textContent='Usuario ya existe'; return; }
-  const u = {id:uid('u'), username, display, badge:'', password:pass, role};
-  users.unshift(u); lsSet('users', users); document.getElementById('regMsg').textContent='Cuenta creada. Inicia sesión.'; pushLog(`Cuenta creada: ${username}`);
+  const exists = await getDocs(query(COL('users'), where('username','==',username)));
+  if(!exists.empty){ document.getElementById('regMsg').textContent='Usuario ya existe'; return; }
+  await addDoc(COL('users'), { username, display, badge:'', password:pass, role, _created: Date.now() });
+  document.getElementById('regMsg').textContent='Cuenta creada. Inicia sesión.';
+  pushLog(`Cuenta creada: ${username}`);
   document.getElementById('regUser').value=''; document.getElementById('regName').value=''; document.getElementById('regPass').value='';
 };
 
-/* ========== UI helpers ========== */
+/* ============== Header / helpers ============== */
 function closeExpanded(){ STATE.expanded=null; expandedRoot.innerHTML=''; window.scrollTo({top:0,behavior:'smooth'}); }
-function updateHeader(){ STATE.currentUser = lsGet('currentUser', STATE.currentUser); const u = STATE.currentUser; userDisplay.textContent = u? `${u.display} (${u.role})` : 'No conectado'; const on = lsGet('onDuty', {}); const users = lsGet('users', []); const active = Object.keys(on).filter(k=>on[k]).map(id=> users.find(u=>u.id===id)?.display || id); dutyStatus.textContent = `En servicio: ${active.length}`; }
+function updateHeader(){
+  // try to restore from localStorage
+  if(!STATE.currentUser){
+    const raw = localStorage.getItem('pda_currentUser');
+    if(raw) STATE.currentUser = JSON.parse(raw);
+  }
+  if(STATE.currentUser){ userDisplay.textContent = `${STATE.currentUser.display} (${STATE.currentUser.role})`; btnLogin.textContent='Cerrar sesión'; }
+  else { userDisplay.textContent = 'No conectado'; btnLogin.textContent='Iniciar'; }
+  // duty count
+  getDocs(COL('onDuty')).then(snap => {
+    let active = 0; snap.forEach(d=> { if(d.data().active) active++; });
+    dutyStatus.textContent = `En servicio: ${active}`;
+  });
+}
 btnLogin.addEventListener('click', ()=>{
-  if(STATE.currentUser){ if(confirm('Cerrar sesión?')){ lsSet('currentUser', null); STATE.currentUser=null; updateHeader(); pushLog('Sesión cerrada'); } } else openLoginModal();
+  if(STATE.currentUser){ if(confirm('Cerrar sesión?')){ STATE.currentUser=null; localStorage.removeItem('pda_currentUser'); updateHeader(); pushLog('Sesión cerrada'); } } else openLoginModal();
 });
 
-/* ========== Init ========== */
-function initUI(){
-  seedIfNeeded();
+/* ============== Init ============== */
+(async function initUI(){
+  await seedIfNeeded();
   renderCards();
-  STATE.currentUser = lsGet('currentUser', STATE.currentUser);
+  STATE.currentUser = JSON.parse(localStorage.getItem('pda_currentUser')||'null');
   updateHeader();
-  renderLogsMini();
-}
-function renderLogsMini(){ const onMap = lsGet('onDuty', {}); const users = lsGet('users', []); const active = Object.keys(onMap).filter(k=>onMap[k]).map(id=> users.find(u=>u.id===id)?.display || id); dutyStatus.textContent = `En servicio: ${active.length}`; userDisplay.textContent = STATE.currentUser ? `${STATE.currentUser.display} (${STATE.currentUser.role})` : 'No conectado'; }
-initUI();
-
+  // Realtime listeners for cards that are open might be attached when opened
+})();
 </script>
 </body>
 </html>
