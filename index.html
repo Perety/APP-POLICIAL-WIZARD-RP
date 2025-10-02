@@ -83,14 +83,14 @@
 
     <div id="expandedRoot"></div>
 
-    <footer>Hecho para Wizard RP • Conexión Firestore • Copia y pega en index.html</footer>
+    <footer> • Hecho para Wizard RP •  </footer>
   </div>
 
   <!-- LOGIN / REG modal (mantener tu sistema) -->
   <div id="loginModal" class="overlay" style="display:none">
     <div class="modal">
       <h3>Entrar / Registrarse</h3>
-      <div class="muted small">Usa tu cuenta o crea una. Login simple (datos en Firestore para demo).</div>
+      <div class="muted small">Usa tu cuenta o crea una. Login simple (datos en Firestore).</div>
 
       <div style="margin-top:12px">
         <label class="muted small">Usuario</label>
@@ -116,9 +116,14 @@
         <div style="display:flex;gap:8px;margin-top:8px">
           <select id="regRole">
             <option value="officer">Oficial</option>
-            <option value="sergeant">Sargento</option>
-            <option value="dispatcher">Despachador</option>
-            <option value="admin">Administrador</option>
+            <option value="officer">Oficial I </option>
+            <option value="officer">Oficial II </option>
+            <option value="officer">Oficial III </option>
+            <option value="sergeant">Sargento I</option>
+            <option value="sergeant">Sargento II</option>
+            <option value="sergeant">Sargento III</option>
+            <option value="dispatcher">Jefe de comisaria</option>
+           
           </select>
           <button id="regCreate" class="btn">Crear</button>
           <button id="regCancel" class="btn-ghost">Cancelar</button>
@@ -904,82 +909,6 @@
         list.appendChild(it);
       });
     });
-  }
-
-  // ---------- TOOLS (Export / Import) ----------
-  async function renderTools(){
-    expandedRoot.innerHTML = `<div class="expanded">
-      <div style="display:flex;justify-content:space-between;align-items:center">
-        <div><strong>Herramientas</strong><div class="muted small">Exportar / Importar datos</div></div>
-        <div><button id="closeT" class="btn-ghost">Cerrar</button></div>
-      </div>
-      <div style="margin-top:12px;display:flex;gap:8px">
-        <button id="doExport" class="btn">Exportar JSON</button>
-        <button id="doImport" class="btn-ghost">Importar JSON</button>
-        <button id="doClear" class="btn-ghost">Borrar colecciones locales</button>
-      </div>
-      <input id="importFile" type="file" style="display:none" accept=".json" />
-    </div>`;
-    document.getElementById('closeT').onclick = ()=> expandedRoot.innerHTML='';
-    document.getElementById('doExport').onclick = exportAll;
-    document.getElementById('doImport').onclick = ()=> document.getElementById('importFile').click();
-    document.getElementById('doClear').onclick = ()=> { if(confirm('Borrar todas las colecciones demo de Firestore? Esto eliminará datos en el proyecto!')){ clearCollections(); } };
-    document.getElementById('importFile').onchange = importFile;
-  }
-
-  async function exportAll(){
-    // Only allow admins or those with export perm
-    if(!STATE.currentUser || !(STATE.currentUser.role === 'admin' || await hasPermission('export'))){ modalAlert('Error','No tienes permiso para exportar'); return; }
-    const collections = ['users','reports','pda','calls','wanted','fines','service','audit','roles'];
-    const out = {};
-    for(const c of collections){
-      const snap = await getDocs(collection(db,c));
-      out[c] = snap.docs.map(d => ({ id: d.id, data: d.data() }));
-    }
-    const blob = new Blob([JSON.stringify(out,null,2)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a'); a.href = url; a.download = `pda_export_${Date.now()}.json`; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-    await pushLog(`${STATE.currentUser.display} exportó datos`);
-  }
-
-  async function importFile(e){
-    if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){ modalAlert('Error','Solo admin puede importar'); return; }
-    const f = e.target.files[0]; if(!f) return;
-    const reader = new FileReader();
-    reader.onload = async (ev) => {
-      try{
-        const data = JSON.parse(ev.target.result);
-        if(!confirm('Importar reemplazará datos en Firestore. Continuar?')) return;
-        // naive import: for each collection, delete existing docs and add new ones
-        for(const key of Object.keys(data)){
-          const arr = data[key];
-          // delete existing
-          const snap = await getDocs(collection(db,key));
-          for(const d of snap.docs) await deleteDoc(doc(db,key,d.id));
-          // add new
-          for(const item of arr){
-            // item may contain id and data, we add as new doc (id will be auto)
-            await addDoc(collection(db,key), item.data);
-          }
-        }
-        modalAlert('Importación','Importación completada. Recargando UI.');
-        await pushLog(`${STATE.currentUser.display} importó datos`);
-        location.reload();
-      }catch(err){ modalAlert('Error','JSON inválido o error: '+err.message); }
-    };
-    reader.readAsText(f);
-  }
-
-  async function clearCollections(){
-    if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){ modalAlert('Error','Solo admin puede borrar'); return; }
-    const colls = ['users','reports','pda','calls','wanted','fines','service','audit','roles'];
-    for(const c of colls){
-      const snap = await getDocs(collection(db,c));
-      for(const d of snap.docs) await deleteDoc(doc(db,c,d.id));
-    }
-    modalAlert('Borrado','Colecciones borradas (seeds se volverán a crear al recargar).');
-    await pushLog(`${STATE.currentUser.display} borró colecciones`);
-    location.reload();
   }
 
   // ====== PERMISSION HELPERS ======
