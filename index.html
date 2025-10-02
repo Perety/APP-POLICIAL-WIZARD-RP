@@ -1,1128 +1,1129 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Wizard RP — PDA Policial (Online)</title>
-<style>
-  :root{
-    --bg:#071018; --muted:#98a8b0; --accent:#844ffc; --accent-2:#6ee7b7;
-    --card:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
-    --glass: rgba(255,255,255,0.03);
-    --radius:12px; --danger:#ff6b6b;
-    --txt:#e7eef6;
-  }
-  *{box-sizing:border-box}
-  html,body{height:100%}
-  body{
-    margin:0;background:
-      radial-gradient(900px 350px at 10% 10%, rgba(132,79,252,0.06), transparent),
-      linear-gradient(180deg, #03121a 0%, var(--bg) 60%);
-    color:var(--txt); font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-  }
-  .wrap{max-width:1180px;margin:18px auto;padding:18px;display:grid;grid-template-rows:auto 1fr;gap:14px}
-  header{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo-img{width:56px;height:56px;border-radius:12px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#071729}
-  .logo-img img{width:100%;height:100%;object-fit:cover}
-  h1{margin:0;font-size:18px}
-  .subtitle{color:var(--muted);font-size:13px}
-  .top-right{display:flex;gap:8px;align-items:center}
-  .pill{background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:999px;font-weight:700}
-  .small{font-size:12px;color:var(--muted)}
-  button{font-family:inherit}
-  .btn{background:var(--accent);color:#fff;padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:800}
-  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:var(--muted);padding:7px 10px;border-radius:10px;cursor:pointer}
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-  .card{background:var(--card);border-radius:var(--radius);padding:18px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(2,6,10,0.6);cursor:pointer;overflow:hidden;position:relative;display:flex;flex-direction:column;gap:12px;min-height:120px;transition:transform .22s,box-shadow .22s}
-  .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,6,10,0.75)}
-  .title{font-weight:900;font-size:16px}
-  .desc{color:var(--muted);font-size:13px}
-  .icon{width:56px;height:56px;border-radius:10px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-size:22px}
-  .expanded{margin-top:14px;border-radius:var(--radius);padding:18px;background:var(--card);border:1px solid rgba(255,255,255,0.03)}
-  .form-row{display:flex;gap:8px}
-  input,textarea,select{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
-  textarea{min-height:110px;resize:vertical}
-  .list{display:flex;flex-direction:column;gap:10px}
-  .item{padding:10px;border-radius:10px;background:var(--glass);display:flex;justify-content:space-between;align-items:center}
-  .muted{color:var(--muted)}
-  .danger{background:linear-gradient(90deg,#ff8a80,#ff5252);color:#041018;padding:6px 8px;border-radius:8px}
-  .ok{background:linear-gradient(90deg,#48c774,#34d399);color:#041018;padding:6px 8px;border-radius:8px}
-  .tiny{font-size:12px}
-  footer{margin-top:18px;text-align:center;color:var(--muted);font-size:13px}
-  .overlay{position:fixed;inset:0;background:linear-gradient(rgba(2,6,10,0.6),rgba(2,6,10,0.8));display:flex;align-items:center;justify-content:center;z-index:9999}
-  .modal{width:540px;max-width:94%;background:linear-gradient(180deg,#071729,#061421);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
-  .link-like{color:var(--accent);cursor:pointer;text-decoration:underline}
-  .grid-2{display:grid;grid-template-columns:1fr 340px;gap:12px}
-  .role-chip{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.02);margin-right:6px;margin-bottom:6px}
-  .badge{background:rgba(255,255,255,0.04);padding:6px 10px;border-radius:999px}
-  @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} .grid-2{grid-template-columns:1fr} }
-  @media (max-width:640px){ .grid{grid-template-columns:1fr} .form-row{flex-direction:column} .modal{width:94%} }
-
-  /* avisos emergentes */
-  #avisos { position: fixed; top: 18px; right: 18px; z-index: 20000; display:flex;flex-direction:column;gap:8px; }
-  .aviso { background:linear-gradient(180deg,#0b2530,#071823); padding:12px 14px;border-radius:8px;border-left:5px solid var(--accent); box-shadow:0 8px 20px rgba(0,0,0,0.6); min-width:260px }
-  .aviso small{display:block;color:var(--muted);margin-top:6px}
-
-  /* notificación sonora (oculto) */
-  audio { display:none }
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Wizard RP — Sistema Policial</title>
+  <style>
+    :root {
+      --accent: #844ffc;
+      --bg: #0a0f1a;
+      --panel: #111a2b;
+      --panel-light: #18253d;
+      --text: #f1f1f1;
+      --muted: #9ba6b2;
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+    header {
+      background: var(--panel);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      border-bottom: 2px solid var(--accent);
+    }
+    header .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    header .logo img { height: 48px; }
+    header h1 { font-size: 20px; margin: 0; }
+    .btn {
+      background: var(--accent);
+      border: none;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn:hover { opacity: 0.9; transform: scale(1.05); }
+    .btn-ghost {
+      background: transparent;
+      border: 2px solid var(--accent);
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-weight: bold;
+      color: var(--accent);
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .btn-ghost:hover { background: var(--accent); color: white; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .card {
+      background: var(--panel);
+      border-radius: 16px;
+      padding: 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+    .card:hover { transform: translateY(-5px); background: var(--panel-light); }
+    .card h3 { margin: 10px 0; font-size: 20px; }
+    .card p { color: var(--muted); font-size: 14px; }
+    .expanded {
+      margin: 20px;
+      background: var(--panel);
+      padding: 20px;
+      border-radius: 16px;
+      animation: fadeIn 0.3s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    input, textarea, select {
+      width: 100%; padding: 8px; margin: 6px 0;
+      border-radius: 8px; border: 1px solid #2c3e50;
+      background: #0d1625; color: white;
+    }
+    .list { margin-top: 12px; display: flex; flex-direction: column; gap: 8px; }
+    .item {
+      padding: 10px; background: var(--panel-light);
+      border-radius: 10px; display: flex;
+      justify-content: space-between; align-items: center;
+    }
+    .item small { color: var(--muted); }
+    footer { text-align: center; padding: 12px; color: var(--muted); font-size: 13px; }
+    /* MODAL LOGIN */
+    .overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,.8);
+      display: flex; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal {
+      background: var(--panel); padding: 20px; border-radius: 12px;
+      width: 420px; max-width: 95%; box-shadow: 0 4px 16px rgba(0,0,0,0.6);
+      animation: fadeIn 0.2s ease-in-out;
+    }
+    .modal h3 { margin-top: 0; }
+    /* Avisos emergentes */
+    #avisosBox {
+      position: fixed; top: 20px; right: 20px;
+      display: flex; flex-direction: column; gap: 10px;
+      z-index: 2000;
+    }
+    .aviso {
+      background: var(--panel-light); padding: 12px 18px;
+      border-left: 5px solid var(--accent);
+      border-radius: 8px; min-width: 220px;
+      box-shadow: 0 4px 10px rgba(0,0,0,.5);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+  </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <div class="logo-img"><img id="logoImg" src="https://cdn.discordapp.com/attachments/1421898595271180360/1422217488145453219/LOGO_WIZARD_FONDO.png.png" alt="WZRD"></div>
-        <div>
-          <h1>Wizard RP — PDA / CAD</h1>
-          <div class="subtitle">Sistema policial online — comparte la URL</div>
-        </div>
-      </div>
+  <header>
+    <div class="logo">
+      <img src="https://cdn.discordapp.com/attachments/1421898595271180360/1422217488145453219/LOGO_WIZARD_FONDO.png.png" alt="Wizard RP Logo">
+      <h1>Wizard RP — Sistema Policial</h1>
+    </div>
+    <div>
+      <span id="userDisplay">Invitado</span>
+      <button id="btnLogin" class="btn-ghost">Iniciar Sesión</button>
+    </div>
+  </header>
 
-      <div class="top-right">
-        <div class="pill small" id="userDisplay">No conectado</div>
-        <div class="pill small" id="dutyStatus">En servicio: 0</div>
-        <button id="btnExport" class="btn">Exportar</button>
-        <button id="btnLogin" class="btn-ghost">Iniciar sesión</button>
-      </div>
-    </header>
+  <section class="grid" id="cardsRoot"></section>
+  <div id="expandedRoot"></div>
+  <footer>Wizard RP — Sistema Policial Online</footer>
 
-    <section class="grid" id="cardsRoot">
-      <!-- tarjetas inyectadas por JS -->
-    </section>
+  <div id="avisosBox"></div>
 
-    <div id="expandedRoot"></div>
-
-    <footer>Hecho para Wizard RP • Conexión firestore: <span id="fbProject">wizard-rp</span></footer>
-  </div>
-
-  <!-- Login / Register modal (tu flujo original, modificado para no permitir registro admin) -->
+  <!-- Modal login -->
   <div id="loginModal" class="overlay" style="display:none">
     <div class="modal">
-      <h3>Entrar / Registrarse</h3>
-      <div class="muted small">Tu cuenta debe ser creada por un administrador. Aquí puedes iniciar sesión o usar "Invitado".</div>
-      <div style="margin-top:12px">
-        <label class="muted small">Usuario</label>
-        <input id="loginUser" placeholder="usuario (ej: perety04)"/>
-        <label class="muted small" style="margin-top:8px">Contraseña</label>
-        <input id="loginPass" type="password" placeholder="contraseña"/>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button id="loginBtn" class="btn">Entrar</button>
-          <button id="guestBtn" class="btn-ghost">Invitado</button>
-          <div style="margin-left:auto" class="small muted">¿Sin cuenta? Pide a un admin que la cree.</div>
-        </div>
-        <div id="loginError" class="muted small" style="margin-top:8px;color:#ff9b9b;display:none"></div>
-      </div>
+      <h3>Iniciar Sesión</h3>
+      <input id="loginUser" placeholder="Usuario">
+      <input id="loginPass" type="password" placeholder="Contraseña">
+      <button id="loginBtn" class="btn">Entrar</button>
+      <p id="loginError" style="color:red"></p>
     </div>
   </div>
+<!-- ------------------ PARTE 2: JS (Firebase + Lógica) ------------------ -->
+<script type="module">
+/*
+  Wizard RP - JS (Parte 2)
+  - Usa Firestore para datos compartidos en tiempo real entre dispositivos
+  - Login simple: usuarios almacenados en collection 'users' (contraseñas en claro en demo)
+  - Solo admins pueden crear usuarios desde el panel de administración
+  - Avisos emergentes para llamadas, asignaciones y cambios de servicio
+  - Auditoría guardada en 'audit'
+  - Prefijos/colecciones: users, pda, reports, calls, wanted, fines, roles, audit, onDuty, incautaciones, alertas
+*/
 
-  <!-- Avisos emergentes -->
-  <div id="avisos"></div>
-  <audio id="pingAudio" src="data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAESsAACJWAAACABAAZGF0YQAAAAA="></audio>
+/* =========== Firebase init =========== */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, getDocs, onSnapshot, doc, setDoc, updateDoc,
+  deleteDoc, serverTimestamp, getDoc, query, where, orderBy
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  <!-- Firebase + App -->
-  <script type="module">
-  /**************************************************************************
-   * Wizard RP — Index single-file (todo incluido)
-   * - Usa Firestore para sincronizar entre dispositivos (lectura/escritura)
-   * - NO usa Firebase Auth (login por comprobación de users collection)
-   * - Requisitos: configurar Firestore rules (recomendado). Aquí se asume que
-   *   tu proyecto firebase ya está configurado y la web key que me diste es la que usamos.
-   *
-   * Nota importante sobre seguridad:
-   * - Este ejemplo usa Firestore desde el cliente con la configuración pública.
-   * - Para un servidor real deberías aplicar reglas de seguridad para limitar quién puede
-   *   escribir en qué colecciones (por ejemplo, solo admins pueden crear roles/usuarios).
-   **************************************************************************/
+const firebaseConfig = {
+  apiKey: "AIzaSyCskczYgGtlPPBEIZiE5PuY7s_cfE_3Chg",
+  authDomain: "wizard-rp.firebaseapp.com",
+  projectId: "wizard-rp",
+  storageBucket: "wizard-rp.firebasestorage.app",
+  messagingSenderId: "479456044047",
+  appId: "1:479456044047:web:65c52e2430bcb6ca586f7a",
+  measurementId: "G-KX5Y56CG0R"
+};
 
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import {
-    getFirestore, collection, addDoc, getDocs, onSnapshot, doc, setDoc, deleteDoc,
-    updateDoc, query, where, orderBy, serverTimestamp, getDoc
-  } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
 
-  // ---------- CONFIG FIREBASE (ya la proporcionaste) ----------
-  const firebaseConfig = {
-    apiKey: "AIzaSyCskczYgGtlPPBEIZiE5PuY7s_cfE_3Chg",
-    authDomain: "wizard-rp.firebaseapp.com",
-    projectId: "wizard-rp",
-    storageBucket: "wizard-rp.firebasestorage.app",
-    messagingSenderId: "479456044047",
-    appId: "1:479456044047:web:65c52e2430bcb6ca586f7a",
-    measurementId: "G-KX5Y56CG0R"
-  };
+/* =========== Estado local =========== */
+let STATE = {
+  currentUser: null,       // {id, username, display, role, ...}
+  impersonator: null,      // si admin está suplantando, guarda admin original aquí
+  listeners: []            // para desconectar listeners si se necesita
+};
 
-  const app = initializeApp(firebaseConfig);
-  const db = getFirestore(app);
-  document.getElementById('fbProject').textContent = firebaseConfig.projectId;
+/* =========== Utilidades UI =========== */
+const cardsRoot = document.getElementById('cardsRoot');
+const expandedRoot = document.getElementById('expandedRoot');
+const userDisplay = document.getElementById('userDisplay');
+const loginModal = document.getElementById('loginModal');
+const loginError = document.getElementById('loginError');
+const avisosBox = document.getElementById('avisosBox');
 
-  // ---------- STATE ----------
-  let STATE = {
-    currentUser: null,    // usuario logueado (obj Firestore user)
-    isAdminOverride: false, // true si admin está impersonando pero mantiene poderes
-    impersonOriginal: null  // datos originales del admin que impersona
-  };
+function showAviso(text, ttl = 6000){
+  const el = document.createElement('div');
+  el.className = 'aviso';
+  el.textContent = text;
+  avisosBox.appendChild(el);
+  setTimeout(()=> el.remove(), ttl);
+}
 
-  /* ---------- UTILS ---------- */
-  function uid(prefix='id'){ return prefix+'_'+Math.random().toString(36).slice(2,9); }
-  function now(){ return Date.now(); }
-  function el(q){ return document.querySelector(q); }
-  function elId(id){ return document.getElementById(id); }
-  function toast(text, sub=''){ // aviso emergente local
-    const box = elId('avisos');
-    const node = document.createElement('div'); node.className='aviso';
-    node.innerHTML = `<div>${text}</div>${sub?`<small>${sub}</small>`:''}`;
-    box.prepend(node);
-    // sound
-    try{ elId('pingAudio').play().catch(()=>{}); }catch(e){}
-    setTimeout(()=> node.remove(), 7000);
-  }
-
-  // push aviso to Firestore (para que lo vean todos)
-  async function pushAviso(type, title, meta = {}) {
-    try{
-      await addDoc(collection(db, 'avisos'), {
-        type, title, meta, created_at: serverTimestamp()
-      });
-    }catch(e){ console.error('pushAviso error', e); }
-  }
-
-  // ---------- PERMISSIONS ----------
-  async function hasPerm(perm){
-    if(!STATE.currentUser) {
-      // invitados -> solo crear llamadas
-      return perm === 'create_call';
-    }
-    // if admin override is active, keep admin rights
-    if(STATE.isAdminOverride) return true;
-    // fetch role document
-    const rolesDoc = (await getDoc(doc(db, 'meta_roles', 'roles'))).data?.roles;
-    // But to keep it simple and robust we store roles as collection 'roles' with docs keyed by role name
-    try{
-      const rdoc = await getDoc(doc(db, 'roles', STATE.currentUser.role || ''));
-      if(!rdoc.exists()) return false;
-      const role = rdoc.data();
-      if(Array.isArray(role.permissions) && role.permissions.includes('all')) return true;
-      return Array.isArray(role.permissions) && role.permissions.includes(perm);
-    }catch(e){
-      console.error('hasPerm error', e); return false;
-    }
-  }
-
-  // convenience: requirePerm -> alert if not
-  async function requirePermOrAlert(perm, msg='No tienes permiso'){
-    const ok = await hasPerm(perm);
-    if(!ok) alert(msg);
-    return ok;
-  }
-
-  // ---------- SEED (si no hay datos iniciales) ----------
-  async function seedIfNeeded(){
-    // check roles collection
-    const rolesSnapshot = await getDocs(collection(db,'roles'));
-    if(rolesSnapshot.empty){
-      // crear roles básicos
-      await setDoc(doc(db,'roles','officer'), { name:'Officer', color:'#7c3aed', permissions:['create_reports','create_pda','create_call'] });
-      await setDoc(doc(db,'roles','sergeant'), { name:'Sergeant', color:'#3b82f6', permissions:['create_reports','create_pda','create_call','delete_reports'] });
-      await setDoc(doc(db,'roles','dispatcher'), { name:'Dispatcher', color:'#f97316', permissions:['create_call','assign_call'] });
-      await setDoc(doc(db,'roles','admin'), { name:'Admin', color:'#10b981', permissions:['all'] });
-      console.log('Roles seed creados');
-    }
-    // check admin user
-    const usersSnapshot = await getDocs(query(collection(db,'users'), where('username','==','admin')));
-    if(usersSnapshot.empty){
-      // crear admin con contraseña más amigable (la pediste)
-      await addDoc(collection(db,'users'), {
-        username:'admin',
-        display:'Admin Wizard',
-        badge:'ADM-001',
-        password:'wizard123', // recomendado cambiar más tarde desde admin
-        role:'admin',
-        created_at: serverTimestamp()
-      });
-      console.log('Admin seed creado');
-    }
-    // seed simple templates si no existen
-    const tplDoc = await getDoc(doc(db,'config','templates'));
-    if(!tplDoc.exists()){
-      await setDoc(doc(db,'config','templates'), {
-        report: "Título: {{title}}\\nHechos: {{facts}}\\nAcciones: {{actions}}\\nOficial: {{author}}",
-        pda: "Nombre: {{name}}\\nAlias: {{alias}}\\nNotas: {{notes}}",
-      });
-    }
-  }
-
-  // ---------- RENDER: tarjetas principales ----------
-  const CARDS = [
-    {id:'pda', title:'PDA / Fichas', desc:'Buscar y crear fichas PDA', icon:'🚓'},
-    {id:'calls', title:'Dispatch / Llamadas', desc:'Crear/Asignar llamadas', icon:'📞'},
-    {id:'reports', title:'Informes', desc:'Crear / Editar informes', icon:'📑'},
-    {id:'wanted', title:'BOLO / Wanted', desc:'Fichas buscados', icon:'🚨'},
-    {id:'fines', title:'Multas', desc:'Generar sanciones', icon:'💸'},
-    {id:'service', title:'Servicio', desc:'Entrar / Salir de servicio', icon:'🟢'},
-    {id:'admin', title:'Administración', desc:'Roles y usuarios (admin)', icon:'⚙️'},
-    {id:'logs', title:'Auditoría', desc:'Historial de acciones', icon:'📜'},
-    {id:'incautaciones', title:'Incautaciones', desc:'Registrar vehículos incautados', icon:'🚗'}
-  ];
-
-  function renderCards(){
-    const root = elId('cardsRoot'); root.innerHTML = '';
-    CARDS.forEach(c=>{
-      const card = document.createElement('div'); card.className='card'; card.dataset.id=c.id;
-      card.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-          <div><div class="title">${c.title}</div><div class="desc">${c.desc}</div></div>
-          <div class="icon">${c.icon}</div></div>
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div class="muted tiny">Acción rápida</div>
-          <div><button class="btn" data-open="${c.id}" style="background:var(--accent)">Abrir</button></div>
-        </div>`;
-      card.onclick = ()=> openCard(c.id);
-      card.querySelector('button[data-open]').onclick = (e)=>{ e.stopPropagation(); openCard(c.id); };
-      root.appendChild(card);
+/* ========== Registro de auditoría ========== */
+async function pushAudit(action, meta = {}){
+  try{
+    await addDoc(collection(db,'audit'), {
+      action, actor: STATE.currentUser ? STATE.currentUser.display : 'Invitado',
+      ts: serverTimestamp(), ...meta
     });
-  }
+  }catch(e){ console.warn('audit err', e); }
+}
 
-  // ---------- OPEN CARD ----------
-  let currentExpanded = null;
-  function openCard(id){
-    currentExpanded = id;
-    const root = elId('expandedRoot'); root.innerHTML = '';
-    const panel = document.createElement('div'); panel.className='expanded';
-    if(id==='pda') renderPDA(panel);
-    else if(id==='calls') renderCalls(panel);
-    else if(id==='reports') renderReports(panel);
-    else if(id==='wanted') renderWanted(panel);
-    else if(id==='fines') renderFines(panel);
-    else if(id==='service') renderService(panel);
-    else if(id==='admin') renderAdmin(panel);
-    else if(id==='logs') renderLogs(panel);
-    else if(id==='incautaciones') renderIncautaciones(panel);
-    root.appendChild(panel);
-    window.scrollTo({ top: panel.offsetTop-20, behavior:'smooth' });
-  }
+/* ========== Permisos y roles (cliente) ========== */
+async function loadRoles(){
+  const snap = await getDocs(collection(db,'roles'));
+  const r = {};
+  snap.forEach(d=> r[d.id] = d.data());
+  return r;
+}
+async function hasPerm(perm){
+  if(!STATE.currentUser) return perm === 'create_call'; // invitados pueden crear llamada
+  // load role from roles collection
+  const roleDoc = await getDoc(doc(db,'roles',STATE.currentUser.role || ''));
+  if(!roleDoc.exists()) return false;
+  const role = roleDoc.data();
+  if(role.permissions && role.permissions.includes('all')) return true;
+  return role.permissions && role.permissions.includes(perm);
+}
 
-  // ---------- PDA (buscar/crear, con imagen URL) ----------
-  async function renderPDA(container){
-    const tplDoc = await getDoc(doc(db,'config','templates'));
-    const templates = tplDoc.exists()? tplDoc.data() : {};
-    container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong>PDA / Fichas</strong><div class="muted small">Buscar y crear fichas</div></div>
-      <div><button class="btn btn-small" id="closeP">Cerrar</button></div>
+/* ========== Render tarjetas principales ========== */
+const CARDS = [
+  {id:'pda', title:'PDA', desc:'Buscar/crear fichas'},
+  {id:'reports', title:'Informes', desc:'Crear y ver informes'},
+  {id:'calls', title:'Llamadas', desc:'Crear/Asignar llamadas'},
+  {id:'wanted', title:'BOLO / Wanted', desc:'Fichas buscadas'},
+  {id:'fines', title:'Multas', desc:'Emitir sanciones'},
+  {id:'service', title:'Servicio', desc:'Entrar/Salir servicio'},
+  {id:'incautaciones', title:'Incautaciones', desc:'Vehículos incautados'},
+  {id:'alertas', title:'Alertas', desc:'Ver/Crear alertas ciudadanas'},
+  {id:'admin', title:'Administración', desc:'Usuarios y roles'},
+  {id:'audit', title:'Auditoría', desc:'Historial (admin/sargento)'}
+];
+
+function renderCards(){
+  cardsRoot.innerHTML = '';
+  CARDS.forEach(c=>{
+    const card = document.createElement('div');
+    card.className = 'card';
+    card.innerHTML = `<h3 style="color:#fff">${c.title}</h3><p>${c.desc}</p>`;
+    card.onclick = ()=> openCard(c.id);
+    cardsRoot.appendChild(card);
+  });
+}
+
+/* ========== Open card router ========== */
+function openCard(id){
+  expandedRoot.innerHTML = '';
+  if(id === 'pda') renderPDA();
+  else if(id === 'reports') renderReports();
+  else if(id === 'calls') renderCalls();
+  else if(id === 'wanted') renderWanted();
+  else if(id === 'fines') renderFines();
+  else if(id === 'service') renderService();
+  else if(id === 'incautaciones') renderIncautaciones();
+  else if(id === 'alertas') renderAlertas();
+  else if(id === 'admin') {
+    if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){
+      showAviso('Acceso denegado: solo administradores.',5000); return;
+    }
+    renderAdmin();
+  }
+  else if(id === 'audit') {
+    if(!STATE.currentUser) { showAviso('Acceso denegado',4000); return; }
+    // only admin or sergeant
+    if(['admin','sergeant'].includes(STATE.currentUser.role)) renderAudit();
+    else showAviso('Acceso denegado: permisos insuficientes',4000);
+  }
+}
+
+/* ========== LOGIN (solo inicio) ========== */
+document.getElementById('btnLogin').onclick = () => loginModal.style.display = 'flex';
+document.getElementById('loginBtn').onclick = async ()=>{
+  const u = document.getElementById('loginUser').value.trim();
+  const p = document.getElementById('loginPass').value.trim();
+  loginError.textContent = '';
+  if(!u || !p){ loginError.textContent = 'Introduce usuario y contraseña'; return; }
+  const snap = await getDocs(collection(db,'users'));
+  let found = null;
+  snap.forEach(d=>{
+    const data = d.data();
+    if(data.username === u && data.password === p){ found = {id: d.id, ...data}; }
+  });
+  if(!found){ loginError.textContent = 'Usuario o contraseña incorrectos'; return; }
+  STATE.currentUser = found;
+  // if admin was impersonating another, ensure correct behavior
+  updateHeader();
+  loginModal.style.display = 'none';
+  await pushAudit(`Sesión iniciada: ${found.username}`, {uid: found.id});
+  showAviso(`Sesión: ${found.display} (${found.role})`,5000);
+  setupRealtime(); // (re)connect listeners if needed
+};
+
+/* ========== Header update and real-time setup ========== */
+function updateHeader(){
+  userDisplay.textContent = STATE.currentUser ? `${STATE.currentUser.display} (${STATE.currentUser.role})` : 'Invitado';
+  // update onDuty count
+  getDocs(collection(db,'onDuty')).then(snap=>{
+    let count = 0;
+    snap.forEach(d =>{ const v = d.data(); if(v.active) count++; });
+    const txt = STATE.currentUser ? `${STATE.currentUser.display} • En servicio: ${count}` : `Invitado • En servicio: ${count}`;
+    userDisplay.textContent = STATE.currentUser ? `${STATE.currentUser.display} (${STATE.currentUser.role})` : `Invitado • En servicio: ${count}`;
+  });
+}
+
+/* ========== Realtime listeners (to show live changes, notifications) ========== */
+let unsubscribers = [];
+function cleanupRealtime(){
+  unsubscribers.forEach(u => { try{ u(); }catch(e){} });
+  unsubscribers = [];
+}
+function setupRealtime(){
+  cleanupRealtime();
+  // Listen for new calls -> avisos
+  const callsCol = collection(db,'calls');
+  const qCalls = query(callsCol, orderBy('created_at','desc'));
+  const unsubCalls = onSnapshot(qCalls, snap=>{
+    snap.docChanges().forEach(ch=>{
+      if(ch.type === 'added'){
+        const data = ch.doc.data();
+        // show aviso for new call only if created recently (<7s) to avoid historic ones showing on reconnect
+        const created = data.created_at ? data.created_at.toDate().getTime() : Date.now();
+        if(Date.now() - created < 8000) showAviso(`Nueva llamada: ${data.caller} — ${data.message}`,7000);
+      }
+      if(ch.type === 'modified'){
+        const data = ch.doc.data();
+        // if assigned recently -> aviso
+        if(data.assigned_changed_recently) showAviso(`Llamada asignada: ${data.caller} → ${data.assigned_to_name || 'unidad'}`,7000);
+      }
+    });
+    // refresh current open calls view if needed
+    if(STATE.expanded === 'calls') loadCalls();
+  });
+  unsubscribers.push(unsubCalls);
+
+  // Listen for onDuty changes -> avisos
+  const unsubDuty = onSnapshot(collection(db,'onDuty'), snap=>{
+    snap.docChanges().forEach(ch=>{
+      if(ch.type === 'modified' || ch.type === 'added'){
+        const d = ch.doc.data();
+        // aviso cuando active cambie
+        if(d.just_changed_recently){
+          if(d.active) showAviso(`${d.display} se ha puesto en servicio`,5000);
+          else {
+            const from = d.start_ts ? new Date(d.start_ts.toDate()).toLocaleString() : 'desconocido';
+            const to = d.end_ts ? new Date(d.end_ts.toDate()).toLocaleString() : 'ahora';
+            showAviso(`${d.display} ha salido de servicio (desde ${from} hasta ${to})`,7000);
+          }
+        }
+      }
+    });
+    if(STATE.expanded === 'service') loadDutyList();
+  });
+  unsubscribers.push(unsubDuty);
+
+  // Live updates for PDAs, reports, wanted etc: refresh views if open
+  const unsubPDA = onSnapshot(collection(db,'pda'), snap => { if(STATE.expanded === 'pda') loadPDA(); });
+  const unsubReports = onSnapshot(collection(db,'reports'), snap => { if(STATE.expanded === 'reports') loadReports(); });
+  const unsubWanted = onSnapshot(collection(db,'wanted'), snap => { if(STATE.expanded === 'wanted') loadWanted(); });
+  const unsubFines = onSnapshot(collection(db,'fines'), snap => { if(STATE.expanded === 'fines') loadFines(); });
+  unsubscribers.push(unsubPDA, unsubReports, unsubWanted, unsubFines);
+}
+
+/* ========== PDA module ========== */
+function renderPDA(){
+  STATE.expanded = 'pda';
+  expandedRoot.innerHTML = `<div class="expanded">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>PDA / Fichas</strong><div class="muted">Buscar y crear fichas</div></div>
+      <div><button class="btn" id="closeP">Cerrar</button></div>
     </div>
-    <div style="margin-top:12px" class="grid-2">
-      <div>
-        <div class="muted small">Buscar</div>
-        <input id="pdaQ" placeholder="Buscar por nombre, alias o texto..." />
-        <div id="pdaResults" style="margin-top:12px"></div>
+    <div style="margin-top:12px;display:flex;gap:12px">
+      <div style="flex:1">
+        <input id="pdaQ" placeholder="Buscar por nombre o texto..."/>
+        <div id="pdaList" class="list" style="margin-top:8px"></div>
       </div>
-      <div>
-        <div class="muted small">Crear nueva ficha (plantilla editable)</div>
-        <textarea id="pdaTpl">${templates.pda||''}</textarea>
-        <label class="muted small">URL imagen (opcional)</label>
-        <input id="pdaImg" placeholder="https://...jpg" />
-        <div style="display:flex;gap:8px;margin-top:8px"><button id="createPDA" class="btn">Crear ficha</button><button id="clearPDA" class="btn-ghost">Limpiar</button></div>
+      <div style="width:380px">
+        <div class="muted small">Plantilla</div>
+        <textarea id="pdaTpl" style="min-height:160px"></textarea>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <button id="pdaCreateBtn" class="btn">Crear ficha</button>
+          <button id="pdaClearBtn" class="btn-ghost">Limpiar</button>
+        </div>
       </div>
-    </div>`;
-    container.querySelector('#closeP').onclick = ()=> closeExpanded();
-    container.querySelector('#pdaQ').oninput = ()=> searchPDA(elId('pdaQ').value);
-    container.querySelector('#createPDA').onclick = createPDA;
-    container.querySelector('#clearPDA').onclick = ()=> { elId('pdaTpl').value=''; elId('pdaImg').value=''; };
-    loadPDAResults();
-  }
-
-  async function loadPDAResults(){
-    const res = elId('pdaResults'); if(!res) return;
-    const snap = await getDocs(query(collection(db,'pda'), orderBy('created_at','desc')));
-    if(snap.empty){ res.innerHTML = '<div class="muted small">Sin fichas</div>'; return; }
-    res.innerHTML = '';
-    snap.forEach(docu=>{
-      const p = docu.data(); p._id = docu.id;
+    </div>
+  </div>`;
+  document.getElementById('closeP').onclick = ()=> closeExpanded();
+  document.getElementById('pdaQ').oninput = ()=> searchPDA(document.getElementById('pdaQ').value);
+  document.getElementById('pdaCreateBtn').onclick = createPDA;
+  loadPDA(); // initial load
+}
+async function loadPDA(){
+  const listEl = document.getElementById('pdaList');
+  const snap = await getDocs(collection(db,'pda'));
+  listEl.innerHTML = '';
+  if(snap.empty){ listEl.innerHTML = '<div class="muted small">Sin fichas</div>'; return; }
+  snap.forEach(d=>{
+    const p = d.data();
+    const item = document.createElement('div'); item.className = 'item';
+    const left = document.createElement('div'); left.style.flex = '1';
+    left.innerHTML = `<b>${p.title||'Ficha'}</b><div class="muted small">${(p.text||'').slice(0,120)}</div>`;
+    const right = document.createElement('div');
+    // only author or admins can delete
+    let delBtn = `<button class="btn-ghost" data-id="${d.id}" data-act="view">Ver</button>`;
+    if(STATE.currentUser && (STATE.currentUser.role === 'admin' || STATE.currentUser.username === p.author)){
+      delBtn += ` <button class="btn" data-id="${d.id}" data-act="del">Borrar</button>`;
+    }
+    right.innerHTML = delBtn;
+    item.appendChild(left); item.appendChild(right);
+    listEl.appendChild(item);
+  });
+  // attach events
+  listEl.querySelectorAll('button[data-act="view"]').forEach(b=> b.onclick = async (e)=>{
+    const id = b.dataset.id;
+    const d = await getDoc(doc(db,'pda',id));
+    const p = d.data();
+    alert(`Ficha: ${p.title}\n\n${p.text}\n\nAutor: ${p.author}\nCreado: ${p.created_at?.toDate?.()?.toLocaleString?.() || '—'}`);
+  });
+  listEl.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async (e)=>{
+    if(!confirm('Borrar ficha PDA?')) return;
+    const id = b.dataset.id;
+    await deleteDoc(doc(db,'pda',id));
+    await pushAudit(`Ficha PDA borrada (${id})`);
+    showAviso('Ficha borrada');
+  });
+}
+async function searchPDA(q){
+  q = (q||'').toLowerCase().trim();
+  if(!q) return loadPDA();
+  const snap = await getDocs(collection(db,'pda'));
+  const listEl = document.getElementById('pdaList'); listEl.innerHTML = '';
+  snap.forEach(d=>{
+    const p = d.data();
+    if((p.text||'').toLowerCase().includes(q) || (p.title||'').toLowerCase().includes(q)){
       const item = document.createElement('div'); item.className='item';
-      item.innerHTML = `<div style="flex:1"><div style="font-weight:700">${p.title||'Ficha'}</div><div class="muted small">${(p.text||'').slice(0,140)}</div></div>
-        <div style="text-align:right">
-          <div style="margin-bottom:6px"><small>${p.author||''} • ${p.created_at?new Date(p.created_at.seconds*1000).toLocaleString():''}</small></div>
-          <div><button class="btn-ghost" data-id="${p._id}" data-act="view">Ver</button> <button class="btn-ghost" data-id="${p._id}" data-act="del">Borrar</button></div>
-        </div>`;
-      res.appendChild(item);
-    });
-    // attach actions
-    res.querySelectorAll('button[data-act="view"]').forEach(b=> b.onclick = async (e)=> {
-      const id = b.dataset.id; const docu = await getDoc(doc(db,'pda',id));
-      if(!docu.exists()) return alert('Ficha no encontrada');
-      const p = docu.data();
-      let html = `Título: ${p.title||''}\n\n${p.text||''}\n\nAutor: ${p.author||''}\nFecha: ${p.created_at?new Date(p.created_at.seconds*1000).toLocaleString():''}`;
-      if(p.image) html += `\n\nImagen: ${p.image}`;
-      alert(html);
-    });
-    res.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async (e)=> {
-      const id = b.dataset.id;
-      // solo usuarios con permisos (admins/sergeants/officers según rol) pueden borrar
-      const allowed = await hasPerm('delete_pda') || (STATE.currentUser && STATE.currentUser.role==='admin');
-      if(!allowed) return alert('No autorizado para borrar fichas');
-      if(!confirm('Borrar ficha PDA?')) return;
-      await deleteDoc(doc(db,'pda',id));
-      pushAudit(`Ficha PDA borrada (${id})`, {by: STATE.currentUser?STATE.currentUser.username:'Invitado'});
-      toast('Ficha PDA borrada');
-      loadPDAResults();
-    });
-  }
+      item.innerHTML = `<div style="flex:1"><b>${p.title||'Ficha'}</b><div class="muted small">${(p.text||'').slice(0,120)}</div></div>
+        <div><button class="btn-ghost" data-id="${d.id}" data-act="view">Ver</button></div>`;
+      listEl.appendChild(item);
+    }
+  });
+  listEl.querySelectorAll('button[data-act="view"]').forEach(b=> b.onclick = async ()=> {
+    const id=b.dataset.id; const d = await getDoc(doc(db,'pda',id)); const p = d.data();
+    alert(`Ficha: ${p.title}\n\n${p.text}`);
+  });
+}
+async function createPDA(){
+  if(!STATE.currentUser){ showAviso('Debes iniciar sesión para crear fichas'); return; }
+  const tpl = document.getElementById('pdaTpl').value.trim();
+  if(!tpl){ alert('Rellena la plantilla'); return; }
+  const title = (tpl.split('\n')[0] || 'Ficha').replace('Nombre:','').trim();
+  await addDoc(collection(db,'pda'), {
+    title, text: tpl, author: STATE.currentUser.username, created_at: serverTimestamp()
+  });
+  await pushAudit(`Ficha PDA creada: ${title}`);
+  showAviso('Ficha creada');
+  document.getElementById('pdaTpl').value = '';
+  loadPDA();
+}
 
-  async function searchPDA(q){
-    q = (q||'').toLowerCase().trim();
-    const res = elId('pdaResults'); if(!res) return;
-    const snap = await getDocs(collection(db,'pda'));
-    const out = [];
-    snap.forEach(d=>{ const p = d.data(); p._id = d.id; if(((p.text||'')+''+(p.title||'')).toLowerCase().includes(q)) out.push(p); });
-    res.innerHTML = out.length ? '' : '<div class="muted small">No hay resultados</div>';
-    out.forEach(p=> {
-      const item = document.createElement('div'); item.className='item';
-      item.innerHTML = `<div style="flex:1"><div style="font-weight:700">${p.title||'Ficha'}</div><div class="muted small">${(p.text||'').slice(0,140)}</div></div>
-        <div style="text-align:right"><div style="margin-bottom:6px"><small>${p.author||''}</small></div><div><button class="btn-ghost" data-id="${p._id}" data-act="view">Ver</button></div></div>`;
-      res.appendChild(item);
-    });
-    // attach view buttons (delegamos ver)
-    res.querySelectorAll('button[data-act="view"]').forEach(b=> b.onclick = async (e)=> {
-      const id = b.dataset.id; const docu = await getDoc(doc(db,'pda',id));
-      if(!docu.exists()) return alert('Ficha no encontrada');
-      const p = docu.data();
-      let html = `Título: ${p.title||''}\n\n${p.text||''}\n\nAutor: ${p.author||''}\nFecha: ${p.created_at?new Date(p.created_at.seconds*1000).toLocaleString():''}`;
-      if(p.image) html += `\n\nImagen: ${p.image}`;
-      alert(html);
-    });
-  }
-
-  async function createPDA(){
-    if(!(await hasPerm('create_pda'))) return alert('No tienes permiso para crear PDA');
-    const txt = elId('pdaTpl').value.trim();
-    if(!txt) return alert('Rellena la plantilla');
-    const img = elId('pdaImg').value.trim() || null;
-    const title = (txt.split('\n')[0]||'Ficha').replace('Nombre:','').trim();
-    const data = { title, text: txt, image: img, author: STATE.currentUser?STATE.currentUser.username:'Invitado', created_at: serverTimestamp() };
-    const docRef = await addDoc(collection(db,'pda'), data);
-    pushAudit(`PDA creada: ${title}`, {by: STATE.currentUser?STATE.currentUser.username:'Invitado'});
-    toast('Ficha PDA creada', title);
-    // push aviso global
-    pushAviso('pda_created', `Ficha PDA creada: ${title}`, {title, by: STATE.currentUser?STATE.currentUser.display: 'Invitado'});
-    elId('pdaTpl').value=''; elId('pdaImg').value='';
-    loadPDAResults();
-  }
-
-  // ---------- CALLS (dispatch) ----------
-  async function renderCalls(container){
-    container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong>Dispatch / Llamadas</strong><div class="muted small">Crear llamadas y asignar unidades</div></div>
-      <div><button class="btn btn-small" id="closeC">Cerrar</button></div>
+/* ========== REPORTS module ========== */
+function renderReports(){
+  STATE.expanded = 'reports';
+  expandedRoot.innerHTML = `<div class="expanded">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>Informes</strong><div class="muted">Crear y consultar informes</div></div>
+      <div><button class="btn" id="closeR">Cerrar</button></div>
     </div>
-    <div style="margin-top:12px;display:flex;gap:8px">
-      <input id="callFrom" placeholder="Remitente (opcional)"/>
-      <input id="callMsg" placeholder="Mensaje"/>
-      <button id="callCreate" class="btn">Crear llamada</button>
+    <div style="margin-top:12px;display:flex;gap:12px">
+      <div style="flex:1">
+        <input id="repTitle" placeholder="Título"/>
+        <textarea id="repDesc" placeholder="Descripción..."></textarea>
+        <div style="display:flex;gap:8px"><button id="repSave" class="btn">Guardar informe</button></div>
+      </div>
+      <div style="width:360px">
+        <div class="muted small">Últimos informes</div>
+        <div id="repList" class="list" style="margin-top:8px"></div>
+      </div>
     </div>
-    <div style="margin-top:12px"><strong>Llamadas</strong><div id="callsList" class="list" style="margin-top:8px"></div></div>`;
-    container.querySelector('#closeC').onclick = ()=> closeExpanded();
-    container.querySelector('#callCreate').onclick = createCall;
-    loadCallsRealtime();
-  }
+  </div>`;
+  document.getElementById('closeR').onclick = ()=> closeExpanded();
+  document.getElementById('repSave').onclick = saveReport;
+  loadReports();
+}
+async function saveReport(){
+  if(!STATE.currentUser){ showAviso('Debes iniciar sesión para crear informes'); return; }
+  const title = document.getElementById('repTitle').value.trim();
+  const desc = document.getElementById('repDesc').value.trim();
+  if(!title || !desc){ alert('Título y descripción obligatorios'); return; }
+  await addDoc(collection(db,'reports'), {
+    title, description: desc, author: STATE.currentUser.display, created_at: serverTimestamp()
+  });
+  await pushAudit(`Informe creado: ${title}`);
+  showAviso('Informe creado');
+  document.getElementById('repTitle').value=''; document.getElementById('repDesc').value='';
+  loadReports();
+}
+async function loadReports(){
+  const snap = await getDocs(collection(db,'reports'));
+  const list = document.getElementById('repList'); list.innerHTML = '';
+  if(snap.empty){ list.innerHTML = '<div class="muted small">Sin informes</div>'; return; }
+  snap.forEach(d=>{
+    const r = d.data();
+    const it = document.createElement('div'); it.className='item';
+    it.innerHTML = `<div style="flex:1"><b>${r.title}</b><div class="muted small">${(r.description||'').slice(0,160)}</div></div>
+      <div style="text-align:right"><small>${r.author||''}</small><div>${r.created_at ? new Date(r.created_at.toDate()).toLocaleString() : ''}</div>
+      <div style="margin-top:6px"><button class="btn-ghost" data-id="${d.id}" data-act="view">Ver</button>
+      ${(STATE.currentUser && (STATE.currentUser.role==='admin' || STATE.currentUser.role==='sergeant' || (r.author===STATE.currentUser.display))) ? `<button class="btn" data-id="${d.id}" data-act="del">Borrar</button>` : ''}</div></div>`;
+    list.appendChild(it);
+  });
+  list.querySelectorAll('button[data-act="view"]').forEach(b=> b.onclick = async ()=>{
+    const d = await getDoc(doc(db,'reports', b.dataset.id));
+    const r = d.data();
+    alert(`Informe: ${r.title}\n\n${r.description}\n\nAutor: ${r.author}`);
+  });
+  list.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=>{
+    if(!confirm('Borrar informe?')) return;
+    await deleteDoc(doc(db,'reports', b.dataset.id));
+    await pushAudit(`Informe borrado: ${b.dataset.id}`);
+    loadReports();
+  });
+}
 
-  // realtime listener para llamadas (todos ven actualizaciones)
-  let unsubCalls = null;
-  function loadCallsRealtime(){
-    if(unsubCalls) unsubCalls();
-    const q = query(collection(db,'calls'), orderBy('created_at','desc'));
-    unsubCalls = onSnapshot(q, snap=>{
-      const list = elId('callsList'); if(!list) return;
-      list.innerHTML = '';
-      if(snap.empty){ list.innerHTML = '<div class="muted small">No hay llamadas</div>'; return; }
-      snap.forEach(docu=>{
-        const c = docu.data(); c._id = docu.id;
-        const assigneeName = c.assigned_to_name || '—';
-        const item = document.createElement('div'); item.className='item';
-        item.innerHTML = `<div style="flex:1"><div style="font-weight:700">${c.caller}</div><div class="muted small">${c.message}</div></div>
-          <div style="text-align:right"><div class="muted tiny">${c.created_at?new Date(c.created_at.seconds*1000).toLocaleString():''}</div><div style="margin-top:8px" class="muted tiny">Asig: ${assigneeName}</div></div>`;
-        const btns = document.createElement('div'); btns.style.marginLeft='12px';
-        // asignar a mí
-        hasPerm('assign_call').then(canAssign=>{
-          if(canAssign && STATE.currentUser){
-            const assign = document.createElement('button'); assign.className='btn-ghost'; assign.textContent='Asignar a mí';
-            assign.onclick = async ()=> assignCall(c._id);
-            btns.appendChild(assign);
-          }
-        });
-        // borrar (solo admin o asignado)
-        (async ()=>{
-          const users = STATE.currentUser;
-          if(STATE.currentUser && (STATE.currentUser.role==='admin' || (c.assigned_to && STATE.currentUser && c.assigned_to === STATE.currentUser.id))){
-            const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
-            del.onclick = async ()=> { if(confirm('Borrar llamada?')) { await deleteDoc(doc(db,'calls',c._id)); pushAudit(`Llamada borrada: ${c._id}`, {by: STATE.currentUser.username}); } };
-            btns.appendChild(del);
-          }
-        })();
-        item.appendChild(btns);
-        list.appendChild(item);
-      });
-    }, err=> console.error('calls onSnapshot error', err));
-  }
-
-  async function createCall(){
-    const caller = elId('callFrom').value.trim() || 'Anonimo';
-    const message = elId('callMsg').value.trim();
-    if(!message) return alert('Introduce un mensaje');
-    // anyone (even guest) can create call
-    const docRef = await addDoc(collection(db,'calls'), {
-      caller, message, status:'pending', assigned_to:null, assigned_to_name:null, created_at: serverTimestamp()
-    });
-    pushAudit(`Llamada creada: ${docRef.id}`, {by: STATE.currentUser?STATE.currentUser.username:'Invitado'});
-    // push global aviso
-    pushAviso('call_created', `Nueva llamada: ${caller}`, {caller, message});
-    toast('Llamada creada', caller);
-    elId('callMsg').value=''; elId('callFrom').value='';
-  }
-
-  async function assignCall(id){
-    if(!STATE.currentUser) return alert('Inicia sesión para asignar');
-    if(!(await hasPerm('assign_call'))) return alert('No tienes permiso para asignar llamadas');
-    const u = STATE.currentUser;
-    await updateDoc(doc(db,'calls',id), { status:'assigned', assigned_to: u.id, assigned_to_name: u.display });
-    pushAudit(`Llamada ${id} asignada a ${u.username}`, {by: u.username});
-    // aviso específico al usuario asignado
-    await pushAviso('call_assigned', `Te han asignado la llamada ${id}`, {assigned_to: u.username, callId: id});
-    toast('Has sido asignado a una llamada', id);
-  }
-
-  // ---------- REPORTS (informes) ----------
-  async function renderReports(container){
-    const tplDoc = await getDoc(doc(db,'config','templates'));
-    const templates = tplDoc.exists()? tplDoc.data() : {};
-    container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong>Informes</strong><div class="muted small">Crear y consultar informes</div></div>
-      <div><button class="btn btn-small" id="closeR">Cerrar</button></div>
+/* ========== CALLS module (dispatch) ========== */
+function renderCalls(){
+  STATE.expanded = 'calls';
+  expandedRoot.innerHTML = `<div class="expanded">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>Dispatch / Llamadas</strong><div class="muted">Crear llamadas y asignar unidades</div></div>
+      <div><button class="btn" id="closeC">Cerrar</button></div>
     </div>
-    <div style="margin-top:12px">
-      <div class="muted small">Plantilla (editable)</div>
-      <textarea id="tplReport" style="min-height:80px">${templates.report||''}</textarea>
+    <div style="margin-top:12px;display:flex;gap:12px">
+      <div style="flex:1">
+        <input id="callFrom" placeholder="Remitente"/>
+        <input id="callMsg" placeholder="Mensaje"/>
+        <div style="display:flex;gap:8px;margin-top:8px"><button id="callCreateBtn" class="btn">Crear llamada</button></div>
+        <div style="margin-top:12px"><strong>Llamadas</strong><div id="callsList" class="list"></div></div>
+      </div>
+      <div style="width:320px">
+        <div class="muted small">Unidades en servicio</div>
+        <div id="callsUnits" class="list" style="margin-top:8px"></div>
+      </div>
     </div>
-    <div style="margin-top:8px" class="form-row">
-      <input id="repTitle" placeholder="Título" />
-      <input id="repAuthor" placeholder="Autor (auto)" />
+  </div>`;
+  document.getElementById('closeC').onclick = ()=> closeExpanded();
+  document.getElementById('callCreateBtn').onclick = createCall;
+  loadCalls();
+  loadUnitsServiceForAssign();
+}
+async function createCall(){
+  const caller = document.getElementById('callFrom').value.trim() || 'Anónimo';
+  const message = document.getElementById('callMsg').value.trim();
+  if(!message){ alert('Mensaje requerido'); return; }
+  const docRef = await addDoc(collection(db,'calls'), {
+    caller, message, status: 'pending', assigned_to: null, created_at: serverTimestamp()
+  });
+  await pushAudit(`Llamada creada: ${caller} — ${message}`);
+  showAviso('Llamada creada');
+  document.getElementById('callFrom').value=''; document.getElementById('callMsg').value='';
+  // loadCalls will update via realtime listener
+}
+async function loadCalls(){
+  const snap = await getDocs(collection(db,'calls'));
+  const list = document.getElementById('callsList'); list.innerHTML = '';
+  if(snap.empty){ list.innerHTML = '<div class="muted small">No hay llamadas</div>'; return; }
+  const usersSnap = await getDocs(collection(db,'users'));
+  const usersMap = {};
+  usersSnap.forEach(d=> usersMap[d.id] = d.data());
+  snap.forEach(d=>{
+    const c = d.data();
+    const item = document.createElement('div'); item.className='item';
+    const assigneeName = c.assigned_to ? (usersMap[c.assigned_to]?.display || '—') : '—';
+    item.innerHTML = `<div style="flex:1"><b>${c.caller}</b><div class="muted small">${c.message}</div></div>
+      <div style="text-align:right"><small>${c.created_at ? new Date(c.created_at.toDate()).toLocaleString() : ''}</small><div style="margin-top:6px" class="muted small">Asig: ${assigneeName}</div>
+      <div style="margin-top:8px">
+        ${ STATE.currentUser && (await hasPerm('assign_call')) ? `<button class="btn-ghost" data-id="${d.id}" data-act="assign">Asignar a mí</button>` : '' }
+        ${ STATE.currentUser && (STATE.currentUser.role==='admin' || c.assigned_to === STATE.currentUser.id) ? `<button class="btn" data-id="${d.id}" data-act="del">Borrar</button>` : '' }
+      </div></div>`;
+    list.appendChild(item);
+  });
+  // attach buttons
+  list.querySelectorAll('button[data-act="assign"]').forEach(b=> b.onclick = async ()=>{
+    if(!STATE.currentUser){ showAviso('Inicia sesión para asignar'); return; }
+    const id = b.dataset.id;
+    // set assigned_to and mark a flag to trigger assignment notification
+    await updateDoc(doc(db,'calls', id), { assigned_to: STATE.currentUser.id, status: 'assigned', assigned_at: serverTimestamp() });
+    await pushAudit(`Llamada ${id} asignada a ${STATE.currentUser.display}`);
+    showAviso('Llamada asignada a ti');
+  });
+  list.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=>{
+    if(!confirm('Borrar llamada?')) return;
+    await deleteDoc(doc(db,'calls', b.dataset.id));
+    await pushAudit(`Llamada borrada: ${b.dataset.id}`);
+    loadCalls();
+  });
+}
+async function loadUnitsServiceForAssign(){
+  // show list of users in onDuty active
+  const snap = await getDocs(collection(db,'onDuty'));
+  const list = document.getElementById('callsUnits'); list.innerHTML = '';
+  let any = false;
+  snap.forEach(d=>{
+    const od = d.data();
+    if(od.active){
+      any = true;
+      const el = document.createElement('div'); el.className = 'item'; el.textContent = `${od.display} • ${od.role || ''}`;
+      list.appendChild(el);
+    }
+  });
+  if(!any) list.innerHTML = '<div class="muted small">Nadie en servicio</div>';
+}
+
+/* ========== WANTED (BOLO) ========== */
+function renderWanted(){
+  STATE.expanded = 'wanted';
+  expandedRoot.innerHTML = `<div class="expanded">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>BOLO / Wanted</strong><div class="muted">Crear fichas buscadas</div></div>
+      <div><button class="btn" id="closeW">Cerrar</button></div>
     </div>
-    <div style="margin-top:8px"><textarea id="repDesc" placeholder="Descripción..."></textarea></div>
-    <div style="margin-top:8px;display:flex;gap:8px"><button id="saveRep" class="btn">Guardar informe</button><button id="clearRep" class="btn-ghost">Limpiar</button></div>
-    <div style="margin-top:12px"><strong>Últimos informes</strong><div id="reportsList" class="list" style="margin-top:8px"></div></div>`;
-    container.querySelector('#closeR').onclick = ()=> closeExpanded();
-    elId('repAuthor').value = STATE.currentUser ? STATE.currentUser.display : 'Invitado';
-    elId('saveRep').onclick = saveReport;
-    elId('clearRep').onclick = ()=>{ elId('repTitle').value=''; elId('repDesc').value=''; };
-    loadReportsRealtime();
-  }
-
-  let unsubReports = null;
-  function loadReportsRealtime(){
-    if(unsubReports) unsubReports();
-    const q = query(collection(db,'reports'), orderBy('created_at','desc'));
-    unsubReports = onSnapshot(q, snap=>{
-      const list = elId('reportsList'); if(!list) return;
-      list.innerHTML = '';
-      if(snap.empty){ list.innerHTML = '<div class="muted small">No hay informes</div>'; return; }
-      snap.forEach(d=>{
-        const r = d.data(); r._id = d.id;
-        const it = document.createElement('div'); it.className='item';
-        it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${r.title}</div><div class="muted small">${(r.description||'').slice(0,160)}</div></div>
-          <div style="text-align:right"><div class="muted tiny">${r.created_at?new Date(r.created_at.seconds*1000).toLocaleString():''}</div><div style="margin-top:6px" class="muted tiny">${r.author||''}</div></div>`;
-        const btns = document.createElement('div'); btns.style.marginLeft='12px';
-        const view = document.createElement('button'); view.className='btn-ghost'; view.textContent='Ver';
-        view.onclick = ()=> alert(`Informe — ${r.title}\n\n${r.description}\n\nAutor: ${r.author}\nFecha: ${r.created_at?new Date(r.created_at.seconds*1000).toLocaleString():''}`);
-        btns.appendChild(view);
-        // borrar: admin / sergeant / permiso delete_reports
-        (async ()=>{
-          if(STATE.currentUser && (STATE.currentUser.role==='admin' || STATE.currentUser.role==='sergeant' || await hasPerm('delete_reports'))){
-            const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
-            del.onclick = async ()=>{ if(confirm('Borrar informe?')) { await deleteDoc(doc(db,'reports',r._id)); pushAudit(`Informe ${r._id} borrado`, {by: STATE.currentUser.username}); } };
-            btns.appendChild(del);
-          }
-        })();
-        it.appendChild(btns);
-        list.appendChild(it);
-      });
-    });
-  }
-
-  async function saveReport(){
-    if(!(await hasPerm('create_reports'))) return alert('No tienes permiso para crear informes');
-    const title = elId('repTitle').value.trim(); const desc = elId('repDesc').value.trim();
-    if(!title || !desc) return alert('Título y descripción obligatorios');
-    const r = { title, description: desc, author: STATE.currentUser?STATE.currentUser.display:'Invitado', created_at: serverTimestamp() };
-    const ref = await addDoc(collection(db,'reports'), r);
-    // update template
-    await setDoc(doc(db,'config','templates'), { report: elId('tplReport').value }, { merge:true });
-    pushAudit(`Informe creado: ${title}`, {by: STATE.currentUser?STATE.currentUser.username:'Invitado'});
-    toast('Informe creado', title);
-    // push aviso global
-    pushAviso('report_created', `Informe: ${title}`, {title});
-    elId('repTitle').value=''; elId('repDesc').value='';
-  }
-
-  // ---------- WANTED ----------
-  async function renderWanted(container){
-    container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong>BOLO / Wanted</strong><div class="muted small">Crear fichas buscadas</div></div>
-      <div><button class="btn btn-small" id="closeW">Cerrar</button></div>
+    <div style="margin-top:12px;display:flex;gap:12px">
+      <div style="flex:1">
+        <input id="wName" placeholder="Nombre / Alias"/>
+        <input id="wBounty" placeholder="Recompensa"/>
+        <textarea id="wDesc" placeholder="Descripción"></textarea>
+        <div style="display:flex;gap:8px"><button id="wCreate" class="btn">Crear ficha</button></div>
+      </div>
+      <div style="width:320px">
+        <div class="muted small">Fichas</div>
+        <div id="wantedList" class="list"></div>
+      </div>
     </div>
-    <div style="margin-top:12px" class="form-row"><input id="wName" placeholder="Nombre / Alias"/><input id="wBounty" placeholder="Recompensa"/></div>
-    <div style="margin-top:8px"><textarea id="wDesc" placeholder="Descripción"></textarea></div>
-    <div style="margin-top:8px;display:flex;gap:8px"><button id="saveW" class="btn">Crear ficha</button></div>
-    <div style="margin-top:12px"><strong>Fichas</strong><div id="wantedList" class="list" style="margin-top:8px"></div></div>`;
-    container.querySelector('#closeW').onclick = ()=> closeExpanded();
-    elId('saveW').onclick = async ()=> {
-      if(!(await hasPerm('create_bolo'))) return alert('No tienes permiso');
-      const name = elId('wName').value.trim(); const desc = elId('wDesc').value.trim(); const bounty = parseInt(elId('wBounty').value||'0',10);
-      if(!name) return alert('Nombre requerido');
-      await addDoc(collection(db,'wanted'), { name, description: desc, bounty, created_at: serverTimestamp() });
-      pushAudit(`Wanted creado: ${name}`, {by: STATE.currentUser?STATE.currentUser.username:'Invitado'});
-      toast('Wanted creado', name);
-      elId('wName').value=''; elId('wDesc').value=''; elId('wBounty').value='';
-    };
-    loadWantedRealtime();
-  }
+  </div>`;
+  document.getElementById('closeW').onclick = ()=> closeExpanded();
+  document.getElementById('wCreate').onclick = createWanted;
+  loadWanted();
+}
+async function createWanted(){
+  if(!STATE.currentUser){ showAviso('Login requerido'); return; }
+  if(!await hasPerm('create_bolo')){ showAviso('Permiso denegado'); return; }
+  const name = document.getElementById('wName').value.trim();
+  const desc = document.getElementById('wDesc').value.trim();
+  const bounty = parseInt(document.getElementById('wBounty').value||'0',10) || 0;
+  if(!name){ alert('Nombre requerido'); return; }
+  await addDoc(collection(db,'wanted'), { name, description: desc, bounty, created_at: serverTimestamp(), author: STATE.currentUser.display });
+  await pushAudit(`Wanted creado: ${name}`);
+  showAviso('Wanted creado');
+  loadWanted();
+}
+async function loadWanted(){
+  const snap = await getDocs(collection(db,'wanted'));
+  const list = document.getElementById('wantedList'); list.innerHTML = '';
+  if(snap.empty){ list.innerHTML = '<div class="muted small">Sin fichas</div>'; return; }
+  snap.forEach(d=>{
+    const w = d.data();
+    const it = document.createElement('div'); it.className='item';
+    it.innerHTML = `<div style="flex:1"><b>${w.name}</b><div class="muted small">${w.description}</div></div><div>${w.bounty||0}€</div>`;
+    list.appendChild(it);
+  });
+}
 
-  let unsubWanted = null;
-  function loadWantedRealtime(){
-    if(unsubWanted) unsubWanted();
-    const q = query(collection(db,'wanted'), orderBy('created_at','desc'));
-    unsubWanted = onSnapshot(q, snap=>{
-      const list = elId('wantedList'); if(!list) return;
-      list.innerHTML = '';
-      if(snap.empty){ list.innerHTML = '<div class="muted small">No hay fichas</div>'; return; }
-      snap.forEach(d=>{
-        const w = d.data(); w._id = d.id;
-        const it = document.createElement('div'); it.className='item';
-        it.innerHTML = `<div style="flex:1"><b>${w.name}</b><div class="muted small">${w.description}</div></div><div class="pill">${w.bounty||0}€</div>`;
-        const btns = document.createElement('div'); btns.style.marginLeft='12px';
-        const view = document.createElement('button'); view.className='btn-ghost'; view.textContent='Ver';
-        view.onclick = ()=> alert(`Wanted — ${w.name}\n\n${w.description}\nRecompensa: ${w.bounty}€`);
-        btns.appendChild(view);
-        (async ()=>{
-          if(await hasPerm('manage_wanted')){
-            const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
-            del.onclick = async ()=>{ if(confirm('Borrar ficha?')){ await deleteDoc(doc(db,'wanted',w._id)); pushAudit(`Wanted ${w._id} borrado`, {by: STATE.currentUser.username}); } };
-            btns.appendChild(del);
-          }
-        })();
-        it.appendChild(btns);
-        list.appendChild(it);
-      });
-    });
-  }
-
-  // ---------- FINES ----------
-  async function renderFines(container){
-    container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong>Multas</strong><div class="muted small">Genera sanciones</div></div>
-      <div><button class="btn btn-small" id="closeF">Cerrar</button></div>
+/* ========== FINES module ========== */
+function renderFines(){
+  STATE.expanded = 'fines';
+  expandedRoot.innerHTML = `<div class="expanded">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>Multas</strong><div class="muted">Generar sanciones</div></div>
+      <div><button class="btn" id="closeF">Cerrar</button></div>
     </div>
-    <div style="margin-top:12px" class="form-row"><input id="fineOff" placeholder="Infractor"/><input id="fineAmt" placeholder="Importe"/></div>
-    <div style="margin-top:8px"><textarea id="fineReason" placeholder="Motivo..."></textarea></div>
-    <div style="margin-top:8px;display:flex;gap:8px"><button id="saveFine" class="btn">Emitir multa</button></div>
-    <div style="margin-top:12px"><strong>Multas</strong><div id="finesList" class="list" style="margin-top:8px"></div></div>`;
-    container.querySelector('#closeF').onclick = ()=> closeExpanded();
-    elId('saveFine').onclick = async ()=> {
-      if(!(await hasPerm('create_fine'))) return alert('No tienes permiso para multar');
-      const off = elId('fineOff').value.trim(); const amt = parseInt(elId('fineAmt').value||'0',10); const reason = elId('fineReason').value.trim();
-      if(!off || !amt) return alert('Infractor e importe requeridos');
-      await addDoc(collection(db,'fines'), { offender: off, amount: amt, reason, author: STATE.currentUser?STATE.currentUser.display:'Invitado', created_at: serverTimestamp() });
-      pushAudit(`Multa creada: ${off} ${amt}€`, {by: STATE.currentUser?STATE.currentUser.username:'Invitado'});
-      toast('Multa emitida', `${off} ${amt}€`);
-      elId('fineOff').value=''; elId('fineAmt').value=''; elId('fineReason').value='';
-    };
-    loadFinesRealtime();
-  }
-
-  let unsubFines = null;
-  function loadFinesRealtime(){
-    if(unsubFines) unsubFines();
-    const q = query(collection(db,'fines'), orderBy('created_at','desc'));
-    unsubFines = onSnapshot(q, snap=>{
-      const list = elId('finesList'); if(!list) return;
-      list.innerHTML = '';
-      if(snap.empty){ list.innerHTML = '<div class="muted small">No hay multas</div>'; return; }
-      snap.forEach(d=>{
-        const f = d.data(); f._id = d.id;
-        const it = document.createElement('div'); it.className='item';
-        it.innerHTML = `<div style="flex:1"><b>${f.offender} • ${f.amount}€</b><div class="muted small">${f.reason}</div></div><div class="muted tiny">${f.created_at?new Date(f.created_at.seconds*1000).toLocaleString():''}</div>`;
-        const btns = document.createElement('div'); btns.style.marginLeft='12px';
-        (async ()=>{
-          if(STATE.currentUser && (STATE.currentUser.role==='admin' || STATE.currentUser.display===f.author || await hasPerm('delete_reports'))){
-            const del = document.createElement('button'); del.className='btn'; del.textContent='Borrar'; del.onclick = async ()=>{ if(confirm('Borrar multa?')){ await deleteDoc(doc(db,'fines',f._id)); pushAudit(`Multa ${f._id} borrada`, {by: STATE.currentUser.username}); } };
-            btns.appendChild(del);
-          }
-        })();
-        it.appendChild(btns);
-        list.appendChild(it);
-      });
-    });
-  }
-
-  // ---------- SERVICE (entrar/salir y lista en servicio) ----------
-  async function renderService(container){
-    container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong>Servicio</strong><div class="muted small">Ponte en servicio o sal</div></div>
-      <div><button class="btn btn-small" id="closeS">Cerrar</button></div>
+    <div style="margin-top:12px;display:flex;gap:12px">
+      <div style="flex:1">
+        <input id="fineOff" placeholder="Infractor (vehículo/nombre)"/>
+        <input id="fineAmt" placeholder="Importe"/>
+        <textarea id="fineReason" placeholder="Motivo..."></textarea>
+        <div style="display:flex;gap:8px"><button id="fineSave" class="btn">Emitir multa</button></div>
+      </div>
+      <div style="width:320px">
+        <div class="muted small">Historial multas</div>
+        <div id="finesList" class="list"></div>
+      </div>
     </div>
-    <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-      <div class="muted small">Tu estado:</div><div id="serviceBox" class="pill">Desconocido</div>
+  </div>`;
+  document.getElementById('closeF').onclick = ()=> closeExpanded();
+  document.getElementById('fineSave').onclick = saveFine;
+  loadFines();
+}
+async function saveFine(){
+  if(!STATE.currentUser){ showAviso('Login requerido'); return; }
+  if(!await hasPerm('create_fine')){ showAviso('Permiso denegado para crear multas'); return; }
+  const off = document.getElementById('fineOff').value.trim();
+  const amt = parseInt(document.getElementById('fineAmt').value||'0',10) || 0;
+  const reason = document.getElementById('fineReason').value.trim();
+  if(!off || !amt){ alert('Infractor e importe requeridos'); return; }
+  await addDoc(collection(db,'fines'), { offender:off, amount:amt, reason, author: STATE.currentUser.display, created_at: serverTimestamp() });
+  await pushAudit(`Multa creada: ${off} ${amt}€`);
+  showAviso('Multa creada');
+  loadFines();
+}
+async function loadFines(){
+  const snap = await getDocs(collection(db,'fines'));
+  const list = document.getElementById('finesList'); list.innerHTML = '';
+  if(snap.empty){ list.innerHTML = '<div class="muted small">Sin multas</div>'; return; }
+  snap.forEach(d=>{
+    const f = d.data();
+    const it = document.createElement('div'); it.className='item';
+    it.innerHTML = `<div style="flex:1"><b>${f.offender} • ${f.amount}€</b><div class="muted small">${f.reason}</div></div><div>${f.created_at ? new Date(f.created_at.toDate()).toLocaleString() : ''}</div>`;
+    list.appendChild(it);
+  });
+}
+
+/* ========== SERVICE (on-duty) ========== */
+function renderService(){
+  STATE.expanded = 'service';
+  expandedRoot.innerHTML = `<div class="expanded">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>Servicio</strong><div class="muted">Ponte en servicio o sal</div></div>
+      <div><button class="btn" id="closeS">Cerrar</button></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:12px;align-items:center">
+      <div class="muted small">Tu estado:</div><div id="serviceBox" class="item">Desconocido</div>
       <div style="margin-left:auto"><button id="toggleDuty" class="btn">Cambiar estado</button></div>
     </div>
-    <div style="margin-top:12px"><strong>Policías en servicio</strong><div id="dutyList" class="list" style="margin-top:8px"></div></div>`;
-    container.querySelector('#closeS').onclick = ()=> closeExpanded();
-    const box = container.querySelector('#serviceBox');
-    const on = (await getDocs(collection(db,'onDuty'))).docs.reduce((acc,d)=>{ acc[d.id] = d.data().since; return acc; }, {});
-    const uId = STATE.currentUser ? STATE.currentUser.id : null;
-    box.textContent = (uId && on[uId]) ? 'En servicio' : 'Fuera de servicio';
-    container.querySelector('#toggleDuty').onclick = async ()=>{
-      if(!STATE.currentUser) return alert('Inicia sesión');
-      const u = STATE.currentUser;
-      const dutyRef = doc(db,'onDuty', u.id);
-      const snap = await getDoc(dutyRef);
-      if(!snap.exists()){
-        // entrar
-        await setDoc(dutyRef, { since: serverTimestamp(), display: u.display });
-        // log servicio
-        await addDoc(collection(db,'serviceLogs'), { userId:u.id, userDisplay:u.display, action:'enter', ts: serverTimestamp() });
-        await pushAviso('service_change', `${u.display} entró en servicio`, {user:u.username});
-        pushAudit(`Entró en servicio: ${u.display}`, {by: u.username});
-        toast(`${u.display} entró en servicio`);
-      } else {
-        // salir
-        const sinceSnap = snap.data().since;
-        await deleteDoc(dutyRef);
-        await addDoc(collection(db,'serviceLogs'), { userId:u.id, userDisplay:u.display, action:'exit', ts: serverTimestamp(), since: sinceSnap });
-        await pushAviso('service_change', `${u.display} salió de servicio`, {user:u.username});
-        pushAudit(`Salió de servicio: ${u.display}`, {by: u.username});
-        toast(`${u.display} salió de servicio`);
-      }
-      loadDutyList();
-      updateHeader();
-    };
-    loadDutyList();
-  }
-
-  async function loadDutyList(){
-    const list = elId('dutyList'); if(!list) return;
-    const snap = await getDocs(collection(db,'onDuty'));
-    const active = [];
-    snap.forEach(d=> active.push({id:d.id, ...(d.data())}));
-    list.innerHTML = active.length ? active.map(a=>`<div class="item">${a.display}</div>`).join('') : '<div class="muted small">Nadie en servicio</div>';
-    updateHeader();
-  }
-
-  // ---------- ADMIN panel ----------
-  async function renderAdmin(container){
-    // only visible if admin or adminOverride
-    if(!(STATE.currentUser && (STATE.currentUser.role==='admin' || STATE.isAdminOverride))){
-      container.innerHTML = `<div class="muted small">Panel de administración: acceso restringido (solo admin)</div>`;
-      return;
+    <div style="margin-top:12px"><strong>Policías en servicio</strong><div id="dutyList" class="list" style="margin-top:8px"></div></div>
+  </div>`;
+  document.getElementById('closeS').onclick = ()=> closeExpanded();
+  document.getElementById('toggleDuty').onclick = toggleDuty;
+  loadDutyList();
+}
+async function toggleDuty(){
+  if(!STATE.currentUser){ showAviso('Inicia sesión'); return; }
+  const uid = STATE.currentUser.id;
+  const ref = doc(db,'onDuty',uid);
+  const snap = await getDoc(ref);
+  if(!snap.exists()){
+    // start duty
+    await setDoc(ref, { uid, display: STATE.currentUser.display, role: STATE.currentUser.role, active: true, start_ts: serverTimestamp(), just_changed_recently: true });
+    await pushAudit(`${STATE.currentUser.display} entró en servicio`);
+  } else {
+    const data = snap.data();
+    if(data.active){
+      // end duty
+      await updateDoc(ref, { active: false, end_ts: serverTimestamp(), just_changed_recently: true });
+      await pushAudit(`${STATE.currentUser.display} salió de servicio`);
+    } else {
+      // reactivate
+      await updateDoc(ref, { active: true, start_ts: serverTimestamp(), just_changed_recently: true });
+      await pushAudit(`${STATE.currentUser.display} entró en servicio`);
     }
-    container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong>Administración</strong><div class="muted small">Gestiona roles, permisos y usuarios</div></div>
-      <div><button class="btn btn-small" id="closeA">Cerrar</button></div>
+  }
+  loadDutyList();
+}
+async function loadDutyList(){
+  const snap = await getDocs(collection(db,'onDuty'));
+  const list = document.getElementById('dutyList'); list.innerHTML = '';
+  let active = [];
+  snap.forEach(d=>{
+    const od = d.data();
+    if(od.active) active.push(od.display);
+  });
+  if(active.length === 0) list.innerHTML = '<div class="muted small">Nadie en servicio</div>';
+  else active.forEach(a => { const el = document.createElement('div'); el.className='item'; el.textContent = a; list.appendChild(el); });
+  updateHeader();
+}
+
+/* ========== INCAUTACIONES (vehículos) ========== */
+function renderIncautaciones(){
+  STATE.expanded = 'incautaciones';
+  expandedRoot.innerHTML = `<div class="expanded">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>Incautaciones</strong><div class="muted">Registrar vehículos incautados</div></div>
+      <div><button class="btn" id="closeI">Cerrar</button></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:12px">
+      <div style="flex:1">
+        <input id="vehPlate" placeholder="Matrícula"/>
+        <input id="vehModel" placeholder="Modelo"/>
+        <textarea id="vehReason" placeholder="Motivo de incautación"></textarea>
+        <div style="display:flex;gap:8px"><button id="vehSave" class="btn">Registrar incautación</button></div>
+      </div>
+      <div style="width:320px">
+        <div class="muted small">Vehículos incautados</div>
+        <div id="vehList" class="list"></div>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('closeI').onclick = ()=> closeExpanded();
+  document.getElementById('vehSave').onclick = saveVeh;
+  loadVeh();
+}
+async function saveVeh(){
+  if(!STATE.currentUser){ showAviso('Login requerido'); return; }
+  const plate = document.getElementById('vehPlate').value.trim();
+  const model = document.getElementById('vehModel').value.trim();
+  const reason = document.getElementById('vehReason').value.trim();
+  if(!plate || !reason){ alert('Matrícula y motivo requeridos'); return; }
+  await addDoc(collection(db,'incautaciones'), { plate, model, reason, author: STATE.currentUser.display, created_at: serverTimestamp() });
+  await pushAudit(`Vehículo incautado: ${plate}`);
+  showAviso('Incautación registrada');
+  loadVeh();
+}
+async function loadVeh(){
+  const snap = await getDocs(collection(db,'incautaciones'));
+  const list = document.getElementById('vehList'); list.innerHTML = '';
+  if(snap.empty) { list.innerHTML = '<div class="muted small">Sin incautaciones</div>'; return; }
+  snap.forEach(d=>{
+    const v = d.data();
+    const it = document.createElement('div'); it.className = 'item';
+    it.innerHTML = `<div style="flex:1"><b>${v.plate} ${v.model||''}</b><div class="muted small">${v.reason}</div></div><div>${v.author||''}</div>`;
+    list.appendChild(it);
+  });
+}
+
+/* ========== ALERTAS ciudad (verde/amarilla/roja) ========== */
+function renderAlertas(){
+  STATE.expanded = 'alertas';
+  expandedRoot.innerHTML = `<div class="expanded">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>Alertas ciudad</strong><div class="muted">Crear y listar alertas (verde/amarilla/roja)</div></div>
+      <div><button class="btn" id="closeA2">Cerrar</button></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:12px">
+      <div style="flex:1">
+        <select id="alertLevel"><option value="verde">Verde</option><option value="amarilla">Amarilla</option><option value="roja">Roja</option></select>
+        <input id="alertTitle" placeholder="Título de la alerta"/>
+        <textarea id="alertDesc" placeholder="Descripción..."></textarea>
+        <div style="display:flex;gap:8px"><button id="alertCreate" class="btn">Crear alerta</button></div>
+      </div>
+      <div style="width:320px">
+        <div class="muted small">Alertas activas</div>
+        <div id="alertList" class="list"></div>
+      </div>
+    </div>
+  </div>`;
+  document.getElementById('closeA2').onclick = ()=> closeExpanded();
+  document.getElementById('alertCreate').onclick = createAlert;
+  loadAlerts();
+}
+async function createAlert(){
+  if(!STATE.currentUser){ showAviso('Login requerido'); return; }
+  const level = document.getElementById('alertLevel').value;
+  const title = document.getElementById('alertTitle').value.trim();
+  const desc = document.getElementById('alertDesc').value.trim();
+  if(!title || !desc) { alert('Título y descripción requeridos'); return; }
+  await addDoc(collection(db,'alertas'), { level, title, description: desc, author: STATE.currentUser.display, created_at: serverTimestamp() });
+  await pushAudit(`Alerta creada: [${level}] ${title}`);
+  showAviso(`Alerta ${level}: ${title}`,7000);
+  loadAlerts();
+}
+async function loadAlerts(){
+  const snap = await getDocs(collection(db,'alertas'));
+  const list = document.getElementById('alertList'); list.innerHTML = '';
+  if(snap.empty){ list.innerHTML = '<div class="muted small">Sin alertas</div>'; return; }
+  snap.forEach(d=>{
+    const a = d.data();
+    const it = document.createElement('div'); it.className='item';
+    it.innerHTML = `<div style="flex:1"><b>[${a.level}] ${a.title}</b><div class="muted small">${a.description}</div></div><div>${a.author||''}</div>`;
+    list.appendChild(it);
+  });
+}
+
+/* ========== ADMIN (roles & users) ========== */
+async function renderAdmin(){
+  STATE.expanded = 'admin';
+  // load roles for select
+  const rolesSnap = await getDocs(collection(db,'roles'));
+  const rolesArr = [];
+  rolesSnap.forEach(d=> rolesArr.push({id:d.id, ...d.data()}));
+  expandedRoot.innerHTML = `<div class="expanded">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>Administración</strong><div class="muted">Gestión usuarios y roles</div></div>
+      <div><button class="btn" id="closeAdm">Cerrar</button></div>
     </div>
     <div style="margin-top:12px;display:flex;gap:12px">
       <div style="flex:1">
         <h4>Usuarios</h4>
-        <div id="usersAdminList" class="list"></div>
+        <div id="usersAdmin" class="list"></div>
       </div>
       <div style="width:360px">
-        <h4>Crear usuario (solo admins)</h4>
-        <input id="adm_newUser" placeholder="username">
-        <input id="adm_newDisplay" placeholder="display">
-        <input id="adm_newPass" placeholder="password">
-        <select id="adm_newRole"></select>
-        <div style="display:flex;gap:8px;margin-top:8px"><button id="adm_createUser" class="btn">Crear</button><button id="adm_refresh" class="btn-ghost">Refrescar</button></div>
-
-        <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+        <h4>Crear usuario (solo admin)</h4>
+        <input id="adm_user" placeholder="username"><input id="adm_display" placeholder="display"><input id="adm_pass" placeholder="password">
+        <select id="adm_role">${rolesArr.map(r=>`<option value="${r.id}">${r.id}</option>`).join('')}</select>
+        <div style="display:flex;gap:8px;margin-top:8px"><button id="adm_create" class="btn">Crear usuario</button><button id="adm_refresh" class="btn-ghost">Refrescar</button></div>
+        <hr style="margin:12px 0;border-top:1px solid #22303f">
         <h4>Roles</h4>
-        <div style="display:flex;gap:8px"><input id="adm_newRoleName" placeholder="nuevo rol"><button id="adm_createRole" class="btn">Crear rol</button></div>
+        <input id="adm_role_new" placeholder="Nombre rol"><button id="adm_role_create" class="btn" style="margin-top:6px">Crear rol</button>
         <div id="rolesAdminList" style="margin-top:12px"></div>
       </div>
-    </div>`;
-    container.querySelector('#closeA').onclick = ()=> closeExpanded();
-    container.querySelector('#adm_createUser').onclick = adminCreateUser;
-    container.querySelector('#adm_refresh').onclick = ()=> renderAdmin(container);
-    container.querySelector('#adm_createRole').onclick = adminCreateRole;
-    loadRolesForSelect();
-    loadUsersAdminRealtime();
-    loadRolesAdminRealtime();
-  }
-
-  // load roles into select (for create)
-  async function loadRolesForSelect(){
-    const sel = elId('adm_newRole'); sel.innerHTML = '';
-    const snap = await getDocs(collection(db,'roles'));
-    snap.forEach(d=> sel.innerHTML += `<option value="${d.id}">${d.id}</option>`);
-  }
-
-  // Realtime users admin list
-  let unsubUsersAdmin = null;
-  function loadUsersAdminRealtime(){
-    if(unsubUsersAdmin) unsubUsersAdmin();
-    const q = query(collection(db,'users'), orderBy('created_at','desc'));
-    unsubUsersAdmin = onSnapshot(q, snap=>{
-      const ul = elId('usersAdminList'); ul.innerHTML = '';
-      if(snap.empty){ ul.innerHTML = '<div class="muted small">No hay usuarios</div>'; return; }
-      snap.forEach(d=> {
-        const u = d.data(); u._id = d.id;
-        const div = document.createElement('div'); div.className='item';
-        div.innerHTML = `<div><b>${u.display} (${u.username})</b><div class="muted small">Rol: <span class="role-chip">${u.role||'—'}</span> • Badge: ${u.badge||'—'}</div></div>
-          <div style="text-align:right">
-            <select data-uid="${u._id}" class="adm_role_sel"></select>
-            <div style="margin-top:6px"><button class="btn-ghost btn-small" data-uid="${u._id}" data-act="del">Borrar</button> <button class="btn btn-small" data-uid="${u._id}" data-act="imp">Impersonar</button></div>
-          </div>`;
-        ul.appendChild(div);
-      });
-      // fill role selects
-      const roleSnap = getDocs(collection(db,'roles')).then(rs=>{
-        const roles = []; rs.forEach(r=> roles.push(r.id));
-        ul.querySelectorAll('.adm_role_sel').forEach(sel=>{
-          const uid = sel.dataset.uid; sel.innerHTML = roles.map(r=>`<option value="${r}">${r}</option>`).join('');
-          // set selected value to user role
-          (async ()=>{
-            const uDoc = await getDoc(doc(db,'users',uid)); if(!uDoc.exists()) return;
-            const udata = uDoc.data(); sel.value = udata.role || '';
-          })();
-          sel.onchange = async (e)=> changeUserRole(uid, e.target.value);
-        });
-        // attach del/imp buttons
-        ul.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=>{
-          const uid = b.dataset.uid;
-          if(!confirm('Borrar usuario?')) return;
-          const uDocRef = doc(db,'users',uid);
-          const uDoc = await getDoc(uDocRef);
-          if(!uDoc.exists()) return;
-          const udata = uDoc.data();
-          if(udata.username === 'admin') return alert('No puedes borrar admin seed');
-          // if user was onDuty, remove them
-          const onDoc = await getDoc(doc(db,'onDuty', uid));
-          if(onDoc.exists()) await deleteDoc(doc(db,'onDuty', uid));
-          // delete user
-          await deleteDoc(uDocRef);
-          pushAudit(`Usuario borrado: ${udata.username}`, {by: STATE.currentUser.username});
-          toast(`Usuario borrado: ${udata.username}`);
-        });
-        ul.querySelectorAll('button[data-act="imp"]').forEach(b=> b.onclick = async ()=>{
-          const uid = b.dataset.uid;
-          const uDoc = await getDoc(doc(db,'users',uid));
-          if(!uDoc.exists()) return alert('Usuario no encontrado');
-          const userTo = uDoc.data();
-          // impersonación: admin encubierto
-          // keep original admin identity
-          if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){
-            return alert('Solo admins pueden impersonar');
-          }
-          STATE.impersonOriginal = {...STATE.currentUser};
-          STATE.currentUser = {...userTo, id: uid};
-          STATE.isAdminOverride = true; // admin retains powers
-          localStorage.setItem('imperson', JSON.stringify(STATE.impersonOriginal));
-          updateHeader();
-          toast(`Impersonando: ${userTo.display}`);
-          pushAudit(`Impersonación: ${STATE.impersonOriginal.username} -> ${userTo.username}`, {by: STATE.impersonOriginal.username});
-        });
-      });
-    });
-  }
-
-  async function changeUserRole(uid, newRole){
-    // only admins
-    if(!STATE.currentUser || (STATE.currentUser.role !== 'admin' && !STATE.isAdminOverride)){
-      return alert('No autorizado');
-    }
-    const userRef = doc(db,'users', uid);
-    await updateDoc(userRef, { role: newRole });
-    pushAudit(`Rol cambiado: ${uid} -> ${newRole}`, {by: STATE.currentUser.username});
-    toast('Rol actualizado');
-  }
-
-  async function adminCreateUser(){
-    if(!STATE.currentUser || (STATE.currentUser.role !== 'admin' && !STATE.isAdminOverride)) return alert('Solo admin puede crear usuarios aquí');
-    const username = elId('adm_newUser').value.trim();
-    const display = elId('adm_newDisplay').value.trim() || username;
-    const pass = elId('adm_newPass').value.trim() || '1234';
-    const role = elId('adm_newRole').value;
-    if(!username) return alert('username requerido');
-    // check exists
-    const snap = await getDocs(query(collection(db,'users'), where('username','==',username)));
-    if(!snap.empty) return alert('Usuario ya existe');
-    await addDoc(collection(db,'users'), { username, display, badge:'', password: pass, role, created_at: serverTimestamp() });
-    pushAudit(`Usuario admin creado: ${username}`, {by: STATE.currentUser.username});
-    toast('Usuario creado', username);
-    elId('adm_newUser').value=''; elId('adm_newDisplay').value=''; elId('adm_newPass').value='';
-  }
-
-  async function adminCreateRole(){
-    if(!STATE.currentUser || (STATE.currentUser.role !== 'admin' && !STATE.isAdminOverride)) return alert('Solo admin puede crear roles');
-    const name = elId('adm_newRoleName').value.trim();
-    if(!name) return alert('Nombre rol requerido');
-    const roleRef = doc(db,'roles', name);
-    const r = await getDoc(roleRef);
-    if(r.exists()) return alert('Rol ya existe');
-    await setDoc(roleRef, { name, color:'#999999', permissions: [] });
-    pushAudit(`Rol creado: ${name}`, {by: STATE.currentUser.username});
-    toast('Rol creado', name);
-    elId('adm_newRoleName').value='';
-    loadRolesForSelect();
-  }
-
-  // Realtime roles admin
-  let unsubRolesAdmin = null;
-  function loadRolesAdminRealtime(){
-    if(unsubRolesAdmin) unsubRolesAdmin();
-    const q = query(collection(db,'roles'));
-    unsubRolesAdmin = onSnapshot(q, snap=>{
-      const out = elId('rolesAdminList'); out.innerHTML = '';
-      snap.forEach(d=>{
-        const key = d.id; const r = d.data();
-        const div = document.createElement('div'); div.className='item';
-        div.innerHTML = `<div style="flex:1"><b>${key}</b><div class="muted small">Permisos: <span id="permBox_${key}">${(r.permissions||[]).join(', ')||'Sin permisos'}</span></div></div>
-          <div style="text-align:right"><button class="btn-ghost" data-role="${key}" data-act="edit">Editar</button> <button class="btn" data-role="${key}" data-act="del">Borrar</button></div>`;
-        out.appendChild(div);
-      });
-      out.querySelectorAll('button[data-act="edit"]').forEach(b=> b.onclick = ()=> openRoleEditor(b.dataset.role));
-      out.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=>{
-        const roleKey = b.dataset.role;
-        if(!confirm('Borrar rol? (Los usuarios con este rol quedarán sin rol)')) return;
-        await deleteDoc(doc(db,'roles', roleKey));
-        // limpiar usuarios con ese rol
-        const us = await getDocs(query(collection(db,'users'), where('role','==',roleKey)));
-        us.forEach(async u=>{
-          await updateDoc(doc(db,'users',u.id), { role: '' });
-        });
-        pushAudit(`Rol borrado: ${roleKey}`, {by: STATE.currentUser.username});
-        toast('Rol borrado', roleKey);
-      });
-    });
-  }
-
-  function loadRolesAdminRealtimeDebounced(){
-    // helper to set up roles UI after seeding
-    loadRolesAdminRealtime();
-  }
-
-  function openRoleEditor(roleKey){
-    // open modal with checkboxes
-    (async ()=>{
-      const rdoc = await getDoc(doc(db,'roles', roleKey));
-      if(!rdoc.exists()) return alert('Rol no existe');
-      const role = rdoc.data();
-      const modal = document.createElement('div'); modal.className='overlay';
-      modal.innerHTML = `<div class="modal"><h3>Editar rol: ${roleKey}</h3><div class="muted small">Marca los permisos</div><div style="margin-top:12px" id="permChecks"></div><div style="display:flex;gap:8px;margin-top:12px"><button id="saveRole" class="btn">Guardar</button><button id="cancelRole" class="btn-ghost">Cancelar</button></div></div>`;
-      document.body.appendChild(modal);
-      const permsList = ['create_reports','delete_reports','create_pda','delete_pda','create_call','assign_call','create_bolo','manage_wanted','create_fine','export','all'];
-      const box = modal.querySelector('#permChecks');
-      box.innerHTML = permsList.map(p=>`<div style="margin-bottom:6px"><label><input type="checkbox" data-perm="${p}" ${ (role.permissions||[]).includes(p) ? 'checked' : '' }/> ${p}</label></div>`).join('');
-      modal.querySelector('#cancelRole').onclick = ()=> modal.remove();
-      modal.querySelector('#saveRole').onclick = async ()=> {
-        const checked = Array.from(box.querySelectorAll('input[type=checkbox]:checked')).map(c=>c.dataset.perm);
-        await updateDoc(doc(db,'roles', roleKey), { permissions: checked });
-        pushAudit(`Rol editado: ${roleKey}`, {by: STATE.currentUser.username});
-        modal.remove(); loadRolesAdminRealtime();
-        toast('Rol guardado', roleKey);
-      };
-    })();
-  }
-
-  // ---------- LOGS / AUDITORÍA ----------
-  async function pushAudit(msg, meta = {}){
-    try{
-      await addDoc(collection(db,'audit'), { msg, meta, by: STATE.currentUser?STATE.currentUser.username:'Invitado', t: serverTimestamp() });
-    }catch(e){ console.error('pushAudit error', e); }
-  }
-  async function renderLogs(container){
-    const q = query(collection(db,'audit'), orderBy('t','desc'));
-    const snap = await getDocs(q);
-    container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong>Auditoría</strong><div class="muted small">Últimas acciones</div></div>
-      <div><button class="btn btn-small" id="closeL">Cerrar</button></div>
     </div>
-    <div style="margin-top:12px" id="logsList" class="list"></div>`;
-    container.querySelector('#closeL').onclick = ()=> closeExpanded();
-    const list = container.querySelector('#logsList');
-    list.innerHTML = '';
-    if(snap.empty) { list.innerHTML = '<div class="muted small">Sin logs</div>'; return; }
-    snap.forEach(d=>{
-      const l = d.data();
-      const it = document.createElement('div'); it.className='item';
-      it.innerHTML = `<div><div style="font-weight:700">${l.msg}</div><div class="muted small">${l.by||''} • ${l.t?new Date(l.t.seconds*1000).toLocaleString():''}</div></div>`;
-      list.appendChild(it);
-    });
-  }
-
-  // ---------- INCAUTACIONES (vehículos) ----------
-  async function renderIncautaciones(container){
-    container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong>Incautaciones</strong><div class="muted small">Registrar vehículos incautados</div></div>
-      <div><button class="btn btn-small" id="closeI">Cerrar</button></div>
-    </div>
-    <div style="margin-top:12px" class="form-row"><input id="inc_plate" placeholder="Matrícula"/><input id="inc_owner" placeholder="Propietario"/></div>
-    <div style="margin-top:8px"><textarea id="inc_notes" placeholder="Notas..."></textarea></div>
-    <div style="margin-top:8px;display:flex;gap:8px"><button id="saveInc" class="btn">Registrar incautación</button></div>
-    <div style="margin-top:12px"><strong>Incautaciones</strong><div id="incList" class="list" style="margin-top:8px"></div></div>`;
-    container.querySelector('#closeI').onclick = ()=> closeExpanded();
-    elId('saveInc').onclick = async ()=> {
-      if(!(await hasPerm('create_inc')) && !(await hasPerm('create_reports'))) return alert('No tienes permiso para registrar incautaciones');
-      const plate = elId('inc_plate').value.trim(); const owner = elId('inc_owner').value.trim(); const notes = elId('inc_notes').value.trim();
-      if(!plate) return alert('Matrícula requerida');
-      await addDoc(collection(db,'incautaciones'), { plate, owner, notes, author: STATE.currentUser?STATE.currentUser.username:'Invitado', created_at: serverTimestamp() });
-      pushAudit(`Incautación registrada: ${plate}`, {by: STATE.currentUser?STATE.currentUser.username:'Invitado'});
-      toast('Vehículo incautado', plate);
-      elId('inc_plate').value=''; elId('inc_owner').value=''; elId('inc_notes').value='';
+  </div>`;
+  document.getElementById('closeAdm').onclick = ()=> closeExpanded();
+  document.getElementById('adm_create').onclick = adminCreateUser;
+  document.getElementById('adm_refresh').onclick = renderAdmin;
+  document.getElementById('adm_role_create').onclick = adminCreateRole;
+  loadUsersAdmin();
+  loadRolesAdmin();
+}
+async function loadUsersAdmin(){
+  const snap = await getDocs(collection(db,'users'));
+  const list = document.getElementById('usersAdmin'); list.innerHTML = '';
+  if(snap.empty){ list.innerHTML = '<div class="muted small">Sin usuarios</div>'; return; }
+  snap.forEach(d=>{
+    const u = d.data();
+    const it = document.createElement('div'); it.className='item';
+    it.innerHTML = `<div><b>${u.display} (${u.username})</b><div class="muted small">Rol: ${u.role || '—'}</div></div>
+      <div style="text-align:right">
+        <select data-uid="${d.id}" class="roleSel">${/* roles loaded later */''}</select>
+        <div style="margin-top:6px"><button class="btn-ghost" data-uid="${d.id}" data-act="del">Borrar</button>
+        <button class="btn" data-uid="${d.id}" data-act="imp">Impersonar</button></div></div>`;
+    list.appendChild(it);
+  });
+  // fill role selects
+  const rolesSnap = await getDocs(collection(db,'roles'));
+  const rolesArr = [];
+  rolesSnap.forEach(r=> rolesArr.push(r.id));
+  list.querySelectorAll('.roleSel').forEach(sel=>{
+    const uid = sel.dataset.uid;
+    sel.innerHTML = rolesArr.map(r=>`<option value="${r}">${r}</option>`).join('');
+    // set selected value
+    getDoc(doc(db,'users',uid)).then(snap=>{ if(snap.exists()){ const data=snap.data(); sel.value = data.role || ''; } });
+    sel.onchange = async (e)=>{
+      const newRole = e.target.value;
+      const uid2 = e.target.dataset.uid;
+      await updateDoc(doc(db,'users', uid2), { role: newRole });
+      await pushAudit(`Cambio rol: ${uid2} -> ${newRole}`);
+      showAviso('Rol actualizado');
+      loadUsersAdmin();
     };
-    loadIncautacionesRealtime();
-  }
-
-  let unsubInc = null;
-  function loadIncautacionesRealtime(){
-    if(unsubInc) unsubInc();
-    const q = query(collection(db,'incautaciones'), orderBy('created_at','desc'));
-    unsubInc = onSnapshot(q, snap=>{
-      const list = elId('incList'); if(!list) return;
-      list.innerHTML = '';
-      if(snap.empty){ list.innerHTML = '<div class="muted small">No hay incautaciones</div>'; return; }
-      snap.forEach(d=>{
-        const x = d.data(); x._id = d.id;
-        const it = document.createElement('div'); it.className='item';
-        it.innerHTML = `<div style="flex:1"><b>${x.plate}</b><div class="muted small">${x.owner || ''} • ${x.notes || ''}</div></div><div class="muted tiny">${x.created_at?new Date(x.created_at.seconds*1000).toLocaleString():''}</div>`;
-        list.appendChild(it);
-      });
-    });
-  }
-
-  // ---------- ALERTAS (verde/amarilla/roja) ----------
-  async function pushAlerta(level, title, desc=''){
-    // level: 'verde'|'amarilla'|'roja'
-    await addDoc(collection(db,'city_alerts'), { level, title, desc, created_at: serverTimestamp() });
-    await pushAviso('city_alert', `${level.toUpperCase()} - ${title}`, {level, desc});
-    pushAudit(`Alerta ciudad ${level}: ${title}`, {});
-    toast(`Alerta ${level.toUpperCase()}`, title);
-  }
-
-  // ---------- HELPERS UI ----------
-  function closeExpanded(){ currentExpanded=null; elId('expandedRoot').innerHTML=''; window.scrollTo({top:0,behavior:'smooth'}); }
-  function updateHeader(){
-    // read currentUser from localStorage or in-memory
-    const u = STATE.currentUser;
-    elId('userDisplay').textContent = u ? `${u.display} (${u.role})` : 'No conectado';
-    // duty count
-    (async ()=>{
-      const snap = await getDocs(collection(db,'onDuty'));
-      elId('dutyStatus').textContent = `En servicio: ${snap.size}`;
-    })();
-  }
-
-  // ---------- LOGIN flow (local modal but synced) ----------
-  elId('btnLogin').onclick = ()=> {
-    if(STATE.currentUser){
-      // si está impersonando y quiere volver
-      if(STATE.isAdminOverride && STATE.impersonOriginal){
-        if(confirm('Salir de impersonación y volver a tu admin?')){
-          STATE.currentUser = STATE.impersonOriginal; STATE.impersonOriginal = null; STATE.isAdminOverride = false;
-          localStorage.removeItem('imperson');
-          updateHeader();
-          toast('Volviste a tu usuario admin');
-          pushAudit('Fin impersonación', {});
-        }
-        return;
-      }
-      if(confirm('Cerrar sesión?')){
-        STATE.currentUser = null; STATE.isAdminOverride = false; STATE.impersonOriginal = null;
-        localStorage.removeItem('currentUser'); localStorage.removeItem('imperson');
-        updateHeader(); toast('Sesión cerrada');
-      }
-      return;
+  });
+  // attach delete & impersonate
+  list.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=>{
+    const uid = b.dataset.uid;
+    if(!confirm('Borrar usuario?')) return;
+    const docSnap = await getDoc(doc(db,'users', uid));
+    if(docSnap.exists() && docSnap.data().username === 'admin'){ alert('No puedes borrar la cuenta admin base'); return; }
+    await deleteDoc(doc(db,'users', uid));
+    await pushAudit(`Usuario borrado: ${uid}`);
+    loadUsersAdmin();
+  });
+  list.querySelectorAll('button[data-act="imp"]').forEach(b=> b.onclick = async ()=>{
+    const uid = b.dataset.uid;
+    const snap = await getDoc(doc(db,'users',uid));
+    if(!snap.exists()) return;
+    const target = { id: snap.id, ...snap.data() };
+    // impersonation: keep the original admin in STATE.impersonator to revert later
+    STATE.impersonator = STATE.currentUser;
+    // set currentUser to target but keep admin privileges if impersonator was admin
+    if(STATE.impersonator && STATE.impersonator.role === 'admin'){
+      // set a marker to indicate adminOverride
+      target.adminOverride = true;
+      target._impersonated_by = STATE.impersonator.id;
     }
-    openLoginModal();
-  };
-
-  function openLoginModal(){ elId('loginModal').style.display='flex'; elId('loginUser').focus(); }
-  function closeLoginModal(){ elId('loginModal').style.display='none'; elId('loginPass').value=''; elId('loginUser').value=''; elId('loginError').style.display='none'; }
-
-  elId('guestBtn').onclick = ()=> { STATE.currentUser = null; localStorage.removeItem('currentUser'); closeLoginModal(); updateHeader(); toast('Entraste como invitado'); };
-
-  elId('loginBtn').onclick = async ()=>{
-    const u = elId('loginUser').value.trim(); const p = elId('loginPass').value.trim();
-    if(!u || !p) { elId('loginError').style.display='block'; elId('loginError').textContent = 'Introduce usuario y contraseña'; return; }
-    // buscar en Firestore users
-    const snap = await getDocs(query(collection(db,'users'), where('username','==', u)));
-    if(snap.empty){ elId('loginError').style.display='block'; elId('loginError').textContent = 'Usuario no encontrado'; return; }
-    let found = null;
-    snap.forEach(d=> { const data = d.data(); if(data.password === p) found = {...data, id: d.id}; });
-    if(found){
-      // si user role admin? ok
-      STATE.currentUser = found;
-      localStorage.setItem('currentUser', JSON.stringify(found));
-      closeLoginModal();
-      updateHeader();
-      pushAudit(`Sesión iniciada: ${found.username}`, {});
-      toast('Sesión iniciada', found.display);
-    } else {
-      elId('loginError').style.display='block'; elId('loginError').textContent = 'Contraseña incorrecta';
-    }
-  };
-
-  // ---------- REACTIVE: escuchar avisos (collection avisos) ----------
-  let unsubAvisos = null;
-  function startAvisosListener(){
-    if(unsubAvisos) unsubAvisos();
-    unsubAvisos = onSnapshot(query(collection(db,'avisos'), orderBy('created_at','desc')), snap=>{
-      snap.docChanges().forEach(change=>{
-        if(change.type === 'added'){
-          const a = change.doc.data();
-          // display visible toast
-          const title = a.title || 'Aviso';
-          const metaText = a.meta && a.meta.by ? `por ${a.meta.by}` : '';
-          toast(title, metaText);
-        }
-      });
-    });
-  }
-
-  // ---------- STARTUP: seed + initial render + listeners ----------
-  (async function init(){
-    try{
-      await seedIfNeeded();
-    }catch(e){ console.error('seedIfNeeded error', e); }
-    renderCards();
-    // restore currentUser from localStorage
-    try {
-      const local = JSON.parse(localStorage.getItem('currentUser') || 'null');
-      if(local) STATE.currentUser = local;
-      const imperson = JSON.parse(localStorage.getItem('imperson') || 'null');
-      if(imperson){ STATE.impersonOriginal = imperson; STATE.isAdminOverride = true; }
-    } catch(e){}
+    STATE.currentUser = target;
     updateHeader();
-    // start generic realtime listeners for modules that need it
-    startAvisosListener();
-    loadCallsRealtime(); loadReportsRealtime(); loadWantedRealtime(); loadFinesRealtime(); loadIncautacionesRealtime();
-    loadUsersAdminRealtime(); loadRolesAdminRealtime(); loadRolesForSelect();
-    // also monitor city alerts
-    onSnapshot(query(collection(db,'city_alerts'), orderBy('created_at','desc')), snap=>{
-      snap.docChanges().forEach(ch=>{
-        if(ch.type === 'added'){
-          const a = ch.doc.data();
-          toast(`ALERTA ${a.level.toUpperCase()}: ${a.title}`, a.desc||'');
-        }
-      })
+    await pushAudit(`Impersonación: ${STATE.impersonator?.display || 'Sistema'} -> ${target.username}`);
+    showAviso(`Impersonando: ${target.display}`);
+    // refresh admin view so that admin still sees everything
+    loadUsersAdmin();
+  });
+}
+async function adminCreateUser(){
+  if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){ alert('Solo admin puede crear usuarios'); return; }
+  const username = document.getElementById('adm_user').value.trim();
+  const display = document.getElementById('adm_display').value.trim() || username;
+  const pass = document.getElementById('adm_pass').value.trim() || 'changeme';
+  const role = document.getElementById('adm_role').value;
+  if(!username){ alert('username requerido'); return; }
+  // check exists
+  const snap = await getDocs(collection(db,'users'));
+  let exists = false;
+  snap.forEach(d => { if(d.data().username === username) exists = true; });
+  if(exists){ alert('Usuario ya existe'); return; }
+  await addDoc(collection(db,'users'), { username, display, password: pass, role });
+  await pushAudit(`Usuario creado por admin: ${username}`);
+  showAviso('Usuario creado');
+  loadUsersAdmin();
+}
+async function adminCreateRole(){
+  if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){ alert('Solo admin'); return; }
+  const name = document.getElementById('adm_role_new').value.trim();
+  if(!name){ alert('Nombre rol requerido'); return; }
+  // create role doc
+  await setDoc(doc(db,'roles',name), { name, permissions: [] });
+  await pushAudit(`Rol creado: ${name}`);
+  showAviso('Rol creado');
+  loadRolesAdmin();
+}
+async function loadRolesAdmin(){
+  const snap = await getDocs(collection(db,'roles'));
+  const out = document.getElementById('rolesAdminList'); out.innerHTML = '';
+  snap.forEach(d=>{
+    const rd = d.data();
+    const div = document.createElement('div'); div.className = 'item';
+    div.innerHTML = `<div style="flex:1"><b>${d.id}</b><div class="muted small">Permisos: ${(rd.permissions||[]).join(', ') || '—'}</div></div>
+      <div><button class="btn-ghost" data-role="${d.id}" data-act="edit">Editar</button> <button class="btn" data-role="${d.id}" data-act="del">Borrar</button></div>`;
+    out.appendChild(div);
+  });
+  out.querySelectorAll('button[data-act="edit"]').forEach(b=> b.onclick = ()=> openRoleEditor(b.dataset.role));
+  out.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=>{
+    if(!confirm('Borrar rol?')) return;
+    await deleteDoc(doc(db,'roles', b.dataset.role));
+    // remove role from users who had it
+    const usersSnap = await getDocs(collection(db,'users'));
+    usersSnap.forEach(async uDoc=>{
+      const u = uDoc.data();
+      if(u.role === b.dataset.role) await updateDoc(doc(db,'users', uDoc.id), { role: '' });
     });
-    // small help
-    pushAudit('Sistema iniciado (cliente)', {});
-  })();
+    await pushAudit(`Rol borrado: ${b.dataset.role}`);
+    loadRolesAdmin();
+  });
+}
+function openRoleEditor(roleKey){
+  // build modal DOM in page
+  const overlay = document.createElement('div'); overlay.className = 'overlay';
+  overlay.innerHTML = `<div class="modal"><h3>Editar rol: ${roleKey}</h3><div class="muted small">Marca permisos</div><div id="permBox"></div>
+    <div style="display:flex;gap:8px;margin-top:12px"><button id="saveRoleBtn" class="btn">Guardar</button><button id="cancelRoleBtn" class="btn-ghost">Cancelar</button></div></div>`;
+  document.body.appendChild(overlay);
+  const perms = ['create_reports','delete_reports','create_pda','create_call','assign_call','create_bolo','manage_wanted','create_fine','export','all'];
+  const box = overlay.querySelector('#permBox');
+  // load current
+  getDoc(doc(db,'roles',roleKey)).then(snap=> {
+    const role = snap.data() || { permissions: []};
+    box.innerHTML = perms.map(p=>`<div style="margin-bottom:6px"><label><input type="checkbox" data-perm="${p}" ${role.permissions && role.permissions.includes(p)?'checked':''}/> ${p}</label></div>`).join('');
+  });
+  overlay.querySelector('#cancelRoleBtn').onclick = ()=> overlay.remove();
+  overlay.querySelector('#saveRoleBtn').onclick = async ()=>{
+    const checked = Array.from(box.querySelectorAll('input[type=checkbox]:checked')).map(i=>i.dataset.perm);
+    await setDoc(doc(db,'roles', roleKey), { name: roleKey, permissions: checked });
+    await pushAudit(`Rol editado: ${roleKey}`);
+    overlay.remove(); loadRolesAdmin();
+  };
+}
 
-  // ---------- UTIL: export/import local -> replaced by admin-only in Firestore: omitted tools panel ----------
+/* ========== AUDIT view (admin/sargento) ========== */
+async function renderAudit(){
+  STATE.expanded = 'audit';
+  expandedRoot.innerHTML = `<div class="expanded">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>Auditoría</strong><div class="muted">Últimas acciones</div></div>
+      <div><button class="btn" id="closeAudit">Cerrar</button></div>
+    </div>
+    <div style="margin-top:12px"><div id="auditList" class="list"></div></div>
+  </div>`;
+  document.getElementById('closeAudit').onclick = ()=> closeExpanded();
+  loadAudit();
+}
+async function loadAudit(){
+  const snap = await getDocs(collection(db,'audit'));
+  const list = document.getElementById('auditList'); list.innerHTML = '';
+  if(snap.empty) { list.innerHTML = '<div class="muted small">Sin registros</div>'; return; }
+  snap.forEach(d=>{
+    const a = d.data();
+    const it = document.createElement('div'); it.className = 'item';
+    it.innerHTML = `<div style="flex:1"><b>${a.action}</b><div class="muted small">${a.actor} • ${a.ts ? (a.ts.toDate ? a.ts.toDate().toLocaleString() : a.ts) : ''}</div></div>`;
+    list.appendChild(it);
+  });
+}
 
-  // ---------- helpers for serverTimestamp in client addDoc usage ----------
-  // At top we imported serverTimestamp symbol? we used serverTimestamp in code; include it:
-  import { serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+/* ========== Misc helpers ========== */
+function closeExpanded(){ STATE.expanded = null; expandedRoot.innerHTML = ''; }
+function initUI(){
+  renderCards();
+  // setup realtime listeners on load to refresh views globally
+  setupRealtime();
+  // initial header
+  updateHeader();
+}
+/* call init */
+initUI();
 
-  // ---------- final: expose some functions for console debugging ----------
-  window.__WZRD = { pushAviso, pushAlerta, db };
+/* ========== Export/Import (admin) ========== */
+async function exportAllData(){
+  if(!STATE.currentUser) { alert('Login requerido'); return; }
+  if(STATE.currentUser.role !== 'admin'){ alert('Solo admin puede exportar'); return; }
+  // fetch all collections used
+  const colNames = ['users','roles','pda','reports','calls','wanted','fines','incautaciones','alertas','audit','onDuty'];
+  const out = {};
+  for(const c of colNames){
+    const snap = await getDocs(collection(db,c));
+    out[c] = [];
+    snap.forEach(d=> out[c].push({ id: d.id, ...d.data() }));
+  }
+  const blob = new Blob([JSON.stringify(out,null,2)], {type:'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href = url; a.download = `wizardrp_export_${Date.now()}.json`; document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  showAviso('Exportado JSON (descarga)');
+}
+async function importAllData(file){
+  if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){ alert('Solo admin puede importar'); return; }
+  const text = await file.text();
+  const data = JSON.parse(text);
+  // This is destructive — remove existing docs (simple approach)
+  if(!confirm('Importar reemplazará colecciones locales en Firestore. Continuar?')) return;
+  for(const colName in data){
+    // naive: add each item as new doc with same id (setDoc)
+    const arr = data[colName];
+    for(const item of arr){
+      const id = item.id;
+      const payload = {...item}; delete payload.id;
+      await setDoc(doc(db, colName, id), payload);
+    }
+  }
+  showAviso('Importación completada');
+  await pushAudit('Importación masiva realizada por admin');
+}
 
-  </script>
+/* ========== Final notes: remove just_changed flags periodically ========== */
+// small cleanup: when onDuty or calls updated with markers we set, we clear markers after a short delay
+// We'll implement when writing to docs we set flags; later we could remove them via scheduled cleanup if needed.
+
+</script>
 </body>
 </html>
+<!-- --------------- FIN PARTE 2 --------------- -->
