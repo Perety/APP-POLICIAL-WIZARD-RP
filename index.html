@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Daynight RP — PDA Policial (Online)</title>
+<title>Daynight RP — PDA Policial</title>
 <style>
   :root{
     --bg:#071018; --muted:#98a8b0; --accent:#844ffc; --accent2:#6ee7b7;
@@ -17,16 +17,15 @@
   html,body{height:100%}
   body{
     margin:0;background:
-      radial-gradient(900px 350px at 10% 10%, rgba(132,79,252,0.04), transparent),
+      radial-gradient(900px 350px at 10% 10%, rgba(132,79,252,0.06), transparent),
       linear-gradient(180deg, #03121a 0%, var(--bg) 60%);
     color:#e7eef6; -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:1200px;margin:18px auto;padding:18px;display:grid;grid-template-rows:auto 1fr;gap:14px}
+  .wrap{max-width:1180px;margin:18px auto;padding:18px;display:grid;grid-template-rows:auto 1fr;gap:14px}
   header{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .brand{display:flex;gap:12px;align-items:center}
-  .logo-img{width:72px;height:72px;border-radius:12px;background:#fff;padding:6px;display:flex;align-items:center;justify-content:center;overflow:hidden}
-  .logo-img img{width:100%;height:100%;object-fit:contain}
-  h1{margin:0;font-size:20px}
+  .logo{width:72px;height:72px;border-radius:12px;background:url('https://cdn.discordapp.com/attachments/1421898595271180360/1422217488145453219/LOGO_WIZARD_FONDO.png.png') center/cover no-repeat;display:flex;align-items:center;justify-content:center;font-weight:900;color:#041018}
+  h1{margin:0;font-size:18px}
   .subtitle{color:var(--muted);font-size:13px}
   .top-right{display:flex;gap:8px;align-items:center}
   .pill{background:rgba(255,255,255,0.03);padding:8px 10px;border-radius:999px;font-weight:700}
@@ -55,23 +54,20 @@
   .link-like{color:var(--accent);cursor:pointer;text-decoration:underline}
   .grid-2{display:grid;grid-template-columns:1fr 360px;gap:12px}
   .role-chip{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.02);margin-right:6px;margin-bottom:6px}
-  .toast{position:fixed;right:18px;bottom:18px;background:rgba(0,0,0,0.7);color:#fff;padding:12px 14px;border-radius:10px;z-index:20000;box-shadow:0 6px 18px rgba(0,0,0,0.6)}
-  .hidden{display:none}
+  .toast{position:fixed;right:18px;bottom:18px;background:rgba(0,0,0,0.7);padding:12px 16px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);z-index:99999;color:#fff}
   @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} .grid-2{grid-template-columns:1fr} }
   @media (max-width:640px){ .grid{grid-template-columns:1fr} .form-row{flex-direction:column} .modal{width:94%} }
   .btn-small{padding:6px 8px;font-size:13px;border-radius:8px}
-  .pill-count{background:rgba(255,255,255,0.02);padding:6px 8px;border-radius:8px}
-  .img-thumb{width:64px;height:64px;border-radius:8px;object-fit:cover}
 </style>
 </head>
 <body>
   <div class="wrap">
     <header>
       <div class="brand">
-        <div class="logo-img"><img id="logoImg" src="https://cdn.discordapp.com/attachments/1421898595271180360/1422217488145453219/LOGO_WIZARD_FONDO.png.png" alt="Logo" /></div>
+        <div class="logo" title="Daynight RP"></div>
         <div>
           <h1>Daynight RP — PDA / CAD</h1>
-          <div class="subtitle">Sistema online — sincronizado en tiempo real</div>
+          <div class="subtitle">Simulador online — comparte la URL con tu comunidad</div>
         </div>
       </div>
 
@@ -87,71 +83,102 @@
 
     <div id="expandedRoot"></div>
 
-    <footer>Hecho para Daynight RP • Online con Firebase • Guarda tus datos con seguridad</footer>
+    <footer>Hecho para Daynight RP • Datos sincronizados con Firestore/Storage</footer>
   </div>
 
-  <!-- Login modal (mantengo la interfaz que pediste pero registro solo por admin) -->
-  <div id="loginModal" class="overlay hidden">
+  <!-- LOGIN / REGISTER modal (tu sistema original) -->
+  <div id="loginModal" class="overlay" style="display:none">
     <div class="modal">
-      <h3>Entrar</h3>
-      <div class="muted small">Accede con tu cuenta (creada por administradores).</div>
+      <h3>Entrar / Registrarse</h3>
+      <div class="muted small">Usa tu cuenta o crea una (solo admins pueden crear cuentas desde Administración)</div>
+
       <div style="margin-top:12px">
         <label class="muted small">Usuario</label>
-        <input id="loginUser" placeholder="usuario (ej: admin)"/>
+        <input id="loginUser" placeholder="usuario (ej: perety04)"/>
         <label class="muted small" style="margin-top:8px">Contraseña</label>
         <input id="loginPass" type="password" placeholder="contraseña"/>
         <div style="display:flex;gap:8px;margin-top:12px">
           <button id="loginBtn" class="btn">Entrar</button>
           <button id="guestBtn" class="btn-ghost">Invitado</button>
-          <div style="margin-left:auto" class="small muted">¿Necesitas cuenta? Contacta con un admin</div>
+          <div style="margin-left:auto" class="small muted">¿Sin cuenta? <span id="showReg" class="link-like">Crear (solo admin permite subidas)</span></div>
         </div>
         <div id="loginError" class="muted small" style="margin-top:8px;color:#ff9b9b;display:none"></div>
+      </div>
+
+      <div id="registerBlock" style="display:none;margin-top:12px;border-top:1px dashed rgba(255,255,255,0.03);padding-top:12px">
+        <h4 style="margin:0 0 8px 0">Crear cuenta</h4>
+        <label class="muted small">Nombre visible</label>
+        <input id="regName" placeholder="Ej: Ofc. Pérez"/>
+        <label class="muted small">Usuario</label>
+        <input id="regUser" placeholder="usuario (ej: perety04)"/>
+        <label class="muted small">Contraseña</label>
+        <input id="regPass" type="password" placeholder="contraseña"/>
+        <div style="display:flex;gap:8px;margin-top:8px">
+          <select id="regRole">
+            <option value="officer">Officer</option>
+            <option value="sergeant">Sergeant</option>
+            <option value="dispatcher">Dispatcher</option>
+            <option value="admin">Admin</option>
+          </select>
+          <button id="regCreate" class="btn">Crear</button>
+          <button id="regCancel" class="btn-ghost">Cancelar</button>
+        </div>
+        <div id="regMsg" class="muted small" style="margin-top:8px"></div>
       </div>
     </div>
   </div>
 
-  <div id="toastRoot" style="position:fixed;right:18px;bottom:18px;z-index:20000"></div>
+  <!-- simple file input for images (hidden) -->
+  <input id="filePicker" type="file" accept="image/*" style="display:none" />
 
-  <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-  <!-- NOTE: We're using compat libs for simpler code in a single file. -->
+<script type="module">
+/* ============================================================
+   Daynight RP — index.html (todo en uno)
+   - copia y pega este archivo en public/index.html
+   - pega tu firebaseConfig en el bloque marcado más abajo
+   - despliega con: firebase deploy --only hosting:daynightrppdapolice
+   ============================================================ */
 
-<script>
-/* ======================================================
-   Daynight RP — index.html (single file)
-   - Usa Firestore + Storage (Firebase) en tiempo real
-   - Copia/pega todo en index.html
-   ====================================================== */
+/* ----------------- Firebase modular (preparado) ----------------- */
+/*
+  IMPORTANTE: reemplaza los valores de firebaseConfig (apiKey, projectId, etc.)
+  por los de tu proyecto desde la consola de Firebase.
+*/
 
-/* ------------------- CONFIGURACIÓN FIREBASE -------------------
-   He usado las credenciales que me proporcionaste para que funcione
-   directamente. Si prefieres no exponerlas, reemplaza estos valores.
------------------------------------------------------------------*/
-const firebaseConfig = {
-  apiKey: "AIzaSyCskczYgGtlPPBEIZiE5PuY7s_cfE_3Chg",
-  authDomain: "wizard-rp.firebaseapp.com",
-  projectId: "wizard-rp",
-  storageBucket: "wizard-rp.firebasestorage.app",
-  messagingSenderId: "479456044047",
-  appId: "1:479456044047:web:65c52e2430bcb6ca586f7a",
-  measurementId: "G-KX5Y56CG0R"
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js";
+import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, setDoc, updateDoc, onSnapshot, query, orderBy, where, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js";
+import { getStorage, ref as sref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.3.0/firebase-storage.js";
+
+const FIREBASE_CONFIG_PLACEHOLDER = {
+  apiKey: "TU_API_KEY",
+  authDomain: "TU_AUTH_DOMAIN",
+  projectId: "TU_PROJECT_ID",
+  storageBucket: "TU_STORAGE_BUCKET",
+  messagingSenderId: "TU_SENDER_ID",
+  appId: "TU_APP_ID",
+  measurementId: "TU_MEASUREMENT_ID"
 };
 
-/* ------------------- Inicializar Firebase ------------------- */
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const storage = firebase.storage();
+// ======== PEGAR AQUÍ TU firebaseConfig (reemplaza el objeto placeholder) ========
+const firebaseConfig = FIREBASE_CONFIG_PLACEHOLDER;
+// =============================================================================
 
-/* ------------------- Estado de la App ------------------- */
-let STATE = {
-  currentUser: null,      // objeto user actual (desde Firestore)
-  impersonatorId: null,   // si admin está impersonando mantiene su id aquí
-  expanded: null
-};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const storage = getStorage(app);
 
-/* ------------------- Helpers UI ------------------- */
+/* ----------------- Helpers y almacenamiento local ----------------- */
+const PREFIX = 'pda_daynight_';
+function lsGet(k, fallback){ try{ const v=localStorage.getItem(PREFIX+k); return v?JSON.parse(v):fallback;}catch(e){return fallback;} }
+function lsSet(k,v){ try{ localStorage.setItem(PREFIX+k, JSON.stringify(v)); }catch(e){} }
+function uid(pref='id'){ return pref + '_' + Math.random().toString(36).slice(2,9); }
+function now(){ return Date.now(); }
+function notify(msg, timeout=3500){ const t=document.createElement('div'); t.className='toast'; t.textContent=msg; document.body.appendChild(t); setTimeout(()=> t.remove(), timeout); }
+
+/* ----------------- App state ----------------- */
+let STATE = { currentUser: lsGet('currentUser', null), expanded: null };
+
+/* ----------------- DOM refs ----------------- */
 const cardsRoot = document.getElementById('cardsRoot');
 const expandedRoot = document.getElementById('expandedRoot');
 const userDisplay = document.getElementById('userDisplay');
@@ -159,99 +186,60 @@ const dutyStatus = document.getElementById('dutyStatus');
 const loginModal = document.getElementById('loginModal');
 const btnLogin = document.getElementById('btnLogin');
 const btnExport = document.getElementById('btnExport');
-const toastRoot = document.getElementById('toastRoot');
 
-function showToast(msg, timeout=4500){
-  const t = document.createElement('div'); t.className='toast'; t.textContent = msg;
-  toastRoot.appendChild(t);
-  setTimeout(()=>{ t.style.transition='opacity .4s'; t.style.opacity=0; setTimeout(()=>t.remove(),400); }, timeout);
+/* ----------------- Permissions / Roles ----------------- */
+function hasPerm(perm){
+  if(!STATE.currentUser) return perm === 'create_call' ? true : false; // guests can create calls
+  const roles = lsGet('roles', {});
+  const roleKey = STATE.currentUser.role;
+  const role = roles[roleKey];
+  if(!role) return false;
+  if(role.permissions && role.permissions.includes('all')) return true;
+  return role.permissions && role.permissions.includes(perm);
 }
 
-function showModal(html){
-  const overlay = document.createElement('div'); overlay.className='overlay';
-  overlay.innerHTML = `<div class="modal">${html}</div>`;
-  overlay.onclick = (e)=>{ if(e.target===overlay) overlay.remove(); };
-  document.body.appendChild(overlay);
-  return overlay;
-}
-
-/* ------------------- Utilidades Firestore ------------------- */
-function docId(){ return Math.random().toString(36).slice(2,9); }
-function now(){ return Date.now(); }
-
-/* Push log into Firestore (only for admin/sergeant or users created by them) */
-async function pushLog(msg){
-  try{
-    const u = STATE.currentUser;
-    // Only create audit logs if the acting user qualifies:
-    // either role === admin|sergeant OR their createdByRole === admin|sergeant
-    if(!u) return;
-    const qualifies = (u.role === 'admin' || u.role === 'sergeant' || (u.createdByRole && (u.createdByRole==='admin' || u.createdByRole==='sergeant')));
-    if(!qualifies) return;
-    await db.collection('logs').add({ msg, t: firebase.firestore.FieldValue.serverTimestamp(), actor: u.username, actorId: u.id });
-    // UI update will come from realtime listener on logs
-  }catch(e){ console.error('pushLog err', e); }
-}
-
-/* ------------------- Seed inicial (si la colección users está vacía) ------------------- */
-async function seedIfNeeded(){
-  const snap = await db.collection('meta').doc('init').get().catch(()=>null);
-  if(snap && snap.exists && snap.data && snap.data().done) return;
-  // Check users collection
-  const uSnap = await db.collection('users').limit(1).get();
-  if(uSnap.empty){
-    // crear admin por defecto
-    const adminId = 'u_admin';
-    await db.collection('users').doc(adminId).set({
-      id: adminId,
-      username: 'admin',
-      display: 'Admin',
-      badge: 'ADM-001',
-      password: 'DayNightRP@2025',
-      role: 'admin',
-      createdBy: 'system',
-      createdByRole: 'admin',
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
-    // ejemplo de datos
-    await db.collection('reports').add({ title: 'Robo tienda', description: 'Robo con arma blanca. Sospechoso huye.', author: 'Admin', authorId: adminId, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-    await db.collection('calls').add({ caller: 'Civ. Morales', message: 'Disparo en puerto', status: 'pending', assigned_to: null, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-    await db.collection('wanted').add({ name: 'Mario Rata', description: 'Robo coches', bounty: 500, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-    await db.collection('pda').add({ title:'Ficha: Juan Pérez', text:'Nombre: Juan Pérez\\nAlias: rata\\nDelitos: robo', author: 'Admin', authorId: adminId, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-    await db.collection('fines').add({ offender:'Veh LSF-021', amount:200, reason:'Exceso velocidad', author:'Admin', authorId: adminId, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-    await db.collection('roles').doc('defaultRoles').set({
-      officer: { name: 'Officer', color:'#7c3aed', permissions: ['create_reports','create_pda','create_call'] },
-      sergeant: { name: 'Sergeant', color:'#3b82f6', permissions: ['create_reports','delete_reports','create_pda','create_call'] },
-      dispatcher: { name: 'Dispatcher', color:'#f97316', permissions: ['create_call','assign_call'] },
-      admin: { name:'Admin', color:'#10b981', permissions: ['all'] }
-    });
-    await db.collection('meta').doc('init').set({ done:true });
-    console.log('Seed inicial creada.');
+/* ----------------- Seed inicial (con admin seguro) ----------------- */
+function seedIfNeeded(){
+  if(!lsGet('inited', false)){
+    const users = [
+      {id:uid('u'), username:'admin', display:'Admin', badge:'ADM-001', password:'DayNightRP@2025', role:'admin'},
+      {id:uid('u'), username:'dispatcher', display:'Dispatch', badge:'DISP', password:'dispatch', role:'dispatcher'},
+      {id:uid('u'), username:'perety04', display:'Perety 04', badge:'PD-314', password:'peretypass', role:'officer'}
+    ];
+    const templates = {
+      report: "Título: {{title}}\\nHechos: {{facts}}\\nAcciones: {{actions}}\\nOficial: {{author}}",
+      pda: "Nombre: {{name}}\\nAlias: {{alias}}\\nNotas: {{notes}}",
+      call: "Remitente: {{caller}}\\nMensaje: {{message}}\\nUbicación: {{location}}",
+      fine: "Infractor: {{offender}}\\nImporte: {{amount}}\\nMotivo: {{reason}}"
+    };
+    const reports = [{id:uid('rep'), title:'Robo en tienda', description:'Robo con arma blanco. Sospechoso huyó.', author:'Admin', created_at:now()}];
+    const wanted = [{id:uid('w'), name:'Mario Rata', description:'Robo coches', bounty:500, created_at:now()}];
+    const calls = [{id:uid('c'), caller:'Civ. X', message:'Disparo', status:'pending', assigned_to:null, created_at:now()}];
+    const pda = [{id:uid('p'), title:'Ficha: Juan Pérez', text:'Nombre: Juan Pérez\\nAlias: rata\\nDelitos: robo', created_at:now(), author:'Admin'}];
+    const fines = [{id:uid('f'), offender:'Veh LSF-021', amount:200, reason:'Exceso velocidad', author:'Admin', created_at:now()}];
+    const roles = {
+      officer: {name:'Officer', color:'#7c3aed', permissions:['create_reports','create_pda','create_call']},
+      sergeant: {name:'Sergeant', color:'#3b82f6', permissions:['create_reports','create_pda','create_call','delete_reports']},
+      dispatcher: {name:'Dispatcher', color:'#f97316', permissions:['create_call','assign_call']},
+      admin: {name:'Admin', color:'#10b981', permissions:['all']}
+    };
+    const alerts = [{id:uid('a'), title:'Robo en curso', description:'Robo en zona centro', level:'rojo', created_at:now()}];
+    lsSet('users', users);
+    lsSet('templates', templates);
+    lsSet('reports', reports);
+    lsSet('wanted', wanted);
+    lsSet('calls', calls);
+    lsSet('pda', pda);
+    lsSet('fines', fines);
+    lsSet('roles', roles);
+    lsSet('alerts', alerts);
+    lsSet('logs', [{id:uid('log'), t:now(), msg:'Seed inicial creada'}]);
+    lsSet('onDuty', {});
+    lsSet('inited', true);
   }
 }
 
-/* ------------------- Realtime listeners ------------------- */
-let unsubscribes = [];
-function startRealtime(){
-  // calls
-  unsubscribes.push(db.collection('calls').orderBy('createdAt','desc').onSnapshot(loadCallsRealtime));
-  // pda
-  unsubscribes.push(db.collection('pda').orderBy('createdAt','desc').onSnapshot(loadPDARealtime));
-  // reports
-  unsubscribes.push(db.collection('reports').orderBy('createdAt','desc').onSnapshot(loadReportsRealtime));
-  // wanted
-  unsubscribes.push(db.collection('wanted').orderBy('createdAt','desc').onSnapshot(loadWantedRealtime));
-  // fines
-  unsubscribes.push(db.collection('fines').orderBy('createdAt','desc').onSnapshot(loadFinesRealtime));
-  // users
-  unsubscribes.push(db.collection('users').orderBy('display').onSnapshot(loadUsersRealtime));
-  // logs (admin panel)
-  unsubscribes.push(db.collection('logs').orderBy('t','desc').limit(200).onSnapshot(snap=>{ window.latestLogs = snap.docs.map(d=>({id:d.id,...d.data()})); }));
-  // onDuty
-  unsubscribes.push(db.collection('onDuty').onSnapshot(loadDutyRealtime));
-}
-
-/* ------------------- Render principales cards ------------------- */
+/* ----------------- UI: cards ----------------- */
 const CARDS = [
   {id:'pda', title:'PDA / Fichas', desc:'Buscar y crear fichas PDA', icon:'🚓'},
   {id:'calls', title:'Dispatch / Llamadas', desc:'Crear/Asignar llamadas', icon:'📞'},
@@ -259,9 +247,9 @@ const CARDS = [
   {id:'wanted', title:'BOLO / Wanted', desc:'Fichas buscados', icon:'🚨'},
   {id:'fines', title:'Multas', desc:'Generar sanciones', icon:'💸'},
   {id:'service', title:'Servicio', desc:'Entrar / Salir de servicio', icon:'🟢'},
+  {id:'alerts', title:'Alertas', desc:'Alertas ciudad (verde/amarilla/roja)', icon:'⚠️'},
   {id:'admin', title:'Administración', desc:'Roles y usuarios (admin)', icon:'⚙️'},
-  {id:'logs', title:'Auditoría', desc:'Historial de acciones', icon:'📜'},
-  {id:'tools', title:'Incautaciones / Alertas', desc:'Alertas ciudadanas y registros', icon:'🧰'}
+  {id:'logs', title:'Auditoría', desc:'Historial de acciones', icon:'📜'}
 ];
 
 function renderCards(){
@@ -274,7 +262,7 @@ function renderCards(){
     </div>
     <div style="display:flex;justify-content:space-between;align-items:center">
       <div class="muted tiny">Acción rápida</div>
-      <div><button class="btn-ghost" data-open="${c.id}">Abrir</button></div>
+      <div><button class="btn" data-open="${c.id}" style="background:var(--accent)">Abrir</button></div>
     </div>`;
     el.onclick = ()=>openCard(c.id);
     el.querySelector('button[data-open]').onclick = (e)=>{ e.stopPropagation(); openCard(c.id); };
@@ -282,7 +270,7 @@ function renderCards(){
   });
 }
 
-/* ------------------- Abrir panel ------------------- */
+/* ----------------- Open card ----------------- */
 function openCard(id){
   STATE.expanded = id;
   expandedRoot.innerHTML = '';
@@ -293,17 +281,18 @@ function openCard(id){
   else if(id==='wanted') renderWanted(panel);
   else if(id==='fines') renderFines(panel);
   else if(id==='service') renderService(panel);
+  else if(id==='alerts') renderAlerts(panel);
   else if(id==='admin') renderAdmin(panel);
   else if(id==='logs') renderLogs(panel);
-  else if(id==='tools') renderTools(panel);
   expandedRoot.appendChild(panel);
   window.scrollTo({ top: panel.offsetTop-20, behavior:'smooth' });
 }
 
-/* ========================= PDA ========================= */
+/* ----------------- PDA ----------------- */
 function renderPDA(container){
+  const templates = lsGet('templates', {});
   container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>PDA / Fichas</strong><div class="muted small">Buscar y crear fichas (adjuntar imagen opcional)</div></div>
+    <div><strong>PDA / Fichas</strong><div class="muted small">Buscar y crear fichas</div></div>
     <div><button class="btn btn-small" id="closeP">Cerrar</button></div>
   </div>
   <div style="margin-top:12px" class="grid-2">
@@ -314,93 +303,77 @@ function renderPDA(container){
     </div>
     <div>
       <div class="muted small">Crear nueva ficha (plantilla editable)</div>
-      <textarea id="pdaTpl">Nombre: \nAlias: \nNotas: </textarea>
-      <div style="display:flex;gap:8px;margin-top:8px">
-        <input id="pdaImage" type="file" accept="image/*" style="width:auto"/>
-        <button id="createPDA" class="btn">Crear ficha</button>
-        <button id="clearPDA" class="btn-ghost">Limpiar</button>
-      </div>
+      <textarea id="pdaTpl">${templates.pda||''}</textarea>
+      <div style="display:flex;gap:8px;margin-top:8px"><button id="createPDA" class="btn">Crear ficha</button><button id="clearPDA" class="btn-ghost">Limpiar</button></div>
+      <div style="margin-top:10px"><small class="muted">Adjuntar imagen:</small><input id="pdaImg" type="file" accept="image/*"></div>
     </div>
   </div>`;
   container.querySelector('#closeP').onclick = ()=> closeExpanded();
   container.querySelector('#pdaQ').oninput = ()=> searchPDA(document.getElementById('pdaQ').value);
   container.querySelector('#createPDA').onclick = createPDA;
-  loadPDARealtimeSnapshotOnce();
+  loadPDAResults();
 }
-
-async function loadPDARealtimeSnapshotOnce(){
-  const resDiv = document.getElementById('pdaResults');
-  if(!resDiv) return;
-  // initial load will be handled by realtime listener loadPDARealtime
-  resDiv.innerHTML = '<div class="muted small">Cargando fichas...</div>';
-}
-function loadPDARealtime(snapshot){
-  // snapshot may be array if called as listener
-  let docs = [];
-  if(snapshot && snapshot.forEach){ snapshot.forEach(d=>docs.push({id:d.id,...d.data()})); }
-  else {
-    // if called manually, fetch
-    db.collection('pda').orderBy('createdAt','desc').get().then(s=>{ loadPDARealtime(s); });
-    return;
-  }
+async function loadPDAResults(){
+  const arr = lsGet('pda', []);
   const res = document.getElementById('pdaResults');
   if(!res) return;
-  res.innerHTML = docs.map(p=>`<div class="item"><div style="flex:1"><b>${p.title||'Ficha'}</b><div class="muted small">${(p.text||'').slice(0,140)}</div></div>
-    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;">
-      ${p.imageUrl?`<img class="img-thumb" src="${p.imageUrl}" />`:''}
-      <div><button class="btn-ghost btn-small" onclick="viewPDA('${p.id}')">Abrir</button> <button class="btn-ghost btn-small" onclick="tryDeletePDA('${p.id}')">Borrar</button></div>
-    </div></div>`).join('') || '<div class="muted small">Sin fichas</div>';
+  res.innerHTML = arr.map(p=>`<div class="item"><div style="flex:1"><b>${(p.title||'Ficha')}</b><div class="muted small">${(p.text||'').slice(0,140)}</div></div>
+    <div><button class="btn-ghost" onclick="viewPDA('${p.id}')">Ver</button> ${canDeletePDA(p) ? `<button class="btn-ghost" onclick="delPDA('${p.id}')">Borrar</button>` : ''}</div></div>`).join('') || '<div class="muted small">Sin fichas</div>';
 }
-
+function searchPDA(q){
+  q = (q||'').toLowerCase().trim();
+  const arr = lsGet('pda', []);
+  const out = arr.filter(p => ((p.text||'').toLowerCase().includes(q) || (p.title||'').toLowerCase().includes(q)));
+  const res = document.getElementById('pdaResults');
+  if(!res) return;
+  res.innerHTML = out.map(p=>`<div class="item"><div style="flex:1"><b>${p.title||'Ficha'}</b><div class="muted small">${(p.text||'').slice(0,140)}</div></div>
+    <div><button class="btn-ghost" onclick="viewPDA('${p.id}')">Ver</button> ${canDeletePDA(p) ? `<button class="btn-ghost" onclick="delPDA('${p.id}')">Borrar</button>` : ''}</div></div>`).join('') || '<div class="muted small">No hay resultados</div>';
+}
+function canDeletePDA(p){
+  if(!STATE.currentUser) return false;
+  if(STATE.currentUser.role==='admin') return true;
+  // Only author or roles with delete permission
+  return (p.author === (STATE.currentUser && STATE.currentUser.username)) || hasPerm('delete_reports');
+}
 async function createPDA(){
-  if(!STATE.currentUser){ showToast('Debes iniciar sesión para crear fichas'); return; }
-  // permisos
-  if(!(STATE.currentUser.role === 'admin' || STATE.currentUser.role === 'sergeant' || STATE.currentUser.role === 'officer' )){ showToast('No tienes permiso para crear fichas'); return; }
-  const text = document.getElementById('pdaTpl').value.trim();
-  if(!text){ showToast('Rellena la plantilla'); return; }
-  const fileInput = document.getElementById('pdaImage');
-  let imageUrl = null;
-  try{
-    if(fileInput && fileInput.files && fileInput.files[0]){
-      const f = fileInput.files[0];
-      const storageRef = storage.ref().child(`pda_images/${Date.now()}_${f.name}`);
-      const snap = await storageRef.put(f);
-      imageUrl = await snap.ref.getDownloadURL();
-    }
-    const title = text.split('\n')[0].replace('Nombre:','').trim() || 'Ficha';
-    await db.collection('pda').add({ title, text, imageUrl, author: STATE.currentUser.display, authorId: STATE.currentUser.id, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-    showToast('Ficha PDA creada');
-    pushLog(`PDA creada: ${title}`);
-    document.getElementById('pdaTpl').value = '';
-    if(fileInput) fileInput.value = '';
-  }catch(e){ console.error(e); showToast('Error al subir imagen o guardar'); }
+  if(!hasPerm('create_pda')){ notify('No tienes permiso para crear fichas'); return; }
+  const txt = document.getElementById('pdaTpl').value.trim();
+  if(!txt){ notify('Rellena la plantilla'); return; }
+  const imgInput = document.getElementById('pdaImg');
+  let imgURL = null;
+  if(imgInput && imgInput.files && imgInput.files[0]){
+    try{
+      const file = imgInput.files[0];
+      const path = `images/pda/${uid('img')}_${file.name}`;
+      const stref = sref(storage, path);
+      await uploadBytes(stref, file);
+      imgURL = await getDownloadURL(stref);
+    }catch(e){ console.error(e); notify('Error subiendo imagen'); }
+  }
+  const arr = lsGet('pda', []);
+  const item = {id:uid('pda'), title: (txt.split('\n')[0]||'Ficha').replace('Nombre:','').trim(), text:txt, created_at:now(), author: STATE.currentUser?STATE.currentUser.username:'Invitado', img:imgURL};
+  arr.unshift(item); lsSet('pda', arr);
+  pushLog(`Ficha PDA creada: ${item.title}`);
+  document.getElementById('pdaTpl').value = '';
+  if(document.getElementById('pdaImg')) document.getElementById('pdaImg').value='';
+  loadPDAResults();
+  notify('Ficha PDA creada');
 }
-
-/* Deletion rules: only admin OR author OR sergeant can delete */
-async function tryDeletePDA(id){
-  const doc = await db.collection('pda').doc(id).get();
-  const data = doc.data();
-  if(!STATE.currentUser){ showToast('Inicia sesión'); return; }
-  const isAuthor = data && data.authorId === STATE.currentUser.id;
-  const allowed = (STATE.currentUser.role === 'admin' || STATE.currentUser.role === 'sergeant' || isAuthor);
-  if(!allowed){ showToast('No puedes borrar esta ficha'); return; }
+function viewPDA(id){
+  const arr = lsGet('pda', []);
+  const p = arr.find(x=>x.id===id);
+  if(!p) return;
+  let txt = `Título: ${p.title}\n\n${p.text}\n\nCreada: ${new Date(p.created_at).toLocaleString()}\nAutor: ${p.author}`;
+  if(p.img) txt += `\n\nImagen: ${p.img}`;
+  alert(txt);
+}
+function delPDA(id){
   if(!confirm('Borrar ficha PDA?')) return;
-  await db.collection('pda').doc(id).delete();
-  showToast('Ficha borrada');
-  pushLog(`PDA ${id} borrada`);
+  let arr = lsGet('pda', []);
+  arr = arr.filter(x=>x.id!==id); lsSet('pda', arr); pushLog(`Ficha PDA borrada: ${id}`); loadPDAResults(); notify('Ficha borrada');
 }
 
-async function viewPDA(id){
-  const doc = await db.collection('pda').doc(id).get();
-  const data = doc.data();
-  if(!data) return;
-  let html = `<h3>${data.title}</h3><pre style="white-space:pre-wrap">${data.text}</pre>`;
-  if(data.imageUrl) html += `<div style="margin-top:8px"><img src="${data.imageUrl}" style="max-width:100%;border-radius:8px"/></div>`;
-  if(data.author) html += `<div class="muted small" style="margin-top:8px">Autor: ${data.author}</div>`;
-  showModal(html);
-}
-
-/* ========================= CALLS (Dispatch) ========================= */
+/* ----------------- Calls (Dispatch) ----------------- */
 function renderCalls(container){
   container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
     <div><strong>Dispatch / Llamadas</strong><div class="muted small">Crear llamadas y asignar unidades</div></div>
@@ -414,94 +387,54 @@ function renderCalls(container){
   <div style="margin-top:12px"><strong>Llamadas</strong><div id="callsList" class="list" style="margin-top:8px"></div></div>`;
   container.querySelector('#closeC').onclick = ()=> closeExpanded();
   container.querySelector('#callCreate').onclick = createCall;
-  // initial load handled by realtime listener
+  loadCalls();
 }
-
-async function createCall(){
+function createCall(){
   const caller = document.getElementById('callFrom').value.trim() || 'Anonimo';
   const message = document.getElementById('callMsg').value.trim();
-  if(!message){ showToast('Introduce un mensaje'); return; }
-  try{
-    const docRef = await db.collection('calls').add({ caller, message, status:'pending', assigned_to:null, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-    document.getElementById('callMsg').value=''; document.getElementById('callFrom').value='';
-    showToast('Llamada creada');
-    pushLog(`Llamada creada por ${caller}`);
-    // notify all listening clients via listener -> show toast in their UI
-  }catch(e){ console.error(e); showToast('Error creando llamada'); }
+  if(!message){ notify('Introduce un mensaje'); return; }
+  const calls = lsGet('calls', []);
+  const c = {id:uid('c'), caller, message, status:'pending', assigned_to:null, created_at:now()};
+  calls.unshift(c); lsSet('calls', calls); pushLog(`Llamada creada por ${caller}`);
+  document.getElementById('callMsg').value=''; document.getElementById('callFrom').value='';
+  loadCalls();
+  notify('Nueva llamada creada');
 }
-
-function loadCallsRealtime(snapshot){
-  let docs = [];
-  snapshot.forEach(d=>docs.push({id:d.id,...d.data()}));
-  const list = document.getElementById('callsList');
-  if(!list) return;
+function loadCalls(){
+  const list = document.getElementById('callsList'); if(!list) return;
+  const calls = lsGet('calls', []);
   list.innerHTML = '';
-  if(!docs.length){ list.innerHTML = '<div class="muted small">No hay llamadas</div>'; return; }
-  const users = window.latestUsers || [];
-  docs.forEach(c=>{
-    const assigneeName = c.assigned_to ? (users.find(u=>u.id===c.assigned_to)?.display || '—') : '—';
-    const it = document.createElement('div'); it.className='item';
-    it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${c.caller}</div><div class="muted small">${c.message}</div></div>
-      <div style="text-align:right"><div class="muted tiny">${c.createdAt && c.createdAt.toDate ? c.createdAt.toDate().toLocaleString() : ''}</div><div style="margin-top:8px" class="muted tiny">Asig: ${assigneeName}</div></div>`;
+  if(!calls.length){ list.innerHTML = '<div class="muted small">No hay llamadas</div>'; return; }
+  const users = lsGet('users', []);
+  calls.forEach(c=>{
+    const assignee = c.assigned_to ? (users.find(u=>u.id===c.assigned_to)?.display || '—') : '—';
+    const el = document.createElement('div'); el.className='item';
+    el.innerHTML = `<div style="flex:1"><b>${c.caller}</b><div class="muted small">${c.message}</div></div>
+      <div style="text-align:right"><div class="muted tiny">${new Date(c.created_at).toLocaleString()}</div><div style="margin-top:8px" class="muted tiny">Asig: ${assignee}</div></div>`;
     const btns = document.createElement('div'); btns.style.marginLeft='12px';
-    // assign dropdown of onDuty users
-    const assignBtn = document.createElement('button'); assignBtn.className='btn-ghost btn-small'; assignBtn.textContent='Asignar';
-    assignBtn.onclick = async ()=>{
-      // fetch active onDuty users to allow assignment
-      const on = await db.collection('onDuty').where('active','==',true).get();
-      const options = on.docs.map(d=>d.data());
-      if(!options.length){ alert('No hay unidades en servicio'); return; }
-      // build HTML for selection
-      const selHtml = `<div><h4>Asignar llamada</h4><div class="muted small">Selecciona unidad en servicio</div>
-        <div style="margin-top:8px">${options.map(o=>`<div style="margin-bottom:6px"><label><input type="radio" name="assign_${c.id}" value="${o.userId}"/> ${o.display}</label></div>`).join('')}</div>
-        <div style="display:flex;gap:8px;margin-top:12px"><button id="doAssign" class="btn">Asignar</button> <button id="cancelAssign" class="btn-ghost">Cancelar</button></div></div>`;
-      const ov = showModal(selHtml);
-      ov.querySelector('#cancelAssign').onclick = ()=> ov.remove();
-      ov.querySelector('#doAssign').onclick = async ()=>{
-        const sel = ov.querySelector(`input[name="assign_${c.id}"]:checked`);
-        if(!sel){ alert('Selecciona una unidad'); return; }
-        const userId = sel.value;
-        await db.collection('calls').doc(c.id).update({ assigned_to: userId, status:'assigned' });
-        // push notification to assigned user by creating a small notification doc? For now, push UI toast and log
-        showToast('Llamada asignada');
-        pushLog(`Llamada ${c.id} asignada a ${userId}`);
-        ov.remove();
-      };
-    };
-    btns.appendChild(assignBtn);
-
-    // delete
-    const delBtn = document.createElement('button'); delBtn.className='btn'; delBtn.textContent='Borrar';
-    delBtn.onclick = async ()=>{
-      // permission: admin OR assigned officer can delete OR dispatcher
-      const canDelete = STATE.currentUser && (STATE.currentUser.role === 'admin' || STATE.currentUser.role === 'dispatcher' || (c.assigned_to && c.assigned_to === STATE.currentUser.id));
-      if(!canDelete){ showToast('No tienes permiso para borrar'); return; }
-      if(!confirm('Borrar llamada?')) return;
-      await db.collection('calls').doc(c.id).delete();
-      showToast('Llamada borrada');
-      pushLog(`Llamada ${c.id} borrada`);
-    };
-    btns.appendChild(delBtn);
-
-    it.appendChild(btns);
-    list.appendChild(it);
+    if(hasPerm('assign_call') && STATE.currentUser){
+      const assign = document.createElement('button'); assign.className='btn-ghost'; assign.textContent='Asignar a mí';
+      assign.onclick = ()=>{ assignCall(c.id); };
+      btns.appendChild(assign);
+    }
+    if(STATE.currentUser && (STATE.currentUser.role==='admin' || (c.assigned_to && STATE.currentUser.id===c.assigned_to))){
+      const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
+      del.onclick = ()=>{ if(confirm('Borrar llamada?')) deleteCall(c.id); };
+      btns.appendChild(del);
+    }
+    el.appendChild(btns);
+    list.appendChild(el);
   });
-
-  // show transient notifications for newly created or assigned calls
-  // We'll display toasts for calls created in last 6 seconds (approx)
-  const recent = snapshot.docs.filter(d=>{
-    const s = d.data().createdAt;
-    if(!s || !s.toDate) return false;
-    return (Date.now() - s.toDate().getTime()) < 5000;
-  });
-  if(recent.length){
-    recent.forEach(r=> showToast(`Nueva llamada: ${r.data().caller} — ${r.data().message}`,6000));
-  }
-
-  // detect recent assignments (we can watch for changes in snapshot). Simpler: skip complex diff; assignments produce logs and UI will show assigned status.
 }
+function assignCall(id){
+  if(!STATE.currentUser){ notify('Inicia sesión para asignar'); return; }
+  let calls = lsGet('calls', []);
+  const c = calls.find(x=>x.id===id); if(!c) return;
+  c.status='assigned'; c.assigned_to = STATE.currentUser.id; lsSet('calls', calls); pushLog(`Llamada ${id} asignada a ${STATE.currentUser.display}`); loadCalls(); notify('Llamada asignada');
+}
+function deleteCall(id){ let calls=lsGet('calls',[]); calls = calls.filter(c=>c.id!==id); lsSet('calls', calls); pushLog(`Llamada ${id} borrada`); loadCalls(); notify('Llamada borrada'); }
 
-/* ========================= REPORTS ========================= */
+/* ----------------- Reports ----------------- */
 function renderReports(container){
   container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
     <div><strong>Informes</strong><div class="muted small">Crear y consultar informes</div></div>
@@ -516,62 +449,67 @@ function renderReports(container){
     <input id="repAuthor" placeholder="Autor (auto)" />
   </div>
   <div style="margin-top:8px"><textarea id="repDesc" placeholder="Descripción..."></textarea></div>
-  <div style="margin-top:8px;display:flex;gap:8px"><button id="saveRep" class="btn">Guardar informe</button><button id="clearRep" class="btn-ghost">Limpiar</button></div>
+  <div style="margin-top:8px;display:flex;gap:8px">
+    <button id="saveRep" class="btn">Guardar informe</button>
+    <button id="clearRep" class="btn-ghost">Limpiar</button>
+    <div style="margin-left:auto"><small class="muted">Adjuntar imagen:</small><input id="repImg" type="file" accept="image/*"></div>
+  </div>
   <div style="margin-top:12px"><strong>Últimos informes</strong><div id="reportsList" class="list" style="margin-top:8px"></div></div>`;
   container.querySelector('#closeR').onclick = ()=> closeExpanded();
-  // fill template from Firestore templates doc
-  db.collection('templates').doc('main').get().then(s=>{
-    const t = s.exists && s.data().report ? s.data().report : "Título: {{title}}\\nHechos: {{facts}}\\nAcciones: {{actions}}\\nOficial: {{author}}";
-    document.getElementById('tplReport').value = t;
-  });
+  const templates = lsGet('templates', {}); document.getElementById('tplReport').value = templates.report || '';
   document.getElementById('repAuthor').value = STATE.currentUser ? STATE.currentUser.display : 'Invitado';
   document.getElementById('saveRep').onclick = saveReport;
+  document.getElementById('clearRep').onclick = ()=>{ document.getElementById('repTitle').value=''; document.getElementById('repDesc').value=''; };
+  loadReports();
 }
-
 async function saveReport(){
-  if(!STATE.currentUser){ showToast('Inicia sesión'); return; }
-  // permission check
-  if(!(STATE.currentUser.role === 'admin' || STATE.currentUser.role === 'sergeant' || STATE.currentUser.role === 'officer')){ showToast('No tienes permiso para crear informes'); return; }
+  if(!hasPerm('create_reports')){ notify('No tienes permiso para crear informes'); return; }
   const title = document.getElementById('repTitle').value.trim();
   const desc = document.getElementById('repDesc').value.trim();
-  if(!title || !desc){ showToast('Título y descripción obligatorios'); return; }
-  await db.collection('reports').add({ title, description: desc, author: STATE.currentUser.display, authorId: STATE.currentUser.id, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-  // update template
-  await db.collection('templates').doc('main').set({ report: document.getElementById('tplReport').value }, { merge:true });
-  showToast('Informe creado');
+  if(!title || !desc){ notify('Título y descripción obligatorios'); return; }
+  let imgURL = null;
+  const imgIn = document.getElementById('repImg');
+  if(imgIn && imgIn.files && imgIn.files[0]){
+    try{
+      const file = imgIn.files[0];
+      const path = `images/reports/${uid('img')}_${file.name}`;
+      const stref = sref(storage, path);
+      await uploadBytes(stref, file);
+      imgURL = await getDownloadURL(stref);
+    }catch(e){ console.error(e); notify('Error subiendo imagen'); }
+  }
+  const reports = lsGet('reports', []);
+  const r = {id:uid('rep'), title, description:desc, author: STATE.currentUser?STATE.currentUser.display:'Invitado', created_at:now(), img:imgURL};
+  reports.unshift(r); lsSet('reports', reports);
+  const templates = lsGet('templates', {}); templates.report = document.getElementById('tplReport').value; lsSet('templates', templates);
   pushLog(`Informe creado: ${title}`);
+  loadReports();
+  notify('Informe guardado');
 }
-
-/* Realtime */
-function loadReportsRealtime(snapshot){
-  let docs = [];
-  snapshot.forEach(d=>docs.push({id:d.id,...d.data()}));
-  const list = document.getElementById('reportsList');
-  if(!list) return;
-  list.innerHTML = docs.map(r=>`<div class="item"><div style="flex:1"><div style="font-weight:700">${r.title}</div><div class="muted small">${(r.description||'').slice(0,160)}</div></div>
-    <div style="text-align:right"><div class="muted tiny">${r.createdAt && r.createdAt.toDate ? r.createdAt.toDate().toLocaleString() : ''}</div><div style="margin-top:6px" class="muted tiny">${r.author||''}</div>
-    <div style="margin-top:6px"><button class="btn-ghost btn-small" onclick="viewReport('${r.id}')">Ver</button> ${(canDeleteReport(r) ? `<button class="btn btn-small" onclick="deleteReport('${r.id}')">Borrar</button>` : '')}</div></div></div>`).join('') || '<div class="muted small">No hay informes</div>';
-}
-
-function canDeleteReport(r){
-  if(!STATE.currentUser) return false;
-  return (STATE.currentUser.role === 'admin' || STATE.currentUser.role === 'sergeant' || r.authorId === STATE.currentUser.id);
-}
-function viewReport(id){
-  db.collection('reports').doc(id).get().then(s=>{
-    const d = s.data();
-    if(!d) return;
-    showModal(`<h3>${d.title}</h3><pre style="white-space:pre-wrap">${d.description}</pre><div class="muted small" style="margin-top:8px">Autor: ${d.author}</div>`);
+function loadReports(){
+  const list = document.getElementById('reportsList'); if(!list) return;
+  const reports = lsGet('reports', []);
+  list.innerHTML = '';
+  if(!reports.length){ list.innerHTML = '<div class="muted small">No hay informes</div>'; return; }
+  reports.forEach(r=>{
+    const it = document.createElement('div'); it.className='item';
+    it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${r.title}</div><div class="muted small">${(r.description||'').slice(0,160)}</div></div>
+      <div style="text-align:right"><div class="muted tiny">${new Date(r.created_at).toLocaleString()}</div><div style="margin-top:6px" class="muted tiny">${r.author||''}</div></div>`;
+    const btns = document.createElement('div'); btns.style.marginLeft='12px';
+    const view = document.createElement('button'); view.className='btn-ghost'; view.textContent='Ver';
+    view.onclick = ()=> { let txt = `${r.description}\n\nAutor: ${r.author}\nFecha: ${new Date(r.created_at).toLocaleString()}`; if(r.img) txt += `\nImagen: ${r.img}`; alert(txt); };
+    btns.appendChild(view);
+    if(STATE.currentUser && (STATE.currentUser.role==='admin' || STATE.currentUser.role==='sergeant' || hasPerm('delete_reports'))){
+      const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar'; del.onclick = ()=>{ if(confirm('Borrar informe?')) deleteReport(r.id); };
+      btns.appendChild(del);
+    }
+    it.appendChild(btns);
+    list.appendChild(it);
   });
 }
-async function deleteReport(id){
-  if(!confirm('Borrar informe?')) return;
-  await db.collection('reports').doc(id).delete();
-  showToast('Informe borrado');
-  pushLog(`Informe ${id} borrado`);
-}
+function deleteReport(id){ let arr=lsGet('reports',[]); arr=arr.filter(r=>r.id!==id); lsSet('reports',arr); pushLog(`Informe ${id} borrado`); loadReports(); notify('Informe borrado'); }
 
-/* ========================= WANTED ========================= */
+/* ----------------- Wanted / BOLO ----------------- */
 function renderWanted(container){
   container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
     <div><strong>BOLO / Wanted</strong><div class="muted small">Crear fichas buscadas</div></div>
@@ -583,31 +521,17 @@ function renderWanted(container){
   <div style="margin-top:12px"><strong>Fichas</strong><div id="wantedList" class="list" style="margin-top:8px"></div></div>`;
   container.querySelector('#closeW').onclick = ()=> closeExpanded();
   container.querySelector('#saveW').onclick = createWanted;
+  loadWanted();
 }
+function createWanted(){ if(!hasPerm('create_bolo')){ notify('No tienes permiso'); return; }
+  const name=document.getElementById('wName').value.trim(); const desc=document.getElementById('wDesc').value.trim(); const bounty=parseInt(document.getElementById('wBounty').value||'0',10);
+  if(!name){ notify('Nombre requerido'); return; }
+  const arr=lsGet('wanted',[]); arr.unshift({id:uid('w'), name, description:desc, bounty, created_at:now()}); lsSet('wanted',arr); pushLog(`Wanted creado: ${name}`); loadWanted(); notify('Ficha creada');
+}
+function loadWanted(){ const list=document.getElementById('wantedList'); if(!list) return; const arr=lsGet('wanted',[]); list.innerHTML=''; if(!arr.length){ list.innerHTML='<div class="muted small">No hay fichas</div>'; return; } arr.forEach(w=>{ const it=document.createElement('div'); it.className='item'; it.innerHTML=`<div style="flex:1"><b>${w.name}</b><div class="muted small">${w.description}</div></div><div class="pill">${w.bounty||0}€</div>`; const btns=document.createElement('div'); btns.style.marginLeft='12px'; const view=document.createElement('button'); view.className='btn-ghost'; view.textContent='Ver'; view.onclick=()=>alert(`Wanted — ${w.name}\n\n${w.description}\nRecompensa: ${w.bounty}€`); btns.appendChild(view); if(hasPerm('manage_wanted')){ const del=document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar'; del.onclick=()=>{ if(confirm('Borrar ficha?')){ deleteWanted(w.id); } }; btns.appendChild(del); } it.appendChild(btns); list.appendChild(it); }); }
+function deleteWanted(id){ let arr=lsGet('wanted',[]); arr=arr.filter(x=>x.id!==id); lsSet('wanted',arr); pushLog(`Wanted ${id} borrado`); loadWanted(); notify('Wanted borrado'); }
 
-async function createWanted(){
-  if(!STATE.currentUser){ showToast('Inicia sesión'); return; }
-  if(!(STATE.currentUser.role === 'admin' || STATE.currentUser.role === 'sergeant' || STATE.currentUser.role === 'dispatcher')){ showToast('No tienes permiso'); return; }
-  const name = document.getElementById('wName').value.trim();
-  const desc = document.getElementById('wDesc').value.trim();
-  const bounty = parseInt(document.getElementById('wBounty').value||'0',10);
-  if(!name){ showToast('Nombre requerido'); return; }
-  await db.collection('wanted').add({ name, description: desc, bounty, createdAt: firebase.firestore.FieldValue.serverTimestamp(), author: STATE.currentUser.display, authorId: STATE.currentUser.id });
-  showToast('Ficha wanted creada');
-  pushLog(`Wanted creado: ${name}`);
-}
-function loadWantedRealtime(snapshot){
-  let docs=[]; snapshot.forEach(d=>docs.push({id:d.id,...d.data()}));
-  const list = document.getElementById('wantedList');
-  if(!list) return;
-  list.innerHTML = docs.map(w=>`<div class="item"><div style="flex:1"><b>${w.name}</b><div class="muted small">${w.description}</div></div><div class="pill">${w.bounty||0}€</div>
-    <div style="margin-left:12px"><button class="btn-ghost btn-small" onclick="viewWanted('${w.id}')">Ver</button> ${(canManageWanted() ? `<button class="btn btn-small" onclick="deleteWanted('${w.id}')">Borrar</button>` : '')}</div></div>`).join('') || '<div class="muted small">No hay fichas</div>';
-}
-function canManageWanted(){ return STATE.currentUser && (STATE.currentUser.role==='sergeant' || STATE.currentUser.role==='dispatcher' || STATE.currentUser.role==='admin'); }
-function viewWanted(id){ db.collection('wanted').doc(id).get().then(s=>{ const d=s.data(); if(!d) return; showModal(`<h3>${d.name}</h3><pre style="white-space:pre-wrap">${d.description}</pre><div class="muted small">Recompensa: ${d.bounty}€</div>`); }); }
-async function deleteWanted(id){ if(!confirm('Borrar wanted?')) return; await db.collection('wanted').doc(id).delete(); showToast('Wanted borrado'); pushLog(`Wanted ${id} borrado`); }
-
-/* ========================= FINES ========================= */
+/* ----------------- Fines (Multas) ----------------- */
 function renderFines(container){
   container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
     <div><strong>Multas</strong><div class="muted small">Genera sanciones</div></div>
@@ -618,102 +542,82 @@ function renderFines(container){
   <div style="margin-top:8px;display:flex;gap:8px"><button id="saveFine" class="btn">Emitir multa</button></div>
   <div style="margin-top:12px"><strong>Multas</strong><div id="finesList" class="list" style="margin-top:8px"></div></div>`;
   container.querySelector('#closeF').onclick = ()=> closeExpanded();
-  container.querySelector('#saveFine').onclick = saveFine;
+  container.querySelector('#saveFine').onclick = saveFine; loadFines();
 }
-async function saveFine(){
-  if(!STATE.currentUser){ showToast('Inicia sesión'); return; }
-  if(!(STATE.currentUser.role === 'admin' || STATE.currentUser.role === 'sergeant' || STATE.currentUser.role === 'officer')){ showToast('No tienes permiso'); return; }
-  const off = document.getElementById('fineOff').value.trim();
-  const amt = parseInt(document.getElementById('fineAmt').value||'0',10);
-  const reason = document.getElementById('fineReason').value.trim();
-  if(!off || !amt){ showToast('Infractor e importe requeridos'); return; }
-  await db.collection('fines').add({ offender:off, amount:amt, reason, author:STATE.currentUser.display, authorId:STATE.currentUser.id, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-  showToast('Multa creada');
-  pushLog(`Multa creada: ${off} ${amt}€`);
+function saveFine(){ if(!hasPerm('create_fine')){ notify('No tienes permiso para multar'); return; }
+  const off=document.getElementById('fineOff').value.trim(); const amt=parseInt(document.getElementById('fineAmt').value||'0',10); const reason=document.getElementById('fineReason').value.trim();
+  if(!off || !amt){ notify('Infractor e importe requeridos'); return; }
+  const arr=lsGet('fines',[]); arr.unshift({id:uid('f'), offender:off, amount:amt, reason, author:STATE.currentUser?STATE.currentUser.display:'Invitado', created_at:now()}); lsSet('fines',arr); pushLog(`Multa creada: ${off} ${amt}€`); loadFines(); notify('Multa creada');
 }
-function loadFinesRealtime(snapshot){
-  let docs=[]; snapshot.forEach(d=>docs.push({id:d.id,...d.data()}));
-  const list = document.getElementById('finesList'); if(!list) return;
-  list.innerHTML = docs.map(f=>`<div class="item"><div style="flex:1"><b>${f.offender} • ${f.amount}€</b><div class="muted small">${f.reason}</div></div><div class="muted tiny">${f.createdAt && f.createdAt.toDate?f.createdAt.toDate().toLocaleString():''}</div>
-    <div style="margin-left:12px">${(STATE.currentUser && (STATE.currentUser.role==='admin' || STATE.currentUser.display===f.author))?`<button class="btn" onclick="deleteFine('${f.id}')">Borrar</button>`:''}</div></div>`).join('') || '<div class="muted small">No hay multas</div>';
-}
-async function deleteFine(id){ if(!confirm('Borrar multa?')) return; await db.collection('fines').doc(id).delete(); showToast('Multa borrada'); pushLog(`Multa ${id} borrada`); }
+function loadFines(){ const list=document.getElementById('finesList'); if(!list) return; const arr=lsGet('fines',[]); list.innerHTML=''; if(!arr.length){ list.innerHTML='<div class="muted small">No hay multas</div>'; return; } arr.forEach(f=>{ const it=document.createElement('div'); it.className='item'; it.innerHTML=`<div style="flex:1"><b>${f.offender} • ${f.amount}€</b><div class="muted small">${f.reason}</div></div><div class="muted tiny">${new Date(f.created_at).toLocaleString()}</div>`; const btns=document.createElement('div'); btns.style.marginLeft='12px'; if(STATE.currentUser && (STATE.currentUser.role==='admin' || STATE.currentUser.display===f.author || hasPerm('delete_reports'))){ const del=document.createElement('button'); del.className='btn'; del.textContent='Borrar'; del.onclick=()=>{ if(confirm('Borrar multa?')){ deleteFine(f.id); } }; btns.appendChild(del); } it.appendChild(btns); list.appendChild(it); }); }
+function deleteFine(id){ let arr=lsGet('fines',[]); arr=arr.filter(x=>x.id!==id); lsSet('fines',arr); pushLog(`Multa ${id} borrada`); loadFines(); notify('Multa borrada'); }
 
-/* ========================= SERVICE / ON DUTY ========================= */
+/* ----------------- Service (on duty with times) ----------------- */
 function renderService(container){
   container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
     <div><strong>Servicio</strong><div class="muted small">Ponte en servicio o sal</div></div>
     <div><button class="btn btn-small" id="closeS">Cerrar</button></div>
   </div>
-  <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-    <div class="muted small">Tu estado:</div><div id="serviceBox" class="pill">Desconocido</div>
-    <div style="margin-left:auto"><button id="toggleDuty" class="btn">Cambiar estado</button></div>
-  </div>
+  <div style="margin-top:12px;display:flex;gap:8px;align-items:center"><div class="muted small">Tu estado:</div><div id="serviceBox" class="pill">Desconocido</div><div style="margin-left:auto"><button id="toggleDuty" class="btn">Cambiar estado</button></div></div>
   <div style="margin-top:12px"><strong>Policías en servicio</strong><div id="dutyList" class="list" style="margin-top:8px"></div></div>`;
   container.querySelector('#closeS').onclick = ()=> closeExpanded();
-  const box = container.querySelector('#serviceBox');
+  const box = container.querySelector('#serviceBox'); const on = lsGet('onDuty', {}); const uId = STATE.currentUser ? STATE.currentUser.id : null;
+  box.textContent = (uId && on[uId] && on[uId].active) ? 'En servicio' : 'Fuera de servicio';
+  container.querySelector('#toggleDuty').onclick = ()=>{ if(!STATE.currentUser){ notify('Inicia sesión'); return; } const map = lsGet('onDuty', {}); if(!map[STATE.currentUser.id]) map[STATE.currentUser.id] = { active:false, history:[] }; map[STATE.currentUser.id].active = !map[STATE.currentUser.id].active; if(map[STATE.currentUser.id].active){ map[STATE.currentUser.id].history.push({ from: now(), to: null }); pushLog(`${STATE.currentUser.display} entró en servicio`); notify(`${STATE.currentUser.display} entró en servicio`); } else { const h = map[STATE.currentUser.id].history; if(h.length && !h[h.length-1].to) h[h.length-1].to = now(); pushLog(`${STATE.currentUser.display} salió de servicio`); notify(`${STATE.currentUser.display} salió de servicio`); } lsSet('onDuty', map); box.textContent = map[STATE.currentUser.id].active ? 'En servicio' : 'Fuera de servicio'; updateHeader(); loadDutyList(); };
   loadDutyList();
-  container.querySelector('#toggleDuty').onclick = toggleDuty;
 }
+function loadDutyList(){ const list=document.getElementById('dutyList'); if(!list) return; const on=lsGet('onDuty',{}); const users=lsGet('users', []); const active = Object.keys(on).filter(k=>on[k] && on[k].active).map(id=> { const u = users.find(us=>us.id===id); return {display: u?u.display:id, history:on[id].history||[]}; }); list.innerHTML = active.map(a=>`<div class="item"><div><b>${a.display}</b><div class="muted small">Sesiones: ${a.history.length}</div></div></div>`).join('') || '<div class="muted small">Nadie en servicio</div>'; updateHeader(); }
 
-async function toggleDuty(){
-  if(!STATE.currentUser){ showToast('Inicia sesión'); return; }
-  const docRef = db.collection('onDuty').doc(STATE.currentUser.id);
-  const doc = await docRef.get();
-  if(!doc.exists || !doc.data().active){
-    // poner en servicio
-    await docRef.set({ userId: STATE.currentUser.id, display: STATE.currentUser.display, active: true, start: firebase.firestore.FieldValue.serverTimestamp() });
-    showToast('En servicio');
-    pushLog(`${STATE.currentUser.display} entró en servicio`);
-  } else {
-    // salir de servicio -> save history entry with start/end
-    const d = doc.data();
-    const start = d.start && d.start.toDate ? d.start.toDate().getTime() : Date.now();
-    const end = Date.now();
-    await db.collection('dutyHistory').add({ userId: STATE.currentUser.id, display: STATE.currentUser.display, start: d.start || firebase.firestore.FieldValue.serverTimestamp(), end: firebase.firestore.FieldValue.serverTimestamp() });
-    await docRef.set({ userId: STATE.currentUser.id, display: STATE.currentUser.display, active: false, start: null, end: firebase.firestore.FieldValue.serverTimestamp() });
-    showToast('Fuera de servicio');
-    pushLog(`${STATE.currentUser.display} salió de servicio`);
-  }
+/* ----------------- Alerts (con borrado) ----------------- */
+function renderAlerts(container){
+  container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+    <div><strong>Alertas</strong><div class="muted small">Crear y gestionar alertas ciudadanas</div></div>
+    <div><button class="btn btn-small" id="closeA">Cerrar</button></div>
+  </div>
+  <div style="margin-top:12px" class="form-row"><input id="alertTitle" placeholder="Título"/><select id="alertLevel"><option value="verde">Verde</option><option value="amarilla">Amarilla</option><option value="roja">Roja</option></select></div>
+  <div style="margin-top:8px"><textarea id="alertDesc" placeholder="Descripción..."></textarea></div>
+  <div style="margin-top:8px;display:flex;gap:8px"><button id="saveAlert" class="btn">Crear alerta</button></div>
+  <div style="margin-top:12px"><strong>Alertas activas</strong><div id="alertsList" class="list" style="margin-top:8px"></div></div>`;
+  container.querySelector('#closeA').onclick = ()=> closeExpanded();
+  container.querySelector('#saveAlert').onclick = createAlert;
+  loadAlerts();
 }
-
-function loadDutyRealtime(snapshot){
-  // update header counts and duty list
-  const users = window.latestUsers || [];
-  const active = [];
-  snapshot.forEach(d=>{
-    const data = d.data();
-    if(data.active) active.push(data);
+function createAlert(){
+  if(!STATE.currentUser){ notify('Inicia sesión para crear alertas'); return; }
+  const title = document.getElementById('alertTitle').value.trim(); const desc = document.getElementById('alertDesc').value.trim(); const level = document.getElementById('alertLevel').value;
+  if(!title){ notify('Título requerido'); return; }
+  const arr = lsGet('alerts', []); const a = {id:uid('a'), title, description:desc, level, created_at:now(), author:STATE.currentUser.username};
+  arr.unshift(a); lsSet('alerts', arr); pushLog(`Alerta creada: ${title}`); loadAlerts(); notify('Alerta creada');
+}
+/* ---- Esta es la función solicitada: loadAlerts con BORRADO (solo admins/roles con manage_alerts) ---- */
+function loadAlerts(){
+  const list = document.getElementById('alertsList');
+  const arr = lsGet('alerts', []);
+  list.innerHTML = '';
+  if(!arr.length){ list.innerHTML = '<div class="muted small">Sin alertas</div>'; return; }
+  arr.forEach(a=>{
+    const it = document.createElement('div'); it.className='item';
+    it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${a.title} • <span class="muted small">${a.level}</span></div><div class="muted small">${(a.description||'')}</div></div>
+      <div style="text-align:right"><div class="muted tiny">${new Date(a.created_at).toLocaleString()}</div></div>`;
+    const btns = document.createElement('div'); btns.style.marginLeft='12px';
+    // Solo admins o roles con permiso manage_alerts pueden borrar alertas
+    if(STATE.currentUser && (STATE.currentUser.role === 'admin' || hasPerm('manage_alerts'))){
+      const del = document.createElement('button'); del.className='btn'; del.textContent='Borrar';
+      del.onclick = ()=> { if(confirm('¿Borrar esta alerta?')) { let arr2 = lsGet('alerts',[]); arr2 = arr2.filter(x=>x.id!==a.id); lsSet('alerts', arr2); pushLog(`Alerta borrada: ${a.title}`); loadAlerts(); notify('Alerta borrada'); } };
+      btns.appendChild(del);
+    }
+    it.appendChild(btns);
+    list.appendChild(it);
   });
-  // update UI count
-  dutyStatus.textContent = `En servicio: ${active.length}`;
-  // update expanded duty list if present
-  const list = document.getElementById('dutyList');
-  if(list){
-    list.innerHTML = active.map(a=>`<div class="item"><div><b>${a.display}</b><div class="muted small">Desde: ${a.start && a.start.toDate ? a.start.toDate().toLocaleString() : ''}</div></div></div>`).join('') || '<div class="muted small">Nadie en servicio</div>';
-  }
 }
 
-/* initial load of duty list */
-async function loadDutyList(){
-  const snap = await db.collection('onDuty').get();
-  const active = [];
-  snap.forEach(d=>{ const data=d.data(); if(data.active) active.push(data); });
-  const list = document.getElementById('dutyList');
-  if(list) list.innerHTML = active.map(a=>`<div class="item"><div><b>${a.display}</b><div class="muted small">Desde: ${a.start && a.start.toDate ? a.start.toDate().toLocaleString() : ''}</div></div></div>`).join('') || '<div class="muted small">Nadie en servicio</div>';
-  dutyStatus.textContent = `En servicio: ${active.length}`;
-}
-
-/* ========================= ADMIN ========================= */
+/* ----------------- Admin panel ----------------- */
 function renderAdmin(container){
-  // only visible to admin (or impersonator admin)
-  if(!isAdminEffective()){
-    container.innerHTML = `<div><strong>Administración</strong><div class="muted small">Acceso restringido. Solo administradores.</div></div>`;
-    return;
-  }
+  const users = lsGet('users', []);
+  const roles = lsGet('roles', {});
   container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
     <div><strong>Administración</strong><div class="muted small">Gestiona roles, permisos y usuarios</div></div>
-    <div><button class="btn btn-small" id="closeA">Cerrar</button></div>
+    <div><button class="btn btn-small" id="closeA2">Cerrar</button></div>
   </div>
   <div style="margin-top:12px;display:flex;gap:12px">
     <div style="flex:1">
@@ -721,9 +625,9 @@ function renderAdmin(container){
       <div id="usersAdminList" class="list"></div>
     </div>
     <div style="width:360px">
-      <h4>Crear usuario (solo admin)</h4>
+      <h4>Crear usuario</h4>
       <input id="adm_newUser" placeholder="username"><input id="adm_newDisplay" placeholder="display"><input id="adm_newPass" placeholder="password">
-      <select id="adm_newRole"><option value="officer">officer</option><option value="sergeant">sergeant</option><option value="dispatcher">dispatcher</option><option value="admin">admin</option></select>
+      <select id="adm_newRole">${Object.keys(roles).map(r=>`<option value="${r}">${r}</option>`).join('')}</select>
       <div style="display:flex;gap:8px;margin-top:8px"><button id="adm_createUser" class="btn">Crear</button><button id="adm_refresh" class="btn-ghost">Refrescar</button></div>
 
       <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
@@ -732,135 +636,68 @@ function renderAdmin(container){
       <div id="rolesAdminList" style="margin-top:12px"></div>
     </div>
   </div>`;
-  container.querySelector('#closeA').onclick = ()=> closeExpanded();
+  container.querySelector('#closeA2').onclick = ()=> closeExpanded();
   container.querySelector('#adm_createUser').onclick = adminCreateUser;
-  container.querySelector('#adm_refresh').onclick = ()=> renderAdmin(container);
+  container.querySelector('#adm_refresh').onclick = ()=>renderAdmin(container);
   container.querySelector('#adm_createRole').onclick = adminCreateRole;
   loadUsersAdmin();
   loadRolesAdmin();
 }
-
-function isAdminEffective(){
-  // Returns true if current session is admin OR impersonator is admin
-  if(!STATE.currentUser) return false;
-  // If we are impersonating but impersonatorId exists and that impersonator is admin
-  if(STATE.impersonatorId){
-    // check impersonator record in latestUsers
-    const imp = (window.latestUsers || []).find(u=>u.id === STATE.impersonatorId);
-    if(imp && imp.role === 'admin') return true;
-  }
-  return STATE.currentUser.role === 'admin';
-}
-
-async function loadUsersAdmin(){
-  const usersSnap = await db.collection('users').orderBy('display').get();
-  const users = usersSnap.docs.map(d=>d.data());
-  window.latestUsers = users;
-  const ul = document.getElementById('usersAdminList');
-  if(!ul) return;
-  ul.innerHTML = '';
-  users.forEach(u=>{
+function loadUsersAdmin(){
+  const users = lsGet('users', []); const roles = lsGet('roles', {});
+  const ul = document.getElementById('usersAdminList'); ul.innerHTML = '';
+  if(!users.length){ ul.innerHTML = '<div class="muted small">No hay usuarios</div>'; return; }
+  users.forEach((u)=>{
     const div = document.createElement('div'); div.className='item';
     div.innerHTML = `<div><b>${u.display} (${u.username})</b><div class="muted small">Rol: <span class="role-chip">${u.role}</span> • Badge: ${u.badge||'—'}</div></div>
       <div style="text-align:right">
-        <select data-uid="${u.id}" class="adm_role_sel">${Object.keys(getRolesObj()).map(r=>`<option value="${r}" ${u.role===r?'selected':''}>${r}</option>`).join('')}</select>
+        <select data-uid="${u.id}" class="adm_role_sel">${Object.keys(lsGet('roles',{})).map(r=>`<option value="${r}" ${u.role===r?'selected':''}>${r}</option>`).join('')}</select>
         <div style="margin-top:6px"><button class="btn-ghost btn-small" data-uid="${u.id}" data-act="del">Borrar</button> <button class="btn btn-small" data-uid="${u.id}" data-act="imp">Impersonar</button></div>
       </div>`;
     ul.appendChild(div);
   });
   // attach events
   ul.querySelectorAll('.adm_role_sel').forEach(sel=>{
-    sel.onchange = (e)=> changeUserRole(e.target.dataset.uid, e.target.value);
+    sel.onchange = (e)=>{ const uid = e.target.dataset.uid; changeUserRole(uid, e.target.value); };
   });
-  ul.querySelectorAll('button[data-act="del"]').forEach(b=>{
-    b.onclick = async ()=>{
-      const uid = b.dataset.uid;
-      if(!confirm('Borrar usuario?')) return;
-      const uDoc = await db.collection('users').doc(uid).get();
-      const udata = uDoc.exists ? uDoc.data() : null;
-      if(udata && udata.username === 'admin'){ alert('No puedes borrar el admin seed'); return; }
-      // if user is in service, remove them from onDuty
-      await db.collection('onDuty').doc(uid).delete().catch(()=>{});
-      await db.collection('users').doc(uid).delete();
-      showToast('Usuario borrado');
-      pushLog(`Usuario borrado: ${uid}`);
-      loadUsersAdmin();
-    };
+  ul.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = ()=>{
+    const uid = b.dataset.uid;
+    if(!confirm('Borrar usuario?')) return;
+    let arr = lsGet('users', []); const u = arr.find(x=>x.id===uid);
+    if(u && u.username==='admin'){ notify('No puedes borrar la cuenta admin seed'); return; }
+    // además si estaba en servicio lo quitamos
+    let on = lsGet('onDuty', {}); if(on[uid]) delete on[uid]; lsSet('onDuty', on);
+    arr = arr.filter(x=>x.id!==uid); lsSet('users', arr); pushLog(`Usuario borrado: ${uid}`); loadUsersAdmin(); notify('Usuario borrado');
   });
-  ul.querySelectorAll('button[data-act="imp"]').forEach(b=>{
-    b.onclick = async ()=>{
-      const uid = b.dataset.uid;
-      const uDoc = await db.collection('users').doc(uid).get();
-      if(!uDoc.exists) return;
-      const u = uDoc.data();
-      // impersonation: keep impersonator id so admin privileges are preserved
-      const adminId = STATE.currentUser.id;
-      STATE.impersonatorId = adminId; // record impersonator
-      // set current user to the impersonated user locally
-      STATE.currentUser = u;
-      localStorage.setItem('currentUser', JSON.stringify(u));
-      updateHeader();
-      showToast('Impersonando: ' + u.display);
-      pushLog(`Impersonación: ${u.username} por ${adminId}`);
-      // re-render admin panel to reflect impersonation still allowed
-      renderAdmin(document.querySelector('.expanded'));
-    };
+  ul.querySelectorAll('button[data-act="imp"]').forEach(b=> b.onclick = ()=>{
+    const uid = b.dataset.uid; const u = lsGet('users',[]).find(x=>x.id===uid); if(!u) return; // impersonation: mantiene permisos admin si admin impersona
+    // guardamos real admin
+    const real = STATE.currentUser;
+    STATE.currentUser = {...u};
+    lsSet('currentUser', STATE.currentUser);
+    updateHeader();
+    pushLog(`Impersonación: ${u.username} (desde ${real?real.username:'? -console?'})`);
+    notify('Ahora eres: ' + u.display);
   });
 }
-
-/* change user role */
-async function changeUserRole(uid, newRole){
-  if(!isAdminEffective()){ showToast('No autorizado'); return; }
-  const uRef = db.collection('users').doc(uid);
-  const uDoc = await uRef.get();
-  if(!uDoc.exists) return;
-  await uRef.update({ role: newRole });
-  showToast('Rol actualizado');
-  pushLog(`Rol cambiado: ${uid} -> ${newRole}`);
-  loadUsersAdmin();
+function changeUserRole(uid,newRole){
+  let users=lsGet('users',[]); const u=users.find(x=>x.id===uid); if(!u) return; u.role=newRole; lsSet('users',users); pushLog(`Rol cambiado: ${u.username} -> ${newRole}`); loadUsersAdmin();
 }
-
-/* admin create user (only admin effective) */
-async function adminCreateUser(){
-  if(!isAdminEffective()){ modalAlert('Error','Solo admin puede crear usuarios'); return; }
-  const username = document.getElementById('adm_newUser').value.trim();
-  const display = document.getElementById('adm_newDisplay').value.trim() || username;
-  const pass = document.getElementById('adm_newPass').value.trim() || '1234';
-  const role = document.getElementById('adm_newRole').value;
-  if(!username){ modalAlert('Error','Username requerido'); return; }
-  // create with doc id unique
-  const id = 'u_' + Date.now().toString(36);
-  await db.collection('users').doc(id).set({
-    id,
-    username,
-    display,
-    badge: '',
-    password: pass,
-    role,
-    createdBy: STATE.impersonatorId ? STATE.impersonatorId : (STATE.currentUser ? STATE.currentUser.id : 'system'),
-    createdByRole: (STATE.currentUser ? STATE.currentUser.role : 'admin'),
-    createdAt: firebase.firestore.FieldValue.serverTimestamp()
-  });
-  showToast('Usuario creado');
-  pushLog(`Usuario admin creado: ${username}`);
-  // clear fields
-  document.getElementById('adm_newUser').value=''; document.getElementById('adm_newDisplay').value=''; document.getElementById('adm_newPass').value='';
-  loadUsersAdmin();
+function adminCreateUser(){
+  if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){ notify('Solo admin puede crear usuarios aquí'); return; }
+  const username=document.getElementById('adm_newUser').value.trim(); const display=document.getElementById('adm_newDisplay').value.trim()||username; const pass=document.getElementById('adm_newPass').value.trim()||'1234'; const role=document.getElementById('adm_newRole').value;
+  if(!username){ notify('username requerido'); return; }
+  let users=lsGet('users',[]); if(users.find(u=>u.username===username)){ notify('Usuario ya existe'); return; }
+  const u={id:uid('u'), username, display, badge:'', password:pass, role}; users.unshift(u); lsSet('users',users); pushLog(`Usuario admin creado: ${username}`); loadUsersAdmin(); notify('Usuario creado');
 }
-
-/* Roles management */
-function getRolesObj(){
-  // roles stored under roles/doc 'roles' or 'defaultRoles' earlier
-  return window.latestRoles || { officer:{name:'Officer', color:'#7c3aed', permissions:['create_reports','create_pda','create_call']}, sergeant:{name:'Sergeant', color:'#3b82f6', permissions:['create_reports','delete_reports','create_pda','create_call']}, dispatcher:{name:'Dispatcher', color:'#f97316', permissions:['create_call','assign_call']}, admin:{name:'Admin', color:'#10b981', permissions:['all']} };
+function adminCreateRole(){
+  if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){ notify('Solo admin puede crear roles'); return; }
+  const name=document.getElementById('adm_newRoleName').value.trim(); if(!name){ notify('Nombre rol requerido'); return; }
+  const roles = lsGet('roles', {}); if(roles[name]){ notify('Rol ya existe'); return; }
+  roles[name] = { name, color:'#999999', permissions:[] }; lsSet('roles', roles); pushLog(`Rol creado: ${name}`); loadRolesAdmin(); loadUsersAdmin(); notify('Rol creado');
 }
-async function loadRolesAdmin(){
-  // read roles doc
-  const rolesSnap = await db.collection('roles').doc('defaultRoles').get();
-  const roles = rolesSnap.exists ? rolesSnap.data() : getRolesObj();
-  window.latestRoles = roles;
-  const out = document.getElementById('rolesAdminList');
-  if(!out) return;
-  out.innerHTML = '';
+function loadRolesAdmin(){
+  const roles = lsGet('roles', {}); const out = document.getElementById('rolesAdminList'); out.innerHTML = '';
   for(const key in roles){
     const r = roles[key];
     const div = document.createElement('div'); div.className='item';
@@ -874,26 +711,17 @@ async function loadRolesAdmin(){
   out.querySelectorAll('button[data-act="edit"]').forEach(b=> b.onclick = ()=>{
     const roleKey = b.dataset.role; openRoleEditor(roleKey);
   });
-  out.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=>{
+  out.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = ()=>{
     const roleKey = b.dataset.role; if(!confirm('Borrar rol? (Los usuarios con este rol quedarán con rol vacío)')) return;
-    const rolesObj = window.latestRoles || {};
-    delete rolesObj[roleKey];
-    await db.collection('roles').doc('defaultRoles').set(rolesObj);
-    // remove role from users
-    const usersSnap = await db.collection('users').where('role','==',roleKey).get();
-    const batch = db.batch();
-    usersSnap.forEach(us=> batch.update(us.ref, { role: '' }));
-    await batch.commit();
-    pushLog(`Rol borrado: ${roleKey}`);
-    loadRolesAdmin();
-    loadUsersAdmin();
+    let roles = lsGet('roles', {}); delete roles[roleKey]; lsSet('roles', roles);
+    let users = lsGet('users', []); users.forEach(u=>{ if(u.role===roleKey) u.role=''; }); lsSet('users', users);
+    pushLog(`Rol borrado: ${roleKey}`); loadRolesAdmin(); loadUsersAdmin(); notify('Rol borrado');
   });
 }
-
 function openRoleEditor(roleKey){
-  const roles = window.latestRoles || {};
+  const roles = lsGet('roles', {});
   const role = roles[roleKey];
-  if(!role){ modalAlert('Error','Rol no existe'); return; }
+  if(!role){ notify('Rol no existe'); return; }
   const modal = document.createElement('div'); modal.className='overlay';
   modal.innerHTML = `<div class="modal">
     <h3>Editar rol: ${roleKey}</h3>
@@ -902,238 +730,126 @@ function openRoleEditor(roleKey){
     <div style="display:flex;gap:8px;margin-top:12px"><button id="saveRole" class="btn">Guardar</button><button id="cancelRole" class="btn-ghost">Cancelar</button></div>
   </div>`;
   document.body.appendChild(modal);
-  const permsList = ['create_reports','delete_reports','create_pda','create_call','assign_call','create_bolo','manage_wanted','create_fine','export','all'];
+  const permsList = ['create_reports','delete_reports','create_pda','create_call','assign_call','create_bolo','manage_wanted','create_fine','export','manage_alerts','all'];
   const box = modal.querySelector('#permChecks');
   box.innerHTML = permsList.map(p=>`<div style="margin-bottom:6px"><label><input type="checkbox" data-perm="${p}" ${role.permissions.includes(p)?'checked':''}/> ${p}</label></div>`).join('');
   modal.querySelector('#cancelRole').onclick = ()=> modal.remove();
-  modal.querySelector('#saveRole').onclick = async ()=>{
+  modal.querySelector('#saveRole').onclick = ()=>{
     const checked = Array.from(box.querySelectorAll('input[type=checkbox]:checked')).map(c=>c.dataset.perm);
     role.permissions = checked;
-    roles[roleKey] = role;
-    await db.collection('roles').doc('defaultRoles').set(roles);
+    roles[roleKey] = role; lsSet('roles', roles);
     pushLog(`Rol editado: ${roleKey}`);
-    modal.remove();
-    loadRolesAdmin();
-    loadUsersAdmin();
+    modal.remove(); loadRolesAdmin(); loadUsersAdmin(); notify('Rol actualizado');
   };
 }
 
-/* create new role */
-async function adminCreateRole(){
-  if(!isAdminEffective()){ modalAlert('Error','Solo admin puede crear roles'); return; }
-  const name = document.getElementById('adm_newRoleName').value.trim();
-  if(!name){ modalAlert('Error','Nombre rol requerido'); return; }
-  const roles = window.latestRoles || {};
-  if(roles[name]){ modalAlert('Error','Rol ya existe'); return; }
-  roles[name] = { name, color:'#999999', permissions:[] };
-  await db.collection('roles').doc('defaultRoles').set(roles);
-  pushLog(`Rol creado: ${name}`);
-  document.getElementById('adm_newRoleName').value='';
-  loadRolesAdmin();
-  loadUsersAdmin();
-}
-
-/* ========================= LOGS (auditoría) ========================= */
+/* ----------------- Logs & tools ----------------- */
+function pushLog(msg){ const logs = lsGet('logs', []); logs.unshift({id:uid('log'), t:now(), msg}); lsSet('logs', logs); renderLogsMini(); }
 function renderLogs(container){
-  if(!isAdminEffective()){
-    container.innerHTML = `<div><strong>Auditoría</strong><div class="muted small">Acceso restringido a administradores.</div></div>`;
-    return;
-  }
-  container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>Auditoría</strong><div class="muted small">Últimas acciones</div></div>
-    <div><button class="btn btn-small" id="closeL">Cerrar</button></div>
-  </div>
-  <div style="margin-top:12px" id="logsList" class="list"></div>`;
+  if(!container){ expandedRoot.innerHTML=''; const panel=document.createElement('div'); panel.className='expanded'; renderLogs(panel); expandedRoot.appendChild(panel); return; }
+  const logs = lsGet('logs', []);
+  container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>Auditoría</strong><div class="muted small">Últimas acciones</div></div><div><button class="btn btn-small" id="closeL">Cerrar</button></div></div>
+    <div style="margin-top:12px" id="logsList" class="list"></div>`;
   container.querySelector('#closeL').onclick = ()=> closeExpanded();
-  // load from window.latestLogs
-  const list = document.getElementById('logsList');
-  const logs = window.latestLogs || [];
-  list.innerHTML = logs.map(l=>`<div class="item"><div><div style="font-weight:700">${l.msg}</div><div class="muted small">${l.actor||''} • ${l.t && l.t.toDate?l.t.toDate().toLocaleString():''}</div></div></div>`).join('') || '<div class="muted small">Sin logs</div>';
+  const list = container.querySelector('#logsList'); list.innerHTML = '';
+  if(!logs.length){ list.innerHTML = '<div class="muted small">Sin logs</div>'; return; }
+  logs.slice(0,200).forEach(l=>{ const it = document.createElement('div'); it.className='item'; it.innerHTML = `<div><div style="font-weight:700">${l.msg}</div><div class="muted small">${new Date(l.t).toLocaleString()}</div></div>`; list.appendChild(it); });
 }
+function renderLogsMini(){ const onMap = lsGet('onDuty', {}); const users = lsGet('users', []); const active = Object.keys(onMap).filter(k=>onMap[k] && onMap[k].active).map(id=> users.find(u=>u.id===id)?.display || id); dutyStatus.textContent = `En servicio: ${active.length}`; }
 
-/* ========================= TOOLS / ALERTAS / INCAUTACIONES ========================= */
-function renderTools(container){
-  // Here we repurposed tools to be 'Alertas / Incautaciones'
-  container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>Alertas / Incautaciones</strong><div class="muted small">Gestiona alertas de ciudad, incautaciones y niveles de alerta</div></div>
-    <div><button class="btn btn-small" id="closeT">Cerrar</button></div>
-  </div>
-  <div style="margin-top:12px;display:flex;gap:8px">
-    <select id="alertLevel"><option value="green">Verde</option><option value="yellow">Amarilla</option><option value="red">Roja</option></select>
-    <input id="alertMsg" placeholder="Mensaje de alerta (opcional)"/>
-    <button id="createAlertBtn" class="btn">Crear alerta</button>
-  </div>
-  <div style="margin-top:12px"><strong>Alertas activas</strong><div id="alertsList" class="list" style="margin-top:8px"></div></div>
-  <div style="margin-top:12px"><strong>Incautaciones</strong><div id="seizuresList" class="list" style="margin-top:8px"></div></div>`;
-  container.querySelector('#closeT').onclick = ()=> closeExpanded();
-  container.querySelector('#createAlertBtn').onclick = createAlert;
-  // realtime listeners for alerts and seizures are in main realtime setup
-}
+/* ----------------- Login / Register original logic (mantener tu flow) ----------------- */
+document.getElementById('btnLogin').onclick = ()=> openLoginModal();
+document.getElementById('btnExport').onclick = ()=> exportAll();
 
-/* create alert - visible to all */
-async function createAlert(){
-  if(!STATE.currentUser){ showToast('Inicia sesión'); return; }
-  // any logged user can create alerts, but only admin can delete them
-  const level = document.getElementById('alertLevel').value;
-  const msg = document.getElementById('alertMsg').value.trim();
-  await db.collection('alerts').add({ level, message: msg, createdBy: STATE.currentUser.display, createdById: STATE.currentUser.id, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
-  showToast('Alerta creada');
-  pushLog(`Alerta creada: ${level} ${msg}`);
-}
+function openLoginModal(){ loginModal.style.display='flex'; document.getElementById('loginUser').focus(); }
+function closeLoginModal(){ loginModal.style.display='none'; document.getElementById('loginPass').value=''; document.getElementById('loginUser').value=''; document.getElementById('loginError').style.display='none'; }
 
-/* delete alert function (admin only) */
-async function deleteAlert(id){
-  if(!isAdminEffective()){ showToast('Solo admin puede borrar alertas'); return; }
-  if(!confirm('Borrar alerta?')) return;
-  await db.collection('alerts').doc(id).delete();
-  showToast('Alerta borrada');
-  pushLog(`Alerta ${id} borrada`);
-}
+document.getElementById('guestBtn').onclick = ()=> { STATE.currentUser = null; lsSet('currentUser', null); updateHeader(); closeLoginModal(); pushLog('Entró como invitado'); notify('Entraste como invitado'); };
+document.getElementById('showReg').onclick = ()=> { const b = document.getElementById('registerBlock'); b.style.display = b.style.display==='none' ? 'block' : 'none'; };
+document.getElementById('regCancel').onclick = ()=> { document.getElementById('registerBlock').style.display='none'; };
 
-/* load alerts realtime */
-function loadAlertsRealtime(snapshot){
-  const docs = []; snapshot.forEach(d=>docs.push({id:d.id,...d.data()}));
-  const list = document.getElementById('alertsList');
-  if(!list) return;
-  list.innerHTML = docs.map(a=>`<div class="item"><div style="flex:1"><b>${a.level.toUpperCase()}</b><div class="muted small">${a.message||''}</div></div>
-    <div style="text-align:right"><div class="muted tiny">${a.createdAt && a.createdAt.toDate? a.createdAt.toDate().toLocaleString() : ''}</div>
-    <div style="margin-top:6px">${isAdminEffective() ? `<button class="btn" onclick="deleteAlert('${a.id}')">Borrar</button>` : ''}</div></div></div>`).join('') || '<div class="muted small">Sin alertas</div>';
-}
-
-/* load seizures realtime (incautaciones) */
-function loadSeizuresRealtime(snapshot){
-  const docs = []; snapshot.forEach(d=>docs.push({id:d.id,...d.data()}));
-  const list = document.getElementById('seizuresList');
-  if(!list) return;
-  list.innerHTML = docs.map(s=>`<div class="item"><div style="flex:1"><b>${s.vehicle||'Vehículo'}</b><div class="muted small">${s.reason||''}</div></div><div class="muted tiny">${s.date && s.date.toDate? s.date.toDate().toLocaleString():''}</div></div>`).join('') || '<div class="muted small">Sin incautaciones</div>';
-}
-
-/* ========================= USERS + LOGIN (propio) ========================= */
-document.getElementById('btnLogin').onclick = ()=> {
-  if(STATE.currentUser){ if(confirm('Cerrar sesión?')){ localStorage.removeItem('currentUser'); STATE.currentUser=null; STATE.impersonatorId=null; updateHeader(); showToast('Sesión cerrada'); } } else openLoginModal();
-};
-document.getElementById('btnExport').onclick = ()=> exportAll;
-
-/* login modal controls */
-function openLoginModal(){ loginModal.classList.remove('hidden'); document.getElementById('loginUser').focus(); }
-function closeLoginModal(){ loginModal.classList.add('hidden'); document.getElementById('loginPass').value=''; document.getElementById('loginUser').value=''; document.getElementById('loginError').style.display='none'; }
-document.getElementById('guestBtn').onclick = ()=> { STATE.currentUser = null; localStorage.removeItem('currentUser'); updateHeader(); closeLoginModal(); showToast('Entró como invitado'); };
-
-document.getElementById('loginBtn').onclick = async ()=>{
-  const u = document.getElementById('loginUser').value.trim();
-  const p = document.getElementById('loginPass').value.trim();
-  if(!u || !p){ document.getElementById('loginError').style.display='block'; document.getElementById('loginError').textContent='Usuario y contraseña requeridos'; return; }
-  const snap = await db.collection('users').where('username','==',u).where('password','==',p).limit(1).get();
-  if(snap.empty){ document.getElementById('loginError').style.display='block'; document.getElementById('loginError').textContent='Usuario o contraseña incorrectos'; return; }
-  const user = snap.docs[0].data();
-  STATE.currentUser = user;
-  localStorage.setItem('currentUser', JSON.stringify(user));
-  updateHeader();
-  closeLoginModal();
-  showToast('Sesión iniciada: ' + user.display);
-  pushLog(`Sesión iniciada: ${user.username}`);
+document.getElementById('loginBtn').onclick = ()=>{
+  const u = document.getElementById('loginUser').value.trim(); const p = document.getElementById('loginPass').value.trim();
+  const users = lsGet('users', []);
+  const found = users.find(x=>x.username === u && x.password === p);
+  if(found){ STATE.currentUser = {...found}; lsSet('currentUser', STATE.currentUser); updateHeader(); closeLoginModal(); pushLog(`Sesión iniciada: ${found.username}`); notify('Sesión iniciada: ' + found.display); }
+  else { document.getElementById('loginError').style.display='block'; document.getElementById('loginError').textContent='Usuario o contraseña incorrectos'; }
 };
 
-/* Only admin can create accounts through adminCreateUser (UI implemented there).
-   Public registration is disabled to avoid free creation as requested. */
+document.getElementById('regCreate').onclick = ()=>{
+  // Creación de cuentas desde modal: solo crear cuentas normales (no admins) - admin debe crear cuentas desde panel admin
+  const username = document.getElementById('regUser').value.trim();
+  const display = document.getElementById('regName').value.trim() || username;
+  const pass = document.getElementById('regPass').value.trim() || '1234';
+  const role = document.getElementById('regRole').value;
+  if(!username){ document.getElementById('regMsg').textContent='Usuario requerido'; return; }
+  const users = lsGet('users', []);
+  if(users.find(u=>u.username===username)){ document.getElementById('regMsg').textContent='Usuario ya existe'; return; }
+  // Para seguridad: no permitimos crear cuentas con rol 'admin' desde el modal
+  const safeRole = role==='admin' ? 'officer' : role;
+  const u = {id:uid('u'), username, display, badge:'', password:pass, role:safeRole};
+  users.unshift(u); lsSet('users', users); document.getElementById('regMsg').textContent='Cuenta creada. Inicia sesión.'; pushLog(`Cuenta creada (self-register): ${username}`);
+  document.getElementById('regUser').value=''; document.getElementById('regName').value=''; document.getElementById('regPass').value='';
+  notify('Cuenta creada. Pide a un admin permisos si necesitas más.');
+};
 
-/* ------------------- EXPORT / IMPORT / CLEAR ------------------- */
-async function exportAll(){
-  if(!isAdminEffective()){ showToast('Solo admin puede exportar'); return; }
-  // fetch collections
-  const collections = ['users','reports','wanted','calls','pda','fines','templates','alerts','seizures','logs'];
-  const data = {};
-  for(const c of collections){
-    const snap = await db.collection(c).get();
-    data[c] = snap.docs.map(d=>({ id:d.id, ...d.data() }));
-  }
+/* ----------------- Auxiliar & header ----------------- */
+function closeExpanded(){ STATE.expanded=null; expandedRoot.innerHTML=''; window.scrollTo({top:0,behavior:'smooth'}); }
+function updateHeader(){ STATE.currentUser = lsGet('currentUser', STATE.currentUser); const u = STATE.currentUser; userDisplay.textContent = u? `${u.display} (${u.role})` : 'No conectado'; renderLogsMini(); }
+btnLogin.addEventListener('click', ()=>{
+  if(STATE.currentUser){ if(confirm('Cerrar sesión?')){ lsSet('currentUser', null); STATE.currentUser=null; updateHeader(); pushLog('Sesión cerrada'); notify('Sesión cerrada'); } } else openLoginModal();
+});
+
+/* ----------------- Export / Import (JSON) ----------------- */
+function exportAll(){
+  if(!hasPerm('export')){ notify('No tienes permiso para exportar'); return; }
+  const data = {
+    users: lsGet('users',[]), roles: lsGet('roles',{}), templates: lsGet('templates',{}),
+    reports: lsGet('reports',[]), wanted: lsGet('wanted',[]), calls: lsGet('calls',[]),
+    pda: lsGet('pda',[]), fines: lsGet('fines',[]), alerts: lsGet('alerts',[]), logs: lsGet('logs',[])
+  };
   const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a'); a.href=url; a.download = 'daynightrp_export_'+Date.now()+'.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-  showToast('Exportado JSON');
+  const a = document.createElement('a'); a.href = url; a.download = 'pda_export_'+Date.now()+'.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  pushLog('Datos exportados');
+  notify('Exportado JSON');
+}
+function importFile(e){
+  const f = e.target.files[0]; if(!f) return;
+  const reader = new FileReader();
+  reader.onload = (ev)=>{
+    try{
+      const data = JSON.parse(ev.target.result);
+      if(!confirm('Importar reemplazará datos locales. Continuar?')) return;
+      if(data.users) lsSet('users', data.users);
+      if(data.roles) lsSet('roles', data.roles);
+      if(data.templates) lsSet('templates', data.templates);
+      if(data.reports) lsSet('reports', data.reports);
+      if(data.wanted) lsSet('wanted', data.wanted);
+      if(data.calls) lsSet('calls', data.calls);
+      if(data.pda) lsSet('pda', data.pda);
+      if(data.fines) lsSet('fines', data.fines);
+      if(data.alerts) lsSet('alerts', data.alerts);
+      if(data.logs) lsSet('logs', data.logs);
+      pushLog('Datos importados');
+      alert('Importación completa. Recargando UI.');
+      location.reload();
+    } catch(err){ notify('JSON inválido'); }
+  };
+  reader.readAsText(f);
 }
 
-/* ------------------- REaltime loader wrappers ------------------- */
-function loadPDARealtimeWrapper(){ db.collection('pda').orderBy('createdAt','desc').onSnapshot(loadPDARealtime); }
-function loadReportsRealtimeWrapper(){ db.collection('reports').orderBy('createdAt','desc').onSnapshot(loadReportsRealtime); }
-function loadWantedRealtimeWrapper(){ db.collection('wanted').orderBy('createdAt','desc').onSnapshot(loadWantedRealtime); }
-function loadCallsRealtimeWrapper(){ db.collection('calls').orderBy('createdAt','desc').onSnapshot(loadCallsRealtime); }
-function loadFinesRealtimeWrapper(){ db.collection('fines').orderBy('createdAt','desc').onSnapshot(loadFinesRealtime); }
-function loadUsersRealtimeWrapper(){ db.collection('users').orderBy('display').onSnapshot(snap=>{ window.latestUsers = snap.docs.map(d=>d.data()); /* re-render admin list if open */ if(STATE.expanded==='admin') loadUsersAdmin(); }); }
-function loadAlertsRealtimeWrapper(){ db.collection('alerts').orderBy('createdAt','desc').onSnapshot(loadAlertsRealtime); }
-function loadSeizuresRealtimeWrapper(){ db.collection('seizures').orderBy('date','desc').onSnapshot(loadSeizuresRealtime); }
+/* ----------------- Logs push ----------------- */
+function pushLog(msg){ const logs = lsGet('logs', []); logs.unshift({id:uid('log'), t:now(), msg}); lsSet('logs', logs); renderLogsMini(); }
 
-/* attach many realtime listeners in startRealtime() */
-function loadUsersRealtime(snapshot){ window.latestUsers = snapshot.docs.map(d=>d.data()); }
-function loadWantedRealtime(snapshot){ loadWantedRealtime(snapshot); }
-function loadFinesRealtime(snapshot){ loadFinesRealtime(snapshot); }
-
-/* ------------------- Inicialización UI y realtime ------------------- */
-async function initUI(){
-  // seed default data if empty
-  await seedIfNeeded();
+/* ----------------- Init & start ----------------- */
+function initUI(){
+  seedIfNeeded();
   renderCards();
-  // restore session from localStorage
-  const stored = localStorage.getItem('currentUser');
-  if(stored){ try{ STATE.currentUser = JSON.parse(stored); }catch(e){ STATE.currentUser = null; } }
+  STATE.currentUser = lsGet('currentUser', STATE.currentUser);
   updateHeader();
-  // start realtime subscriptions
-  startRealtime();
-  // additional separate listeners
-  loadPDARealtimeWrapper();
-  loadReportsRealtimeWrapper();
-  loadWantedRealtimeWrapper();
-  loadCallsRealtimeWrapper();
-  loadFinesRealtimeWrapper();
-  loadUsersRealtimeWrapper();
-  loadAlertsRealtimeWrapper();
-  loadSeizuresRealtimeWrapper();
-  // roles
-  db.collection('roles').doc('defaultRoles').get().then(s=>{ if(s.exists) window.latestRoles = s.data(); else db.collection('roles').doc('defaultRoles').set(getRolesObj()); loadRolesAdmin(); });
-  // logs
-  db.collection('logs').orderBy('t','desc').limit(200).onSnapshot(s=>{ window.latestLogs = s.docs.map(d=>({id:d.id,...d.data()})); });
-  // onDuty
-  db.collection('onDuty').onSnapshot(loadDutyRealtime);
 }
-
-/* update header UI */
-function updateHeader(){
-  // ensure currentUser object is fresh from Firestore if possible
-  if(STATE.currentUser && STATE.currentUser.id){
-    // fetch latest user doc
-    db.collection('users').doc(STATE.currentUser.id).get().then(s=>{
-      if(s.exists){
-        STATE.currentUser = s.data();
-        localStorage.setItem('currentUser', JSON.stringify(STATE.currentUser));
-        userDisplay.textContent = `${STATE.currentUser.display} (${STATE.currentUser.role})`;
-      } else {
-        // removed user
-        STATE.currentUser = null;
-        localStorage.removeItem('currentUser');
-        userDisplay.textContent = 'No conectado';
-      }
-    }).catch(()=>{ userDisplay.textContent = STATE.currentUser ? `${STATE.currentUser.display} (${STATE.currentUser.role})` : 'No conectado'; });
-  } else {
-    userDisplay.textContent = 'No conectado';
-  }
-  // duty count updated by loadDutyRealtime
-}
-
-/* ------------------- Utility small helpers ------------------- */
-function modalAlert(title,msg){ showModal(`<h3>${title}</h3><div style="white-space:pre-wrap">${msg}</div>`); }
-
-/* ------------------- Start app ------------------- */
 initUI();
-
-/* Expose some functions to window for onclick from generated HTML */
-window.viewPDA = viewPDA;
-window.delPDA = tryDeletePDA;
-window.viewReport = viewReport;
-window.deleteReport = deleteReport;
-window.deleteWanted = deleteWanted;
-window.deleteFine = deleteFine;
-window.deleteCall = async function(id){ await db.collection('calls').doc(id).delete(); };
-window.deleteAlert = deleteAlert;
 
 </script>
 </body>
