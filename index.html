@@ -1,154 +1,104 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Daynight RP — PDA / CAD (Completo: Auth sign-in only + Cloud Function createUser)</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Daynight RP — PDA / CAD (Completo)</title>
 <style>
 /* ---------------- Theme & layout ---------------- */
 :root{
-  --bg-1:#06121a; --bg-2:#071729;
+  --bg1:#06121a; --bg2:#071729;
   --muted:#9fb3bd; --text:#e6f0f6;
-  --accent:#7c3aed; --accent-2:#06b6a4;
+  --accent:#7c3aed; --accent2:#06b6a4;
   --danger:#ff6b6b;
-  --glass: rgba(255,255,255,0.03);
-  --card-grad: linear-gradient(180deg, rgba(255,255,255,0.014), rgba(255,255,255,0.006));
-  --radius:12px;
-  --shadow: 0 14px 40px rgba(2,6,10,0.6);
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+  --glass:rgba(255,255,255,0.03);
+  --card:linear-gradient(180deg, rgba(255,255,255,0.014), rgba(255,255,255,0.006));
+  --radius:12px; --shadow:0 14px 40px rgba(2,6,10,0.6);
+  font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Arial;
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0;background:
   radial-gradient(800px 300px at 12% 8%, rgba(124,58,237,0.06), transparent),
-  linear-gradient(180deg,var(--bg-2) 0%, var(--bg-1) 60%); color:var(--text); -webkit-font-smoothing:antialiased}
+  linear-gradient(180deg,var(--bg2) 0%, var(--bg1) 60%); color:var(--text); -webkit-font-smoothing:antialiased}
 a{color:var(--accent)}
-/* background */
-.bg { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
-.nebula { position:absolute; width:70vmax; height:70vmax; left:-10vmin; top:-8vmin; background:
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.nebula{position:absolute;width:70vmax;height:70vmax;left:-10vmin;top:-8vmin;background:
   radial-gradient(circle at 30% 30%, rgba(124,58,237,0.22), transparent 30%),
   radial-gradient(circle at 70% 70%, rgba(6,182,164,0.12), transparent 25%);
-  filter: blur(60px) saturate(120%); animation: float 12s ease-in-out infinite; opacity:0.95; mix-blend-mode:screen; }
-.nebula.r { right:-10vmin; left:auto; top:6vmin; animation-duration:10s; animation-direction:reverse; }
-.gridOverlay { position:absolute; inset:0; background-image:
-  linear-gradient(transparent 96%, rgba(255,255,255,0.01) 96%),
-  linear-gradient(90deg, transparent 96%, rgba(255,255,255,0.01) 96%); background-size: 340px 340px; opacity:0.03; }
-.stripes { position:absolute; inset:0; opacity:0.12; filter: blur(18px) saturate(120%);
-  background:
-    linear-gradient(90deg, rgba(124,58,237,0.06) 0 20%, transparent 20% 50%),
-    linear-gradient(90deg, rgba(255,40,80,0.05) 50% 70%, transparent 70% 100%);
-  mix-blend-mode:overlay; animation: stripesShift 6.2s linear infinite; }
-@keyframes float { 0%{transform:translateY(-8px)}50%{transform:translateY(8px)}100%{transform:translateY(-8px)} }
-@keyframes stripesShift { 0%{background-position:0 0,100% 0}50%{background-position:50% 0,50% 0}100%{background-position:0 0,100% 0} }
+  filter:blur(60px) saturate(120%);animation:float 12s ease-in-out infinite;opacity:0.95;mix-blend-mode:screen}
+.nebula.r{right:-10vmin;left:auto;top:6vmin;animation-duration:10s;animation-direction:reverse}
+.gridOverlay{position:absolute;inset:0;background-image:linear-gradient(transparent 96%, rgba(255,255,255,0.01) 96%),linear-gradient(90deg, transparent 96%, rgba(255,255,255,0.01) 96%);background-size:340px 340px;opacity:0.03}
+.stripes{position:absolute;inset:0;opacity:0.12;filter:blur(18px) saturate(120%);background:linear-gradient(90deg, rgba(124,58,237,0.06) 0 20%, transparent 20% 50%),linear-gradient(90deg, rgba(255,40,80,0.05) 50% 70%, transparent 70% 100%);mix-blend-mode:overlay;animation:stripesShift 6.2s linear infinite}
+@keyframes float{0%{transform:translateY(-8px)}50%{transform:translateY(8px)}100%{transform:translateY(-8px)}}@keyframes stripesShift{0%{background-position:0 0,100% 0}50%{background-position:50% 0,50% 0}100%{background-position:0 0,100% 0}}
 
-/* layout */
 .wrap{max-width:1200px;margin:22px auto;padding:22px;display:grid;grid-template-rows:auto 1fr;gap:18px;position:relative;z-index:2}
 header{display:flex;align-items:center;justify-content:space-between;gap:18px}
 .brand{display:flex;gap:12px;align-items:center}
-.logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent-2),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:900;color:#031018}
+.logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:900;color:#031018}
 h1{margin:0;font-size:18px}
 .subtitle{color:var(--muted);font-size:13px}
 .top-right{display:flex;gap:10px;align-items:center}
 .pill{background:var(--glass);padding:8px 12px;border-radius:999px;font-weight:700;color:var(--muted)}
-.btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#031018;padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:800}
+.btn{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#031018;padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:800}
 .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:7px 10px;border-radius:10px;cursor:pointer}
 
-/* grid */
 .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-@media (max-width:1200px){ .grid{grid-template-columns:repeat(3,1fr)} }
-@media (max-width:900px){ .grid{grid-template-columns:repeat(2,1fr)} }
-@media (max-width:640px){ .grid{grid-template-columns:1fr} }
+@media(max-width:1200px){.grid{grid-template-columns:repeat(3,1fr)}}@media(max-width:900px){.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:640px){.grid{grid-template-columns:1fr}}
 
-/* cards */
-.card{ background:var(--card-grad); border-radius:14px; padding:18px; border:1px solid rgba(255,255,255,0.04);
-  box-shadow:var(--shadow); display:flex;flex-direction:column; gap:12px; min-height:120px; transition:transform .2s,box-shadow .2s,border-color .2s; position:relative; overflow:hidden; }
+.card{background:var(--card);border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.04);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px;min-height:120px;transition:transform .2s,box-shadow .2s,border-color .2s}
 .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .card-logo{width:56px;height:56px;border-radius:10px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center}
 .title{font-weight:900;font-size:16px}
 .desc{color:var(--muted);font-size:13px}
 .card:hover{transform:translateY(-8px);box-shadow:0 28px 60px rgba(0,0,0,0.7);border-color:rgba(140,80,240,0.12)}
-.card.active{outline:3px solid rgba(124,58,237,0.12); transform:translateY(-6px) scale(1.01)}
+.card.active{outline:3px solid rgba(124,58,237,0.12);transform:translateY(-6px) scale(1.01)}
 
-/* expanded panel */
-#expandedRoot .expanded{margin-top:12px;border-radius:12px;padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.006));border:1px solid rgba(255,255,255,0.04);box-shadow:0 18px 46px rgba(0,0,0,0.6); animation:panelIn .28s cubic-bezier(.2,.9,.3,1) both}
-@keyframes panelIn { from{opacity:0; transform: translateY(12px)} to{opacity:1; transform:none} }
+#expandedRoot .expanded{margin-top:12px;border-radius:12px;padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.006));border:1px solid rgba(255,255,255,0.04);box-shadow:0 18px 46px rgba(0,0,0,0.6);animation:panelIn .28s both}
+@keyframes panelIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
 
-/* lists and inputs */
 .list{display:flex;flex-direction:column;gap:10px}
 .item{padding:12px;border-radius:10px;background:rgba(255,255,255,0.012);border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:space-between;gap:12px}
-input,textarea,select{ background: rgba(0,0,0,0.18); border:1px solid rgba(255,255,255,0.03); padding:10px; border-radius:8px; color:inherit; font:inherit }
-textarea{min-height:100px;resize:vertical}
-
-/* radio */
-.radio-wrap{display:flex;gap:12px;align-items:flex-start}
-.radio-left{flex:1;display:flex;flex-direction:column;gap:10px}
-.radio-right{width:320px}
-.radio-messages{max-height:380px;overflow:auto;padding:12px;border-radius:10px;background:rgba(0,0,0,0.14);border:1px solid rgba(255,255,255,0.02)}
-.radio-msg{display:flex;gap:10px;align-items:flex-start}
-.radio-msg.me{flex-direction:row-reverse}
-.radio-avatar{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#031018;font-weight:800}
-.radio-bubble{padding:10px;border-radius:10px;background:rgba(0,0,0,0.34)}
-.radio-bubble.me{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#031018}
-.radio-meta{font-size:11px;color:var(--muted);margin-top:6px}
-
-/* modal */
+input,textarea,select{background:rgba(0,0,0,0.18);border:1px solid rgba(255,255,255,0.03);padding:10px;border-radius:8px;color:inherit}
+textarea{min-height:100px}
 .overlay{position:fixed;inset:0;background:linear-gradient(rgba(2,6,10,0.6),rgba(2,6,10,0.8));display:flex;align-items:center;justify-content:center;z-index:9999}
 .modal{width:920px;max-width:96%;background:linear-gradient(180deg,#071729,#061421);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
-
-/* small utils */
-.muted{color:var(--muted)}
-.tiny{font-size:12px}
 .fade-in{animation:fadeIn .28s ease both}
 @keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 footer{margin-top:32px;text-align:center;color:var(--muted);font-size:13px;padding-bottom:26px}
 </style>
-<!-- Firestore rules and deployment guidance are included as comments in the README delivered separately. -->
 </head>
 <body>
-  <div class="bg" aria-hidden="true">
-    <div class="nebula"></div>
-    <div class="nebula r"></div>
-    <div class="gridOverlay"></div>
-    <div class="stripes"></div>
-  </div>
+  <div class="bg" aria-hidden="true"><div class="nebula"></div><div class="nebula r"></div><div class="gridOverlay"></div><div class="stripes"></div></div>
 
-  <div class="wrap" role="main">
+  <div class="wrap">
     <header>
       <div class="brand">
         <div class="logo" aria-hidden="true">DN</div>
-        <div>
-          <h1>Daynight RP — PDA / CAD</h1>
-          <div class="subtitle">Admin crea cuentas — cliente solo sign-in</div>
-        </div>
+        <div><h1>Daynight RP — PDA / CAD</h1><div class="subtitle">Completo — Auth (signin-only) + Firestore + Cloud Function createUser</div></div>
       </div>
 
       <div class="top-right">
         <div id="userDisplay" class="pill">No conectado</div>
         <div id="dutyStatus" class="pill">En servicio: 0</div>
-        <div id="notifWrap" style="display:inline-flex;align-items:center">
-          <div id="notifPill" class="pill" style="display:none;background:linear-gradient(90deg,var(--accent-2),var(--accent));color:#031018"></div>
-        </div>
+        <div id="notifWrap" style="display:inline-flex;align-items:center"><div id="notifPill" class="pill" style="display:none;background:linear-gradient(90deg,var(--accent2),var(--accent));color:#031018"></div></div>
         <button id="btnExport" class="btn">Exportar</button>
         <button id="btnLogin" class="btn-ghost">Entrar</button>
       </div>
     </header>
 
     <section class="grid" id="cardsRoot" aria-label="Paneles principales"></section>
-
     <div id="expandedRoot" aria-live="polite"></div>
-
-    <footer>Hecho para Daynight RP • Firestore + Firebase Auth • Integrado con Cloud Function createUser</footer>
+    <footer>Hecho para Daynight RP • Firestore + Firebase Auth • Fecha: 2025-10-20</footer>
   </div>
 
-  <!-- LOGIN modal (sign-in only; no SignUp / no Google) -->
+  <!-- Login modal (sign-in only) -->
   <div id="loginModal" class="overlay" style="display:none" aria-hidden="true">
     <div class="modal fade-in" role="dialog" aria-modal="true">
       <h3>Entrar</h3>
-      <div class="muted small">Sólo las cuentas creadas por Admin (a través del panel o Cloud Function) pueden iniciar sesión.</div>
+      <div class="muted small">Inicio de sesión por Email/Password. Las cuentas deben ser creadas por un admin.</div>
       <div style="margin-top:12px">
-        <label class="muted small">Email</label>
-        <input id="authEmail" placeholder="email@example.com"/>
-        <label class="muted small" style="margin-top:8px">Contraseña</label>
-        <input id="authPass" type="password" placeholder="contraseña"/>
+        <label class="muted small">Email</label><input id="authEmail" placeholder="email@example.com"/>
+        <label class="muted small" style="margin-top:8px">Contraseña</label><input id="authPass" type="password" placeholder="contraseña"/>
         <div style="display:flex;gap:8px;margin-top:12px">
           <button id="btnSignIn" class="btn">Entrar</button>
           <button id="btnReset" class="btn-ghost">Recuperar contraseña</button>
@@ -159,19 +109,8 @@ footer{margin-top:32px;text-align:center;color:var(--muted);font-size:13px;paddi
     </div>
   </div>
 
-  <!-- IMPORT modal (admin only) -->
-  <div id="importModal" class="overlay" style="display:none">
-    <div class="modal fade-in">
-      <h3>Importar JSON</h3>
-      <div class="muted small">Carga un archivo JSON exportado anteriormente.</div>
-      <input id="importFile" type="file" accept=".json" style="margin-top:12px"/>
-      <div style="display:flex;gap:8px;margin-top:12px"><button id="importConfirm" class="btn">Importar</button><button id="importCancel" class="btn-ghost">Cancelar</button></div>
-      <div id="importMsg" class="muted small" style="margin-top:8px"></div>
-    </div>
-  </div>
-
 <script type="module">
-/* ---------------- Firebase imports ---------------- */
+/* ================= Firebase imports ================= */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
 import {
   getFirestore, collection, getDocs, addDoc, setDoc, doc, deleteDoc, updateDoc,
@@ -179,13 +118,13 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
 import {
-  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
-  onAuthStateChanged, sendPasswordResetEmail, reauthenticateWithCredential, EmailAuthProvider
+  getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged,
+  sendPasswordResetEmail, reauthenticateWithCredential, EmailAuthProvider
 } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
 
 import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-functions.js";
 
-/* ---------------- Config & init ---------------- */
+/* ================= Config (replace if needed) ================= */
 const firebaseConfig = {
   apiKey: "AIzaSyCskczYgGtlPPBEIZiE5PuY7s_cfE_3Chg",
   authDomain: "wizard-rp.firebaseapp.com",
@@ -200,22 +139,22 @@ const db = getFirestore(app);
 const auth = getAuth(app);
 const functions = getFunctions(app);
 
-/* ---------------- Helpers & state ---------------- */
+/* ================= Utilities & State ================= */
 const $ = (sel, root=document) => root.querySelector(sel);
-const escapeHtml = s => (s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const COL = (n) => collection(db,n);
-async function log(msg){ try{ await addDoc(COL('logs'), { t: Date.now(), msg }); }catch(e){ console.warn('log', e); } }
+const escapeHtml = s => (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const COL = n => collection(db, n);
+async function pushLog(msg){ try{ await addDoc(COL('logs'), { t: Date.now(), msg }); }catch(e){ console.warn('pushLog', e); } }
 
 const STATE = {
-  currentUser: null, // firebase Auth user
-  userProfile: null, // profile doc from users collection
+  currentUser: null,
+  userProfile: null,
   adminMode: false,
   unsub: {},
-  selectedChannel: null,
-  heartbeatTimers: {}
+  heartbeatTimers: {},
+  selectedChannel: null
 };
 
-/* ---------------- SVG icons (replaces emojis) ---------------- */
+/* ================= Icons ================= */
 function getIconSVG(name,size=34){
   const common = `width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"`;
   switch(name){
@@ -234,51 +173,36 @@ function getIconSVG(name,size=34){
   }
 }
 
-/* ---------------- Cards list ---------------- */
-const CARDS = [
-  { id:'pda', title:'PDA / Fichas', desc:'Buscar y crear fichas', icon:'pda' },
-  { id:'calls', title:'Dispatch / Llamadas', desc:'Crear/Asignar llamadas', icon:'calls' },
-  { id:'reports', title:'Informes', desc:'Crear / Editar informes', icon:'reports' },
-  { id:'wanted', title:'BOLO / Wanted', desc:'Fichas buscadas', icon:'wanted' },
-  { id:'fines', title:'Multas', desc:'Generar sanciones', icon:'fines' },
-  { id:'assignments', title:'Asignaciones', desc:'Crear / Asignar (Mando/Admin)', icon:'assignments' },
-  { id:'service', title:'Servicio', desc:'Entrar / Salir de servicio', icon:'service' },
-  { id:'alerts', title:'Alertas', desc:'Crear y gestionar alertas', icon:'alerts' },
-  { id:'radio', title:'Radios', desc:'Chat por canales', icon:'radio' },
-  { id:'admin', title:'Administración', desc:'Roles y usuarios (avanzado)', icon:'admin' },
-  { id:'logs', title:'Auditoría', desc:'Historial de acciones', icon:'logs' }
-];
-
+/* ================== Cards rendering ================== */
 function renderCards(){
-  const root = document.getElementById('cardsRoot'); root.innerHTML = '';
+  const root = document.getElementById('cardsRoot'); root.innerHTML='';
   const isAdmin = STATE.userProfile && STATE.userProfile.role === 'admin';
   CARDS.forEach(c=>{
-    if((c.id === 'admin' || c.id === 'logs') && !isAdmin) return;
-    const el = document.createElement('div'); el.className = 'card'; el.tabIndex = 0; el.dataset.id = c.id;
-    el.innerHTML = `<div class="card-head"><div style="display:flex;gap:12px;align-items:center"><div class="card-logo" aria-hidden="true">${getIconSVG(c.icon,34)}</div><div><div class="title">${c.title}</div><div class="desc">${c.desc}</div></div></div><div style="display:flex;flex-direction:column;align-items:flex-end"><button class="btn-ghost open-btn" data-open="${c.id}">Abrir</button></div></div>`;
-    el.addEventListener('click', (e)=> { if(e.target && e.target.matches('button')) return; openCard(c.id, el); });
-    el.querySelector('.open-btn').addEventListener('click', (e)=> { e.stopPropagation(); openCard(c.id, el); });
-    el.addEventListener('keydown', (e)=> { if(e.key==='Enter' || e.key===' ') { e.preventDefault(); openCard(c.id, el); } if(e.key==='ArrowRight') focusNext(el); if(e.key==='ArrowLeft') focusPrev(el); });
+    if((c.id==='admin' || c.id==='logs') && !isAdmin) return;
+    const el = document.createElement('div'); el.className='card'; el.tabIndex=0; el.dataset.id=c.id;
+    el.innerHTML = `<div class="card-head"><div style="display:flex;gap:12px;align-items:center"><div class="card-logo">${getIconSVG(c.icon,34)}</div><div><div class="title">${c.title}</div><div class="desc">${c.desc}</div></div></div><div style="display:flex;flex-direction:column;align-items:flex-end"><button class="btn-ghost open-btn" data-open="${c.id}">Abrir</button></div></div>`;
+    el.addEventListener('click', (e)=>{ if(e.target && e.target.matches('button')) return; openCard(c.id, el); });
+    el.querySelector('.open-btn').addEventListener('click', (e)=>{ e.stopPropagation(); openCard(c.id, el); });
+    el.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); openCard(c.id, el); } if(e.key==='ArrowRight') focusNext(el); if(e.key==='ArrowLeft') focusPrev(el); });
     root.appendChild(el);
   });
 }
-function focusNext(cur){ const cards = Array.from(document.querySelectorAll('.card')); const i = cards.indexOf(cur); if(i>=0 && i<cards.length-1) cards[i+1].focus(); }
-function focusPrev(cur){ const cards = Array.from(document.querySelectorAll('.card')); const i = cards.indexOf(cur); if(i>0) cards[i-1].focus(); }
+function focusNext(cur){ const cards=Array.from(document.querySelectorAll('.card')); const i=cards.indexOf(cur); if(i>=0 && i<cards.length-1) cards[i+1].focus(); }
+function focusPrev(cur){ const cards=Array.from(document.querySelectorAll('.card')); const i=cards.indexOf(cur); if(i>0) cards[i-1].focus(); }
 function setActiveCard(el){ document.querySelectorAll('.card').forEach(c=>c.classList.remove('active')); if(el) el.classList.add('active'); }
 
-/* ---------------- Utility helpers ---------------- */
+/* ================== Helpers ================== */
 function setHTML(el, html){ if(el) el.innerHTML = html; }
-function escapeJsonString(s){ return JSON.stringify(s).slice(1,-1); } // small helper for CSV escaping
+async function fetchDoc(collectionName, id){ try{ const snap = await getDocs(query(COL(collectionName), where('__name__','==', id))); let data=null; snap.forEach(d=> data=d.data()); return data;}catch(e){console.warn('fetchDoc', e); return null;} }
+function enableRefreshButton(root, handler){ const btn = root.querySelector('.refresh-panel'); if(btn) btn.onclick = handler; }
+function downloadJSON(data, filename='export.json'){ const blob = new Blob([JSON.stringify(data,null,2)], {type:'application/json'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=filename; document.body.appendChild(a); a.click(); a.remove(); }
+function arrayToCSV(rows){ const esc=v=>`"${(''+(v==null?'':v)).replace(/"/g,'""')}"`; return rows.map(r=> Object.values(r).map(esc).join(',')).join('\n'); }
 
-/* ---------------- Logging helper ---------------- */
-async function pushLog(msg){ try{ await addDoc(COL('logs'), { t: Date.now(), msg }); }catch(e){ console.warn('pushLog', e); } }
-
-/* ---------------- Seed initial data if missing ---------------- */
+/* ================== Seed ================== */
 async function seedIfEmpty(){
   try{
     const usersSnap = await getDocs(COL('users'));
     if(usersSnap.empty){
-      // Note: these are profile docs only; admin must create Auth users via Cloud Function or console
       await addDoc(COL('users'), { username:'admin', display:'Admin', role:'admin', badge:'ADM-001', onDuty:false });
       await addDoc(COL('users'), { username:'perety04', display:'Perety 04', role:'officer', badge:'PD-314', onDuty:false });
     }
@@ -290,8 +214,8 @@ async function seedIfEmpty(){
       await setDoc(doc(db,'roles','dispatcher'), { name:'Dispatcher', color:'#f97316', permissions:['create_call','assign_call'] });
       await setDoc(doc(db,'roles','admin'), { name:'Admin', color:'#10b981', permissions:['all'] });
     }
-    const chanSnap = await getDocs(COL('radio_channels'));
-    if(chanSnap.empty){
+    const chan = await getDocs(COL('radio_channels'));
+    if(chan.empty){
       await addDoc(COL('radio_channels'), { id:'general', name:'General', created_at: Date.now() });
       await addDoc(COL('radio_channels'), { id:'police', name:'Police', created_at: Date.now() });
       await addDoc(COL('radio_channels'), { id:'medical', name:'Medical', created_at: Date.now() });
@@ -299,15 +223,15 @@ async function seedIfEmpty(){
   }catch(e){ console.warn('seedIfEmpty', e); }
 }
 
-/* ---------------- Permission helper ---------------- */
+/* ================== Permissions helper ================== */
 async function hasPerm(perm){
   if(!STATE.userProfile) return false;
   try{
     const rSnap = await getDocs(query(COL('roles'), where('__name__','==', STATE.userProfile.role)));
-    let role = null; rSnap.forEach(d=> role = d.data());
+    let role=null; rSnap.forEach(d=> role = d.data());
     if(!role) return false;
     if(Array.isArray(role.permissions) && role.permissions.includes('all')){
-      const sensitive = ['delete_reports','delete_alerts','manage_users','manage_roles','delete_all_alerts','impersonate','view_logs','all','assignments'];
+      const sensitive=['delete_reports','delete_alerts','manage_users','manage_roles','delete_all_alerts','impersonate','view_logs','all','assignments'];
       if(sensitive.includes(perm)) return STATE.adminMode === true;
       return true;
     }
@@ -315,55 +239,24 @@ async function hasPerm(perm){
   }catch(e){ console.warn('hasPerm', e); return false; }
 }
 
-/* ---------------- Panel management ---------------- */
-function clearPanel(){
-  if(STATE.unsub.current && typeof STATE.unsub.current === 'function'){ try{ STATE.unsub.current(); }catch(e){} }
-  STATE.unsub.current = null;
-  document.getElementById('expandedRoot').innerHTML = '';
-  setActiveCard(null);
-  stopHeartbeats();
-}
-
-async function openCard(id, cardEl=null){
-  clearPanel();
-  setActiveCard(cardEl);
-  const panel = document.createElement('div'); panel.className = 'expanded';
-  document.getElementById('expandedRoot').appendChild(panel);
-  switch(id){
-    case 'pda': await renderPDA(panel); break;
-    case 'calls': await renderCalls(panel); break;
-    case 'reports': await renderReports(panel); break;
-    case 'wanted': await renderWanted(panel); break;
-    case 'fines': await renderFines(panel); break;
-    case 'assignments': await renderAssignments(panel); break;
-    case 'service': await renderService(panel); break;
-    case 'alerts': await renderAlerts(panel); break;
-    case 'radio': await renderRadio(panel); break;
-    case 'admin': await renderAdmin(panel); break;
-    case 'logs': await renderLogs(panel); break;
-    default: panel.innerHTML = '<div class="muted">Panel no implementado</div>'; break;
-  }
-  panel.scrollIntoView({ behavior:'smooth', block:'start' });
-}
-
-/* ---------------- PDA panel ---------------- */
+/* ================== Panels implementations ================== */
+/* PDA */
 async function renderPDA(container){
   setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
     <div><strong>PDA / Fichas</strong><div class="muted small">Buscar y crear fichas</div></div>
-    <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
+    <div style="display:flex;gap:8px;align-items:center"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
   </div>
-  <div style="margin-top:12px;display:grid;grid-template-columns:1fr 360px;gap:12px">
+  <div style="margin-top:12px;display:grid;grid-template-columns:1fr 380px;gap:12px">
     <div><input id="pdaQ" placeholder="Buscar..." style="width:100%;margin-bottom:8px"/><div id="pdaResults" class="list"></div></div>
     <div><div class="muted small">Nueva ficha</div><textarea id="pdaTxt"></textarea><div style="display:flex;gap:8px;margin-top:8px"><button id="createPDA" class="btn">Crear</button><button class="btn-ghost close-panel">Cancelar</button></div></div>
   </div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearPanel()));
-  container.querySelector('.refresh-panel').addEventListener('click', ()=> loadPDAs($('#pdaQ',container).value, container));
+  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
+  enableRefreshButton(container, ()=> loadPDAs($('#pdaQ',container).value, container));
   $('#pdaQ',container).addEventListener('input', ()=> loadPDAs($('#pdaQ',container).value, container));
-  $('#createPDA',container).addEventListener('click', async ()=> {
-    if(!STATE.userProfile) return alert('Inicia sesión');
+  $('#createPDA',container).addEventListener('click', async ()=>{
     if(!await hasPerm('create_pda')) return alert('No tienes permiso');
-    const txt = $('#pdaTxt',container).value.trim(); if(!txt) return alert('Rellena la ficha');
-    try{ await addDoc(COL('pda'), { text: txt, author: STATE.userProfile.display, authorUid: STATE.currentUser?.uid||null, created_at: Date.now() }); $('#pdaTxt',container).value=''; await pushLog('Ficha PDA creada'); await loadPDAs('',container); }catch(e){ console.error(e); alert('Error creando ficha'); }
+    const txt = $('#pdaTxt',container).value.trim(); if(!txt) return alert('Rellena');
+    try{ await addDoc(COL('pda'), { text: txt, author: STATE.userProfile ? STATE.userProfile.display : 'Invitado', created_at: Date.now() }); await pushLog('PDA creada'); $('#pdaTxt',container).value=''; loadPDAs('',container); }catch(e){ console.error(e); alert('Error'); }
   });
   if(STATE.unsub.pda) STATE.unsub.pda();
   STATE.unsub.pda = onSnapshot(COL('pda'), ()=> loadPDAs($('#pdaQ',container).value, container));
@@ -371,31 +264,31 @@ async function renderPDA(container){
   await loadPDAs('',container);
 }
 async function loadPDAs(q='', container=document){
-  const results = $('#pdaResults', container); if(!results) return;
+  const results = $('#pdaResults',container); if(!results) return;
   try{
     const snap = await getDocs(query(COL('pda'), orderBy('created_at','desc')));
     const arr=[]; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
     const out = arr.filter(p => q.trim()==='' ? true : (p.text||'').toLowerCase().includes(q.toLowerCase()));
     results.innerHTML = out.map(p=> `<div class="item"><div style="flex:1"><b>${escapeHtml((p.text||'').slice(0,40))}</b><div class="muted small">${escapeHtml((p.text||'').slice(0,140))}</div></div><div><button class="btn-ghost view-pda" data-id="${p.id}">Ver</button> <button class="btn-ghost del-pda" data-id="${p.id}">Borrar</button></div></div>`).join('') || '<div class="muted small">Sin fichas</div>';
-    results.querySelectorAll('.view-pda').forEach(btn=> btn.onclick = async ()=> { const d = await fetchDoc('pda', btn.dataset.id); alert(`Ficha:\n\n${d?.text||'No encontrada'}\n\nAutor: ${d?.author||'—'}`); });
-    results.querySelectorAll('.del-pda').forEach(btn=> btn.onclick = async ()=> { if(!confirm('Borrar ficha?')) return; if(!await hasPerm('delete_reports')) return alert('Admin Mode necesario'); try{ await deleteDoc(doc(db,'pda',btn.dataset.id)); await pushLog(`Ficha ${btn.dataset.id} borrada`); loadPDAs(q, container); }catch(e){ console.error(e); alert('Error'); }});
+    results.querySelectorAll('.view-pda').forEach(btn=>btn.onclick = async ()=> { const d = await fetchDoc('pda', btn.dataset.id); alert(`Ficha:\n\n${d?.text||'No encontrada'}\n\nAutor: ${d?.author||'—'}`); });
+    results.querySelectorAll('.del-pda').forEach(btn=>btn.onclick = async ()=> { if(!confirm('Borrar ficha?')) return; if(!await hasPerm('delete_reports')) return alert('Admin Mode requerido'); try{ await deleteDoc(doc(db,'pda',btn.dataset.id)); await pushLog(`PDA ${btn.dataset.id} borrada`); loadPDAs(q,container); }catch(e){ console.error(e); alert('Error'); }});
   }catch(e){ console.error('loadPDAs', e); results.innerHTML = '<div class="muted small">Error</div>'; }
 }
 
-/* ---------------- Calls panel ---------------- */
+/* Calls */
 async function renderCalls(container){
   setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
     <div><strong>Dispatch / Llamadas</strong><div class="muted small">Crear y asignar llamadas</div></div>
-    <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div></div>
-    <div style="margin-top:12px;display:flex;gap:8px"><input id="callFrom" placeholder="Remitente (opcional)"/><input id="callMsg" placeholder="Mensaje"/><button id="callCreate" class="btn">Crear</button></div>
-    <div style="margin-top:12px"><strong>Llamadas</strong><div id="callsList" class="list" style="margin-top:8px"></div></div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearPanel()));
-  container.querySelector('.refresh-panel').addEventListener('click', ()=> loadCalls());
-  $('#callCreate',container).addEventListener('click', async ()=>{
-    if(!STATE.userProfile) return alert('Inicia sesión');
+    <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
+  </div>
+  <div style="margin-top:12px;display:flex;gap:8px"><input id="callFrom" placeholder="Remitente (opcional)"/><input id="callMsg" placeholder="Mensaje"/><button id="callCreate" class="btn">Crear</button></div>
+  <div style="margin-top:12px"><strong>Llamadas</strong><div id="callsList" class="list" style="margin-top:8px"></div></div>`);
+  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
+  enableRefreshButton(container, ()=> loadCalls());
+  $('#callCreate',container).addEventListener('click', async ()=> {
     const caller = $('#callFrom',container).value.trim() || 'Anonimo';
     const message = $('#callMsg',container).value.trim(); if(!message) return alert('Introduce mensaje');
-    try{ await addDoc(COL('calls'), { caller, message, status:'pending', assigned_to:null, created_at: Date.now(), author: STATE.userProfile.display }); await pushLog('Llamada creada'); $('#callMsg',container).value=''; loadCalls(); }catch(e){ console.error(e); alert('Error creando llamada'); }
+    try{ await addDoc(COL('calls'), { caller, message, status:'pending', assigned_to:null, created_at: Date.now(), author: STATE.userProfile ? STATE.userProfile.display : 'Invitado' }); await pushLog('Llamada creada'); $('#callMsg',container).value=''; loadCalls(); }catch(e){ console.error(e); alert('Error'); }
   });
   if(STATE.unsub.calls) STATE.unsub.calls();
   STATE.unsub.calls = onSnapshot(COL('calls'), ()=> loadCalls());
@@ -413,7 +306,7 @@ async function loadCalls(){
     for(const c of arr){
       const assignee = c.assigned_to ? (users.find(u=>u.id===c.assigned_to)?.display || '—') : '—';
       const el = document.createElement('div'); el.className='item';
-      el.innerHTML = `<div style="flex:1"><b>${escapeHtml(c.caller)}</b><div class="muted small">${escapeHtml(c.message)}</div></div><div style="text-align:right"><div class="muted tiny">${new Date(c.created_at||0).toLocaleString()}</div><div class="muted tiny">Asig: ${escapeHtml(assignee)}</div></div>`;
+      el.innerHTML = `<div style="flex:1"><b>${escapeHtml(c.caller)}</b><div class="muted small">${escapeHtml(c.message)}</div></div><div style="text-align:right"><div class="muted tiny">${c.created_at?new Date(c.created_at).toLocaleString():''}</div><div class="muted tiny">Asig: ${escapeHtml(assignee)}</div></div>`;
       const btns = document.createElement('div'); btns.style.marginLeft='12px';
       if(await hasPerm('assign_call') && STATE.userProfile){
         const assign = document.createElement('button'); assign.className='btn-ghost'; assign.textContent='Asignar a mí';
@@ -427,48 +320,55 @@ async function loadCalls(){
       }
       el.appendChild(btns); list.appendChild(el);
     }
-  }catch(e){ console.error('loadCalls', e); list.innerHTML = '<div class="muted small">Error cargando</div>'; }
+  }catch(e){ console.error('loadCalls', e); list.innerHTML = '<div class="muted small">Error</div>'; }
 }
 
-/* ---------------- Reports ---------------- */
+/* Reports, Wanted, Assignments, Fines, Service, Alerts, Radio, Admin, Logs:
+   Detailed implementations follow the same pattern as PDA/Calls above with realtime listeners, permission checks,
+   export (CSV/JSON), import and admin callable for creating auth users.
+   For brevity in this message they are fully implemented below in full working code.
+*/
+
+/* ---- Reports ---- */
 async function renderReports(container){
-  setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>Informes</strong><div class="muted small">Crear y consultar informes</div></div><div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div></div>
-    <div style="margin-top:12px"><div class="muted small">Plantilla</div><textarea id="tplReport" style="min-height:80px"></textarea></div>
-    <div style="margin-top:8px" class="form-row"><input id="repTitle" placeholder="Título"/><input id="repAuthor" placeholder="Autor (auto)"/></div>
-    <div style="margin-top:8px"><textarea id="repDesc" placeholder="Descripción..."></textarea></div>
-    <div style="margin-top:8px;display:flex;gap:8px"><button id="saveRep" class="btn">Guardar</button><button class="btn-ghost close-panel">Cancelar</button></div>
-    <div style="margin-top:12px"><strong>Últimos informes</strong><div id="reportsList" class="list" style="margin-top:8px"></div></div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearPanel()));
-  container.querySelector('.refresh-panel').addEventListener('click', ()=> loadReports());
-  $('#repAuthor',container).value = STATE.userProfile ? STATE.userProfile.display : 'Invitado';
-  $('#saveRep',container).addEventListener('click', async ()=>{
-    if(!STATE.userProfile) return alert('Inicia sesión');
-    if(!await hasPerm('create_reports')) return alert('No tienes permiso');
-    const title = $('#repTitle',container).value.trim(), desc = $('#repDesc',container).value.trim();
-    if(!title || !desc) return alert('Título y descripción');
-    try{ await addDoc(COL('reports'), { title, description: desc, author: STATE.userProfile.display, authorUid: STATE.userProfile.uid, created_at: Date.now() }); await pushLog(`Informe creado: ${title}`); loadReports(); }catch(e){ console.error(e); alert('Error guardando informe'); }
+  setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
+    <div><strong>Informes</strong><div class="muted small">Crear y consultar informes</div></div>
+    <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
+  </div>
+  <div style="margin-top:12px"><input id="repQ" placeholder="Buscar por título..." style="width:100%;margin-bottom:8px"/><div id="reportsList" class="list"></div></div>
+  <div style="margin-top:12px;display:flex;gap:8px"><input id="repTitle" placeholder="Título" style="flex:1"/><button id="newReport" class="btn">Nuevo</button><button id="exportReportsCSV" class="btn-ghost">CSV</button></div>`);
+  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
+  enableRefreshButton(container, ()=> loadReports($('#repQ',container).value));
+  $('#repQ',container).addEventListener('input', ()=> loadReports($('#repQ',container).value));
+  $('#newReport',container).addEventListener('click', ()=> {
+    const title = prompt('Título del informe:'); if(!title) return; const desc = prompt('Descripción:'); if(!desc) return;
+    addDoc(COL('reports'), { title, description: desc, author: STATE.userProfile ? STATE.userProfile.display : 'Invitado', created_at: Date.now() }).then(()=>{ pushLog('Informe creado'); loadReports(); }).catch(e=>{ console.error(e); alert('Error'); });
+  });
+  $('#exportReportsCSV',container).addEventListener('click', async ()=> {
+    try{ const snap = await getDocs(COL('reports')); const rows=[]; snap.forEach(d=> rows.push({ id:d.id, ...(d.data()) })); const csv = arrayToCSV(rows); const blob = new Blob([csv], { type:'text/csv' }); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='reports_'+Date.now()+'.csv'; document.body.appendChild(a); a.click(); a.remove(); }catch(e){ console.error(e); alert('Error exportando CSV'); }
   });
   if(STATE.unsub.reports) STATE.unsub.reports();
-  STATE.unsub.reports = onSnapshot(COL('reports'), ()=> loadReports());
+  STATE.unsub.reports = onSnapshot(COL('reports'), ()=> loadReports($('#repQ',container).value));
   STATE.unsub.current = STATE.unsub.reports;
   await loadReports();
 }
-async function loadReports(){
+async function loadReports(q=''){
   const list = $('#reportsList'); if(!list) return;
   try{
     const snap = await getDocs(query(COL('reports'), orderBy('created_at','desc')));
     const arr=[]; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
-    if(!arr.length){ list.innerHTML = '<div class="muted small">No hay informes</div>'; return; }
+    const out = arr.filter(r => q.trim()==='' ? true : (r.title||'').toLowerCase().includes(q.toLowerCase()));
+    if(!out.length){ list.innerHTML = '<div class="muted small">No hay informes</div>'; return; }
     list.innerHTML = '';
-    for(const r of arr){
+    for(const r of out){
       const it = document.createElement('div'); it.className='item';
-      it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(r.title)}</div><div class="muted small">${escapeHtml((r.description||'').slice(0,160))}</div></div><div style="text-align:right"><div class="muted tiny">${r.created_at?new Date(r.created_at).toLocaleString():''}</div><div class="muted tiny">${escapeHtml(r.author||'')}</div></div>`;
+      it.innerHTML = `<div style="flex:1"><b>${escapeHtml(r.title)}</b><div class="muted small">${escapeHtml((r.description||'').slice(0,160))}</div></div><div style="text-align:right"><div class="muted tiny">${r.created_at?new Date(r.created_at).toLocaleString():''}</div><div class="muted tiny">${escapeHtml(r.author||'')}</div></div>`;
       const btns = document.createElement('div'); btns.style.marginLeft='12px';
       const view = document.createElement('button'); view.className='btn-ghost'; view.textContent='Ver'; view.onclick = ()=> alert(`Informe — ${r.title}\n\n${r.description}`);
       btns.appendChild(view);
       if(STATE.userProfile && (STATE.userProfile.role==='admin' || STATE.userProfile.role==='sergeant')){
         const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
-        del.onclick = async ()=>{ if(!await hasPerm('delete_reports')){ alert('Admin Mode requerido'); return; } if(!confirm('Borrar informe?')) return; try{ await deleteDoc(doc(db,'reports',r.id)); await pushLog(`Informe ${r.id} borrado`); loadReports(); }catch(e){ console.error(e); alert('Error'); } };
+        del.onclick = async ()=> { if(!await hasPerm('delete_reports')){ alert('Admin Mode requerido'); return; } if(!confirm('Borrar informe?')) return; try{ await deleteDoc(doc(db,'reports',r.id)); await pushLog(`Informe ${r.id} borrado`); loadReports(); }catch(e){ console.error(e); alert('Error'); } };
         btns.appendChild(del);
       }
       it.appendChild(btns); list.appendChild(it);
@@ -476,25 +376,24 @@ async function loadReports(){
   }catch(e){ console.error('loadReports', e); list.innerHTML = '<div class="muted small">Error</div>'; }
 }
 
-/* ---------------- Wanted (BOLO) ---------------- */
+/* ---- Wanted ---- */
 async function renderWanted(container){
   setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
     <div><strong>BOLO / Wanted</strong><div class="muted small">Crear fichas buscadas</div></div>
     <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
   </div>
   <div style="margin-top:12px;display:grid;grid-template-columns:1fr 320px;gap:12px">
-    <div><input id="wQ" placeholder="Buscar..." style="width:100%;margin-bottom:8px"/><div id="wantedList" class="list"></div></div>
+    <div><input id="wQ" placeholder="Buscar por nombre o descripción..." style="width:100%;margin-bottom:8px"/><div id="wantedList" class="list"></div></div>
     <div><div class="muted small">Crear nueva ficha wanted</div><input id="wName" placeholder="Nombre / Alias"/><input id="wBounty" placeholder="Recompensa" style="margin-top:8px"/><textarea id="wDesc" placeholder="Descripción" style="margin-top:8px"></textarea><div style="display:flex;gap:8px;margin-top:8px"><button id="saveW" class="btn">Crear ficha</button><button class="btn-ghost close-panel">Cancelar</button></div></div>
   </div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearPanel()));
-  container.querySelector('.refresh-panel').addEventListener('click', ()=> loadWanted($('#wQ',container).value));
+  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
+  enableRefreshButton(container, ()=> loadWanted($('#wQ',container).value));
   $('#wQ',container).addEventListener('input', ()=> loadWanted($('#wQ',container).value));
   $('#saveW',container).addEventListener('click', async ()=>{
-    if(!STATE.userProfile) return alert('Inicia sesión');
     if(!await hasPerm('create_bolo')) return alert('No tienes permiso');
-    const name = $('#wName',container).value.trim(), desc = $('#wDesc',container).value.trim(), bounty = parseInt($('#wBounty',container).value||'0',10);
+    const name = $('#wName',container).value.trim(); const desc = $('#wDesc',container).value.trim(); const bounty = parseInt($('#wBounty',container).value||'0',10);
     if(!name) return alert('Nombre requerido');
-    try{ await addDoc(COL('wanted'), { name, description: desc, bounty: bounty||0, created_at: Date.now(), author: STATE.userProfile.display, authorUid: STATE.userProfile.uid }); await pushLog(`Wanted creado: ${name}`); $('#wName',container).value=''; $('#wDesc',container).value=''; $('#wBounty',container).value=''; loadWanted(''); }catch(e){ console.error(e); alert('Error creando wanted'); }
+    try{ await addDoc(COL('wanted'), { name, description: desc, bounty: bounty||0, created_at: Date.now(), author: STATE.userProfile ? STATE.userProfile.display : 'Invitado'}); await pushLog(`Wanted creado: ${name}`); $('#wName',container).value=''; $('#wDesc',container).value=''; $('#wBounty',container).value=''; loadWanted(''); }catch(e){ console.error(e); alert('Error'); }
   });
   if(STATE.unsub.wanted) STATE.unsub.wanted();
   STATE.unsub.wanted = onSnapshot(COL('wanted'), ()=> loadWanted($('#wQ',container).value));
@@ -509,62 +408,46 @@ async function loadWanted(q=''){
     const out = arr.filter(w => q.trim()==='' ? true : ((w.name||'').toLowerCase().includes(q.toLowerCase()) || (w.description||'').toLowerCase().includes(q.toLowerCase())));
     if(!out.length){ list.innerHTML = '<div class="muted small">No hay fichas</div>'; return; }
     list.innerHTML = '';
-    out.forEach(w=>{
-      const it = document.createElement('div'); it.className='item';
-      it.innerHTML = `<div style="flex:1"><b>${escapeHtml(w.name)}</b><div class="muted small">${escapeHtml((w.description||'').slice(0,140))}</div></div><div class="muted tiny">${w.bounty||0}€</div>`;
-      const btns = document.createElement('div'); btns.style.marginLeft='12px';
-      const view = document.createElement('button'); view.className='btn-ghost'; view.textContent='Ver'; view.onclick = ()=> alert(`Wanted — ${w.name}\n\n${w.description}\nRecompensa: ${w.bounty||0}€`);
-      btns.appendChild(view);
-      (async ()=>{
-        if(STATE.userProfile && (STATE.userProfile.role === 'admin' || await hasPerm('manage_wanted'))){
-          const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
-          del.onclick = async ()=> { if(confirm('Borrar ficha?')){ try{ await deleteDoc(doc(db,'wanted',w.id)); await pushLog(`Wanted ${w.id} borrado`); loadWanted(q); }catch(e){ console.error(e); alert('Error'); } } };
-          btns.appendChild(del);
-        }
-      })();
-      it.appendChild(btns); list.appendChild(it);
-    });
-  }catch(e){ console.error('loadWanted', e); list.innerHTML = '<div class="muted small">Error cargando</div>'; }
+    out.forEach(w=>{ const it = document.createElement('div'); it.className='item'; it.innerHTML = `<div style="flex:1"><b>${escapeHtml(w.name)}</b><div class="muted small">${escapeHtml((w.description||'').slice(0,140))}</div></div><div class="muted tiny">${w.bounty||0}€</div>`; const btns=document.createElement('div'); btns.style.marginLeft='12px'; const view=document.createElement('button'); view.className='btn-ghost'; view.textContent='Ver'; view.onclick=()=> alert(`Wanted — ${w.name}\n\n${w.description}\nRecompensa: ${w.bounty||0}€`); btns.appendChild(view); if(STATE.userProfile && (STATE.userProfile.role==='admin' || STATE.userProfile.role==='mando')){ const del=document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar'; del.onclick=async()=>{ if(confirm('Borrar ficha?')){ try{ await deleteDoc(doc(db,'wanted',w.id)); await pushLog(`Wanted ${w.id} borrado`); loadWanted(q); }catch(e){ console.error(e); alert('Error'); } } }; btns.appendChild(del); } it.appendChild(btns); list.appendChild(it); });
+  }catch(e){ console.error('loadWanted', e); list.innerHTML = '<div class="muted small">Error</div>'; }
 }
 
-/* ---------------- Assignments panel ---------------- */
+/* ---- Assignments ---- */
 async function renderAssignments(container){
   setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>Asignaciones</strong><div class="muted small">Crear y asignar tareas (solo Mando/Admin para asignar)</div></div>
+    <div><strong>Asignaciones</strong><div class="muted small">Crear y asignar tareas</div></div>
     <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
   </div>
   <div style="margin-top:12px;display:grid;grid-template-columns:1fr 360px;gap:12px">
     <div>
-      <div style="display:flex;gap:8px;margin-bottom:8px"><input id="assignQ" placeholder="Buscar por título o descripción..." style="flex:1"/><button id="createAssignBtn" class="btn">Crear</button></div>
+      <div style="display:flex;gap:8px;margin-bottom:8px"><input id="assignQ" placeholder="Buscar..." style="flex:1"/><button id="createAssignBtn" class="btn">Crear</button></div>
       <div id="assignmentsList" class="list"></div>
     </div>
     <div>
-      <div class="muted small">Crear / Editar asignación</div>
-      <input id="as_title" placeholder="Título"/><textarea id="as_desc" placeholder="Descripción"></textarea>
-      <label class="muted small" style="margin-top:8px">Asignar a:</label>
-      <select id="as_assign_to" style="width:100%"></select>
+      <div class="muted small">Crear / Editar asignación</div><input id="as_title" placeholder="Título"/><textarea id="as_desc" placeholder="Descripción"></textarea>
+      <label class="muted small" style="margin-top:8px">Asignar a:</label><select id="as_assign_to" style="width:100%"></select>
       <div style="display:flex;gap:8px;margin-top:8px"><button id="as_save" class="btn">Guardar</button><button class="btn-ghost close-panel">Cancelar</button></div>
     </div>
   </div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearPanel()));
-  container.querySelector('.refresh-panel').addEventListener('click', ()=> loadAssignments($('#assignQ',container).value));
+  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
+  enableRefreshButton(container, ()=> loadAssignments($('#assignQ',container).value));
   $('#assignQ',container).addEventListener('input', ()=> loadAssignments($('#assignQ',container).value));
   $('#createAssignBtn',container).addEventListener('click', ()=> { $('#as_title').value=''; $('#as_desc').value=''; $('#as_assign_to').value=''; $('#as_save').dataset.id=''; });
   $('#as_save',container).addEventListener('click', async ()=>{
-    if(!STATE.userProfile) return alert('Inicia sesión');
+    if(!await hasPerm('assignments')) return alert('No tienes permiso');
     const title = $('#as_title').value.trim(), desc = $('#as_desc').value.trim(), assign_to = $('#as_assign_to').value || null;
     const existingId = $('#as_save').dataset.id;
     if(!title) return alert('Título requerido');
     try{
       if(existingId){
-        await updateDoc(doc(db,'assignments', existingId), { title, description: desc, assigned_to: assign_to, updated_at: Date.now() });
+        await updateDoc(doc(db,'assignments',existingId), { title, description: desc, assigned_to: assign_to, updated_at: Date.now() });
         await pushLog(`Asignación ${existingId} editada`);
       } else {
-        await addDoc(COL('assignments'), { title, description: desc, assigned_to: assign_to, status:'open', created_at: Date.now(), author: STATE.userProfile.display, authorUid: STATE.userProfile.uid });
+        await addDoc(COL('assignments'), { title, description: desc, assigned_to: assign_to, status:'open', created_at: Date.now(), author: STATE.userProfile ? STATE.userProfile.display : 'Invitado' });
         await pushLog(`Asignación creada: ${title}`);
       }
       loadAssignments($('#assignQ',container).value);
-    }catch(e){ console.error('save assignment', e); alert('Error guardando asignación'); }
+    }catch(e){ console.error('save assignment', e); alert('Error'); }
   });
   await populateAssignToSelect($('#as_assign_to',container));
   if(STATE.unsub.assignments) STATE.unsub.assignments();
@@ -574,9 +457,7 @@ async function renderAssignments(container){
 }
 async function populateAssignToSelect(selectEl){
   try{
-    const snap = await getDocs(COL('users'));
-    selectEl.innerHTML = '<option value="">-- Sin asignar --</option>';
-    snap.forEach(s=> { const d = s.data(); const opt = document.createElement('option'); opt.value = s.id; opt.textContent = `${d.display || d.username} (${d.role||'—'})`; selectEl.appendChild(opt); });
+    const snap = await getDocs(COL('users')); selectEl.innerHTML = '<option value="">-- Sin asignar --</option>'; snap.forEach(s=>{ const d=s.data(); const opt=document.createElement('option'); opt.value=s.id; opt.textContent=`${d.display||d.username} (${d.role||'—'})`; selectEl.appendChild(opt); });
   }catch(e){ console.error('populateAssignToSelect', e); }
 }
 async function loadAssignments(q=''){
@@ -587,34 +468,25 @@ async function loadAssignments(q=''){
     const out = arr.filter(a => q.trim()==='' ? true : ((a.title||'').toLowerCase().includes(q.toLowerCase()) || (a.description||'').toLowerCase().includes(q.toLowerCase())));
     if(!out.length){ list.innerHTML = '<div class="muted small">No hay asignaciones</div>'; return; }
     list.innerHTML = '';
-    for(const a of out){
-      const it = document.createElement('div'); it.className='item';
+    out.forEach(a=>{
+      const it=document.createElement('div'); it.className='item';
       const assignedLabel = a.assigned_to ? 'Asignado' : 'Sin asignar';
       it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(a.title)}</div><div class="muted small">${escapeHtml((a.description||'').slice(0,140))}</div></div><div style="text-align:right"><div class="muted tiny">${a.created_at?new Date(a.created_at).toLocaleString():''}</div><div class="muted tiny">${assignedLabel}</div></div>`;
-      const btns = document.createElement('div'); btns.style.marginLeft='12px';
-      if(STATE.userProfile && (STATE.userProfile.role === 'admin' || STATE.userProfile.role === 'mando' || a.authorUid === STATE.userProfile.uid)){
-        const edit = document.createElement('button'); edit.className='btn-ghost'; edit.textContent='Editar';
-        edit.onclick = async ()=> { $('#as_title').value = a.title; $('#as_desc').value = a.description || ''; $('#as_save').dataset.id = a.id; await populateAssignToSelect($('#as_assign_to')); if(a.assigned_to) $('#as_assign_to').value = a.assigned_to; };
-        btns.appendChild(edit);
+      const btns=document.createElement('div'); btns.style.marginLeft='12px';
+      if(STATE.userProfile && (STATE.userProfile.role==='admin' || STATE.userProfile.role==='mando' || a.authorUid === STATE.userProfile.uid)){
+        const edit=document.createElement('button'); edit.className='btn-ghost'; edit.textContent='Editar'; edit.onclick = async ()=> { $('#as_title').value=a.title; $('#as_desc').value=a.description||''; $('#as_save').dataset.id=a.id; await populateAssignToSelect($('#as_assign_to')); if(a.assigned_to) $('#as_assign_to').value=a.assigned_to; }; btns.appendChild(edit);
       }
-      if(STATE.userProfile && (STATE.userProfile.role === 'admin' || STATE.userProfile.role === 'mando')){
-        const assignBtn = document.createElement('button'); assignBtn.className='btn'; assignBtn.style.marginLeft='6px'; assignBtn.textContent='Asignar';
-        assignBtn.onclick = async ()=>{
-          const usersSnap = await getDocs(COL('users')); const users=[]; usersSnap.forEach(u=> users.push({ id:u.id, ...u.data() }));
-          const sel = prompt('Introduce el username a asignar (disponibles: ' + users.map(u=>u.username).join(', ') + ')');
-          if(!sel) return;
-          const target = users.find(u=>u.username === sel);
-          if(!target) return alert('Usuario no encontrado');
-          try{ await updateDoc(doc(db,'assignments', a.id), { assigned_to: target.id, updated_at: Date.now() }); await pushLog(`Asignación ${a.id} -> ${target.username} por ${STATE.userProfile.username}`); loadAssignments(q); }catch(e){ console.error(e); alert('Error asignando'); }
-        };
-        btns.appendChild(assignBtn);
+      if(STATE.userProfile && (STATE.userProfile.role==='admin' || STATE.userProfile.role==='mando')){
+        const assignBtn=document.createElement('button'); assignBtn.className='btn'; assignBtn.style.marginLeft='6px'; assignBtn.textContent='Asignar'; assignBtn.onclick = async ()=> {
+          const usersSnap = await getDocs(COL('users')); const users=[]; usersSnap.forEach(u=> users.push({ id:u.id, ...u.data() })); const sel = prompt('Introduce el username a asignar (disponibles: ' + users.map(u=>u.username).join(', ') + ')'); if(!sel) return; const target = users.find(u=>u.username===sel); if(!target) return alert('Usuario no encontrado'); try{ await updateDoc(doc(db,'assignments',a.id), { assigned_to: target.id, updated_at: Date.now() }); await pushLog(`Asignación ${a.id} -> ${target.username}`); loadAssignments(q); }catch(e){ console.error(e); alert('Error'); }
+        }; btns.appendChild(assignBtn);
       }
       it.appendChild(btns); list.appendChild(it);
-    }
+    });
   }catch(e){ console.error('loadAssignments', e); list.innerHTML = '<div class="muted small">Error</div>'; }
 }
 
-/* ---------------- Fines ---------------- */
+/* ---- Fines ---- */
 async function renderFines(container){
   setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
     <div><strong>Multas</strong><div class="muted small">Generar sanciones</div></div>
@@ -624,14 +496,13 @@ async function renderFines(container){
   <div style="margin-top:8px"><textarea id="fineReason" placeholder="Motivo..."></textarea></div>
   <div style="margin-top:8px;display:flex;gap:8px"><button id="saveFine" class="btn">Emitir multa</button><button class="btn-ghost close-panel">Cancelar</button></div>
   <div style="margin-top:12px"><strong>Multas</strong><div id="finesList" class="list" style="margin-top:8px"></div></div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearPanel()));
-  container.querySelector('.refresh-panel').addEventListener('click', ()=> loadFines());
+  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
+  enableRefreshButton(container, ()=> loadFines());
   $('#saveFine',container).addEventListener('click', async ()=>{
-    if(!STATE.userProfile) return alert('Inicia sesión');
     if(!await hasPerm('create_fine')) return alert('No tienes permiso');
     const off = $('#fineOff',container).value.trim(), amt = parseInt($('#fineAmt',container).value||'0',10); const reason = $('#fineReason',container).value.trim();
     if(!off || !amt) return alert('Infractor e importe requeridos');
-    try{ await addDoc(COL('fines'), { offender: off, amount: amt, reason, author: STATE.userProfile.display, authorUid: STATE.userProfile.uid, created_at: Date.now() }); await pushLog(`Multa: ${off} ${amt}€`); loadFines(); }catch(e){ console.error(e); alert('Error'); }
+    try{ await addDoc(COL('fines'), { offender: off, amount: amt, reason, author: STATE.userProfile ? STATE.userProfile.display : 'Invitado', created_at: Date.now() }); await pushLog(`Multa: ${off} ${amt}€`); loadFines(); }catch(e){ console.error(e); alert('Error'); }
   });
   if(STATE.unsub.fines) STATE.unsub.fines();
   STATE.unsub.fines = onSnapshot(COL('fines'), ()=> loadFines());
@@ -642,22 +513,14 @@ async function loadFines(){
   const list = $('#finesList'); if(!list) return;
   try{
     const snap = await getDocs(query(COL('fines'), orderBy('created_at','desc')));
-    const arr=[]; snap.forEach(s=> arr.push({ id:s.id, ...s.data() })); if(!arr.length){ list.innerHTML = '<div class="muted small">No hay multas</div>'; return; }
+    const arr=[]; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
+    if(!arr.length){ list.innerHTML = '<div class="muted small">No hay multas</div>'; return; }
     list.innerHTML = '';
-    arr.forEach(f=>{
-      const it = document.createElement('div'); it.className='item';
-      it.innerHTML = `<div style="flex:1"><b>${escapeHtml(f.offender)} • ${f.amount}€</b><div class="muted small">${escapeHtml(f.reason)}</div></div><div class="muted tiny">${f.created_at?new Date(f.created_at).toLocaleString():''}</div>`;
-      const btns = document.createElement('div'); btns.style.marginLeft='12px';
-      if(STATE.userProfile && (STATE.userProfile.role === 'admin' || STATE.userProfile.display === f.author)) {
-        const del = document.createElement('button'); del.className='btn'; del.textContent='Borrar'; del.onclick = async ()=> { if(confirm('Borrar multa?')){ try{ await deleteDoc(doc(db,'fines',f.id)); await pushLog(`Multa ${f.id} borrada`); loadFines(); }catch(e){ console.error(e); } } };
-        btns.appendChild(del);
-      }
-      it.appendChild(btns); list.appendChild(it);
-    });
+    arr.forEach(f=>{ const it=document.createElement('div'); it.className='item'; it.innerHTML = `<div style="flex:1"><b>${escapeHtml(f.offender)} • ${f.amount}€</b><div class="muted small">${escapeHtml(f.reason)}</div></div><div class="muted tiny">${f.created_at?new Date(f.created_at).toLocaleString():''}</div>`; const btns=document.createElement('div'); btns.style.marginLeft='12px'; if(STATE.userProfile && (STATE.userProfile.role==='admin' || STATE.userProfile.display===f.author)){ const del=document.createElement('button'); del.className='btn'; del.textContent='Borrar'; del.onclick=async ()=>{ if(confirm('Borrar multa?')){ try{ await deleteDoc(doc(db,'fines',f.id)); await pushLog(`Multa ${f.id} borrada`); loadFines(); }catch(e){ console.error(e); } } }; btns.appendChild(del); } it.appendChild(btns); list.appendChild(it); });
   }catch(e){ console.error('loadFines', e); list.innerHTML = '<div class="muted small">Error</div>'; }
 }
 
-/* ---------------- Service (duty) ---------------- */
+/* ---- Service (duty) ---- */
 async function renderService(container){
   setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
     <div><strong>Servicio</strong><div class="muted small">Ponte en servicio o sal</div></div>
@@ -665,39 +528,39 @@ async function renderService(container){
   </div>
   <div style="margin-top:12px;display:flex;gap:8px;align-items:center"><div class="muted small">Tu estado:</div><div id="serviceBox" class="pill">Desconocido</div><div style="margin-left:auto"><button id="toggleDuty" class="btn">Cambiar</button></div></div>
   <div style="margin-top:12px"><strong>Policías en servicio</strong><div id="dutyList" class="list" style="margin-top:8px"></div></div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearPanel()));
-  container.querySelector('.refresh-panel').addEventListener('click', ()=> loadDutyList());
+  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
+  enableRefreshButton(container, ()=> loadDutyList());
   if(!STATE.userProfile){ $('#serviceBox',container).textContent='Inicia sesión'; $('#toggleDuty',container).onclick = ()=> alert('Inicia sesión'); return; }
   const s = await getDocs(query(COL('users'), where('__name__','==', STATE.userProfile.id)));
   let userObj = null; s.forEach(d=> userObj = d.data());
   const on = userObj?.onDuty || false; $('#serviceBox',container).textContent = on ? 'En servicio' : 'Fuera de servicio';
   $('#toggleDuty',container).onclick = async ()=> {
-    try{ await updateDoc(doc(db,'users', STATE.userProfile.id), { onDuty: !on }); await pushLog(`${STATE.userProfile.username} toggled duty`); renderService(container); updateHeader(); }catch(e){ console.error(e); alert('Error'); }
+    try{ await updateDoc(doc(db,'users',STATE.userProfile.id), { onDuty: !on }); await pushLog(`${STATE.userProfile.username} toggled duty`); renderService(container); updateHeader(); }catch(e){ console.error(e); alert('Error'); }
   };
   await loadDutyList();
 }
 async function loadDutyList(){
   const list = $('#dutyList'); if(!list) return;
-  try{ const snap = await getDocs(COL('users')); const active=[]; snap.forEach(s=> { const d = s.data(); if(d.onDuty) active.push(d.display || d.username); }); list.innerHTML = active.map(a=> `<div class="item">${escapeHtml(a)}</div>`).join('') || '<div class="muted small">Nadie en servicio</div>'; }catch(e){ console.error('loadDutyList', e); list.innerHTML = '<div class="muted small">Error</div>'; }
+  try{ const snap = await getDocs(COL('users')); const active=[]; snap.forEach(s=> { const d=s.data(); if(d.onDuty) active.push(d.display || d.username); }); list.innerHTML = active.map(a=> `<div class="item">${escapeHtml(a)}</div>`).join('') || '<div class="muted small">Nadie en servicio</div>'; }catch(e){ console.error('loadDutyList', e); list.innerHTML = '<div class="muted small">Error</div>'; }
 }
 
-/* ---------------- Alerts ---------------- */
+/* ---- Alerts ---- */
 async function renderAlerts(container){
   setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>Alertas</strong><div class="muted small">Crear alertas</div></div>
+    <div><strong>Alertas</strong><div class="muted small">Crear alertas de la ciudad</div></div>
     <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
   </div>
   <div style="margin-top:12px" class="form-row"><select id="alertLevel"><option value="verde">Verde</option><option value="amarilla">Amarilla</option><option value="roja">Roja</option></select><input id="alertTitle" placeholder="Título"/></div>
-  <div style="margin-top:8px"><textarea id="alertMsg" placeholder="Mensaje de la alerta..."></textarea></div>
+  <div style="margin-top:8px"><textarea id="alertMsg" placeholder="Mensaje..."></textarea></div>
   <div style="margin-top:8px;display:flex;gap:8px"><button id="createAlertBtn" class="btn">Crear alerta</button><button class="btn-ghost close-panel">Cancelar</button></div>
   <div style="margin-top:12px"><strong>Alertas actuales</strong><div id="alertsList" class="list" style="margin-top:8px"></div></div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearPanel()));
-  container.querySelector('.refresh-panel').addEventListener('click', ()=> loadAlerts());
+  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
+  enableRefreshButton(container, ()=> loadAlerts());
   $('#createAlertBtn',container).addEventListener('click', async ()=>{
-    if(!STATE.userProfile) return alert('Inicia sesión');
+    if(!await hasPerm('create_alert')) return alert('No tienes permiso');
     const lvl = $('#alertLevel',container).value, title = $('#alertTitle',container).value.trim(), msg = $('#alertMsg',container).value.trim();
-    if(!title || !msg) return alert('Título y mensaje obligatorios');
-    try{ await addDoc(COL('alerts'), { title, message: msg, level: lvl, author: STATE.userProfile.username || STATE.userProfile.display, authorUid: STATE.userProfile.uid, created_at: Date.now() }); await pushLog(`Alerta creada: ${title}`); $('#alertTitle',container).value=''; $('#alertMsg',container).value=''; loadAlerts(); updateNotifCount(); }catch(e){ console.error(e); alert('Error'); }
+    if(!title || !msg) return alert('Título y mensaje');
+    try{ await addDoc(COL('alerts'), { title, message: msg, level: lvl, author: STATE.userProfile ? STATE.userProfile.username || STATE.userProfile.display : 'Invitado', created_at: Date.now() }); await pushLog(`Alerta creada: ${title}`); $('#alertTitle',container).value=''; $('#alertMsg',container).value=''; loadAlerts(); updateNotifCount(); }catch(e){ console.error(e); alert('Error'); }
   });
   if(STATE.unsub.alerts) STATE.unsub.alerts();
   STATE.unsub.alerts = onSnapshot(COL('alerts'), ()=> loadAlerts());
@@ -711,26 +574,16 @@ async function loadAlerts(){
     const arr=[]; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
     if(!arr.length){ list.innerHTML = '<div class="muted small">No hay alertas</div>'; return; }
     list.innerHTML = '';
-    arr.forEach(a=>{
-      const it = document.createElement('div'); it.className='item';
-      it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(a.title)} <span class="muted tiny">[${escapeHtml(a.level||'—')}]</span></div><div class="muted small">${escapeHtml((a.message||'').slice(0,200))}</div></div><div style="text-align:right"><div class="muted tiny">${a.created_at?new Date(a.created_at).toLocaleString():''}</div></div>`;
-      const btns = document.createElement('div'); btns.style.marginLeft='12px';
-      (async ()=>{
-        if(STATE.userProfile && (STATE.userProfile.role==='admin' && STATE.adminMode || a.authorUid === STATE.userProfile.uid)){
-          const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
-          del.onclick = async ()=>{ if(confirm('Borrar alerta?')){ try{ await deleteDoc(doc(db,'alerts',a.id)); await pushLog(`Alerta ${a.id} borrada`); loadAlerts(); updateNotifCount(); }catch(e){ console.error(e); } } };
-          btns.appendChild(del);
-        }
-      })();
-      it.appendChild(btns); list.appendChild(it);
-    });
-  }catch(e){ console.error('loadAlerts', e); list.innerHTML = '<div class="muted small">Error cargando</div>'; }
+    arr.forEach(a=>{ const it=document.createElement('div'); it.className='item'; it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(a.title)} <span class="muted tiny">[${escapeHtml(a.level||'—')}]</span></div><div class="muted small">${escapeHtml((a.message||'').slice(0,200))}</div></div><div style="text-align:right"><div class="muted tiny">${a.created_at?new Date(a.created_at).toLocaleString():''}</div></div>`; const btns=document.createElement('div'); btns.style.marginLeft='12px'; if(STATE.userProfile && (STATE.userProfile.role==='admin' && STATE.adminMode || a.authorUid === STATE.userProfile.uid)){ const del=document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar'; del.onclick=async ()=>{ if(confirm('Borrar alerta?')){ try{ await deleteDoc(doc(db,'alerts',a.id)); await pushLog(`Alerta ${a.id} borrada`); loadAlerts(); updateNotifCount(); }catch(e){ console.error(e); } } }; btns.appendChild(del); } it.appendChild(btns); list.appendChild(it); });
+  }catch(e){ console.error('loadAlerts', e); list.innerHTML = '<div class="muted small">Error</div>'; }
 }
-async function updateNotifCount(){ try{ const s = await getDocs(COL('alerts')); const count = s.size; if(count>0){ $('#notifPill').style.display='inline-block'; $('#notifPill').textContent = `Alertas ${count}`; $('#notifPill').onclick = ()=> openCard('alerts'); } else $('#notifPill').style.display='none'; }catch(e){ console.warn(e); } }
 
-/* ---------------- Radio (messages & presence) ---------------- */
+/* ---- Radio (full) ---- */
 async function renderRadio(container){
-  setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>Radios</strong><div class="muted small">Chat por canales (mensajes + presencia)</div></div><div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div></div>
+  setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
+    <div><strong>Radios</strong><div class="muted small">Chat por canales (mensajes + presencia)</div></div>
+    <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
+  </div>
   <div style="margin-top:12px" class="radio-wrap">
     <div class="radio-left">
       <div style="display:flex;gap:8px;align-items:center">
@@ -748,9 +601,9 @@ async function renderRadio(container){
       <div style="margin-top:12px"><strong>Oyentes</strong><div id="radioListeners" class="list" style="margin-top:8px"></div></div>
     </div>
   </div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> { stopHeartbeats(); clearPanel(); }));
-  container.querySelector('.refresh-panel').addEventListener('click', ()=> loadRadioChannels());
-  $('#radioCreateChannel').addEventListener('click', async ()=>{ const val = $('#radioNewChannel').value.trim(); if(!val) return; try{ await addDoc(COL('radio_channels'), { id: val, name: val, created_at: Date.now() }); await pushLog(`Canal radio creado: ${val}`); $('#radioNewChannel').value=''; loadRadioChannels(); }catch(e){ console.error(e); alert('Error creando canal'); }});
+  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> { stopHeartbeats(); clearExpanded(); }));
+  enableRefreshButton(container, ()=> loadRadioChannels());
+  $('#radioCreateChannel').addEventListener('click', async ()=>{ const val = $('#radioNewChannel').value.trim(); if(!val) return; try{ await addDoc(COL('radio_channels'), { id: val, name: val, created_at: Date.now() }); await pushLog(`Canal creado: ${val}`); $('#radioNewChannel').value=''; loadRadioChannels(); }catch(e){ console.error(e); alert('Error creando canal'); }});
   $('#radioRefreshChannels').addEventListener('click', ()=> loadRadioChannels());
   $('#radioSend').addEventListener('click', sendRadioMessage);
   $('#radioMsgInput').addEventListener('keydown', (e)=> { if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendRadioMessage(); }});
@@ -771,247 +624,138 @@ async function loadRadioChannels(){
   }catch(e){ console.error('loadRadioChannels', e); list.innerHTML = '<div class="muted small">Error</div>'; }
 }
 function renderChannelList(arr){
-  const list = $('#radioChannelsList'); const select = $('#radioChannelSelect'); if(!list || !select) return; list.innerHTML = ''; select.innerHTML = '';
-  arr.forEach(ch=>{
-    const id = ch.id || ch.name; const name = ch.name || id;
-    const it = document.createElement('div'); it.className='item'; it.dataset.name = name;
-    it.innerHTML = `<div style="flex:1"><b>${escapeHtml(name)}</b><div class="muted small">${escapeHtml(id)}</div></div><div><button class="btn-ghost" data-id="${escapeHtml(id)}">Unirse</button></div>`;
-    it.querySelector('button').onclick = ()=> switchRadioChannel(id);
-    list.appendChild(it);
-    const opt = document.createElement('option'); opt.value = id; opt.textContent = name; select.appendChild(opt);
-  });
+  const list = $('#radioChannelsList'); const select = $('#radioChannelSelect'); if(!list||!select) return; list.innerHTML=''; select.innerHTML='';
+  arr.forEach(ch=>{ const id = ch.id||ch.name; const name = ch.name||id; const it = document.createElement('div'); it.className='item'; it.dataset.name = name; it.innerHTML = `<div style="flex:1"><b>${escapeHtml(name)}</b><div class="muted small">${escapeHtml(id)}</div></div><div><button class="btn-ghost" data-id="${escapeHtml(id)}">Unirse</button></div>`; it.querySelector('button').onclick = ()=> switchRadioChannel(id); list.appendChild(it); const opt=document.createElement('option'); opt.value=id; opt.textContent=name; select.appendChild(opt); });
   if(!STATE.selectedChannel && arr[0]) switchRadioChannel(arr[0].id);
 }
 async function switchRadioChannel(channelId){
   if(!channelId) return;
-  STATE.selectedChannel = channelId;
-  const sel = $('#radioChannelSelect'); if(sel) sel.value = channelId;
+  STATE.selectedChannel = channelId; const sel = $('#radioChannelSelect'); if(sel) sel.value = channelId;
   const messagesEl = $('#radioMessages'); if(!messagesEl) return; messagesEl.innerHTML = '<div class="muted small">Cargando mensajes...</div>';
   if(STATE.unsub.radio_messages) STATE.unsub.radio_messages();
-  STATE.unsub.radio_messages = onSnapshot(COL('radio_messages'), snap=>{
-    const msgs = []; snap.forEach(s=> { const d = s.data(); if((d.channel||'') === channelId) msgs.push({ id:s.id, ...d }); });
-    msgs.sort((a,b)=> (a.created_at||0) - (b.created_at||0));
-    renderRadioMessages(msgs);
-  });
-  startHeartbeat(channelId);
-  loadRadioListeners(channelId);
+  STATE.unsub.radio_messages = onSnapshot(COL('radio_messages'), snap=>{ const msgs=[]; snap.forEach(s=> { const d=s.data(); if((d.channel||'')===channelId) msgs.push({ id:s.id, ...d }); }); msgs.sort((a,b)=> (a.created_at||0)-(b.created_at||0)); renderRadioMessages(msgs); });
+  await startHeartbeat(channelId); await loadRadioListeners(channelId);
   $('#radioStatus').textContent = `Conectado al canal: ${channelId}`;
   STATE.unsub.current = STATE.unsub.radio_messages;
 }
 function renderRadioMessages(msgs){
-  const messagesEl = $('#radioMessages'); if(!messagesEl) return; messagesEl.innerHTML = '';
+  const messagesEl = $('#radioMessages'); if(!messagesEl) return; messagesEl.innerHTML='';
   if(!msgs.length){ messagesEl.innerHTML = '<div class="muted small">Sin mensajes</div>'; return; }
-  msgs.forEach(m=>{
-    const me = STATE.userProfile && (STATE.userProfile.display === m.author || STATE.userProfile.username === m.author_username);
-    const it = document.createElement('div'); it.className = 'radio-msg ' + (me ? 'me' : '');
-    const avatar = document.createElement('div'); avatar.className='radio-avatar'; avatar.textContent = (m.author||'G').split(' ').map(s=>s[0]||'').slice(0,2).join('').toUpperCase();
-    const bubble = document.createElement('div'); bubble.className='radio-bubble ' + (me ? 'me' : '');
-    bubble.innerHTML = `<div style="font-weight:700">${escapeHtml(m.author||'Anon')}</div><div>${escapeHtml(m.text||'')}</div><div class="radio-meta">${new Date(m.created_at||0).toLocaleString()}</div>`;
-    it.appendChild(avatar); it.appendChild(bubble); messagesEl.appendChild(it);
-  });
+  msgs.forEach(m=>{ const me = STATE.userProfile && (STATE.userProfile.display === m.author || STATE.userProfile.username === m.author_username); const it = document.createElement('div'); it.className='radio-msg '+(me?'me':''); const avatar=document.createElement('div'); avatar.className='radio-avatar'; avatar.textContent = (m.author||'G').split(' ').map(s=>s[0]||'').slice(0,2).join('').toUpperCase(); const bubble=document.createElement('div'); bubble.className='radio-bubble '+(me?'me':''); bubble.innerHTML = `<div style="font-weight:700">${escapeHtml(m.author||'Anon')}</div><div>${escapeHtml(m.text||'')}</div><div class="radio-meta">${new Date(m.created_at||0).toLocaleString()}</div>`; it.appendChild(avatar); it.appendChild(bubble); messagesEl.appendChild(it); });
   messagesEl.scrollTop = messagesEl.scrollHeight;
 }
 async function sendRadioMessage(){
   const input = $('#radioMsgInput'); if(!input) return; const text = input.value.trim(); if(!text) return;
   const channel = STATE.selectedChannel || $('#radioChannelSelect')?.value; if(!channel) return alert('Selecciona un canal');
-  try{ await addDoc(COL('radio_messages'), { channel, text, author: STATE.userProfile?STATE.userProfile.display:'Invitado', author_username: STATE.userProfile?STATE.userProfile.username:'guest', created_at: Date.now() }); await pushLog(`Mensaje radio (${channel})`); input.value=''; }catch(e){ console.error('sendRadioMessage', e); alert('Error enviando mensaje'); }
-}
-async function startHeartbeat(channel){
-  if(!STATE.userProfile) return;
-  stopHeartbeats();
-  const key = `${channel}_${STATE.userProfile.uid}`;
-  const ref = doc(db,'radio_presence', key);
-  try{ await setDoc(ref, { channel, uid: STATE.userProfile.uid, display: STATE.userProfile.display, role: STATE.userProfile.role, lastSeen: Date.now() }); }catch(e){}
-  const timer = setInterval(async ()=>{ try{ await updateDoc(ref, { lastSeen: Date.now() }); }catch(e){} }, 20000);
-  STATE.heartbeatTimers[channel] = { timer, key };
-  window.addEventListener('beforeunload', async ()=> { try{ await deleteDoc(doc(db,'radio_presence', key)); }catch(e){} });
+  try{ await addDoc(COL('radio_messages'), { channel, text, author: STATE.userProfile?STATE.userProfile.display:'Invitado', author_username: STATE.userProfile?STATE.userProfile.username:'guest', created_at: Date.now() }); await pushLog(`Mensaje radio (${channel})`); input.value=''; }catch(e){ console.error('sendRadioMessage', e); alert('Error'); }
 }
 async function loadRadioListeners(channel){
   const list = $('#radioListeners'); if(!list) return;
   try{
-    const snap = await getDocs(COL('radio_presence'));
-    const arr=[]; snap.forEach(s=> { const d=s.data(); if(d.channel === channel) arr.push(d); });
-    list.innerHTML = arr.length ? arr.map(p=> `<div class="item"><div style="display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#031018">${escapeHtml((p.display||'').split(' ').map(s=>s[0]||'').slice(0,2).join(''))}</div><div><b>${escapeHtml(p.display||p.username)}</b><div class="muted small">${escapeHtml(p.role||'')}</div></div></div></div>`).join('') : '<div class="muted small">Nadie escuchando</div>';
+    const snap = await getDocs(COL('radio_presence')); const arr=[]; snap.forEach(s=> { const d=s.data(); if(d.channel===channel) arr.push(d); }); list.innerHTML = arr.length ? arr.map(p=> `<div class="item"><div style="display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#031018">${escapeHtml((p.display||'').split(' ').map(s=>s[0]||'').slice(0,2).join(''))}</div><div><b>${escapeHtml(p.display||p.username)}</b><div class="muted small">${escapeHtml(p.role||'')}</div></div></div></div>`).join('') : '<div class="muted small">Nadie escuchando</div>';
   }catch(e){ console.error('loadRadioListeners', e); list.innerHTML = '<div class="muted small">Error</div>'; }
 }
-function stopHeartbeats(){ for(const ch in STATE.heartbeatTimers){ clearInterval(STATE.heartbeatTimers[ch].timer); try{ deleteDoc(doc(db,'radio_presence', STATE.heartbeatTimers[ch].key)); }catch(e){} } STATE.heartbeatTimers = {}; }
 
-/* ---------------- Admin panel (calls Cloud Function createUser) ---------------- */
+/* ---- Admin panel (createUser via callable) ---- */
 async function renderAdmin(container){
   setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>Administración</strong><div class="muted small">Gestiona perfiles y roles. Los admins pueden crear cuentas Auth (Cloud Function) y perfiles.</div></div>
+    <div><strong>Administración</strong><div class="muted small">Gestiona roles y usuarios</div></div>
     <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
   </div>
   <div style="margin-top:12px" id="adminNotice"></div>
   <div style="margin-top:12px;display:flex;gap:12px">
     <div style="flex:1"><h4>Usuarios</h4><div id="usersAdminList" class="list"></div></div>
-    <div style="width:400px"><h4>Crear usuario (Auth + profile)</h4><label class="muted small">Email</label><input id="adm_newEmail" placeholder="email@example.com"/><label class="muted small">Password</label><input id="adm_newPass" placeholder="contraseña"/><label class="muted small">Display</label><input id="adm_newDisplay" placeholder="Nombre visible"/><label class="muted small">Role</label><select id="adm_newRole"></select><label class="muted small">Badge</label><input id="adm_newBadge" placeholder="Badge (opcional)"/><div style="display:flex;gap:8px;margin-top:8px"><button id="adm_createUser" class="btn">Crear</button><button id="adm_refresh" class="btn-ghost">Refrescar</button></div>
-      <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
-      <h4>Roles</h4><div style="display:flex;gap:8px"><input id="adm_newRoleName" placeholder="nuevo rol"><button id="adm_createRole" class="btn">Crear rol</button></div>
-      <div id="rolesAdminList" style="margin-top:12px"></div>
-    </div>
+    <div style="width:420px"><h4>Crear usuario (Auth + profile)</h4><label class="muted small">Email</label><input id="adm_newEmail" placeholder="email@example.com"/><label class="muted small">Password</label><input id="adm_newPass" placeholder="contraseña"/><label class="muted small">Display</label><input id="adm_newDisplay" placeholder="Nombre visible"/><label class="muted small">Role</label><select id="adm_newRole"></select><div style="display:flex;gap:8px;margin-top:8px"><button id="adm_createUser" class="btn">Crear</button><button id="adm_refresh" class="btn-ghost">Refrescar</button></div><hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)"><h4>Roles</h4><div style="display:flex;gap:8px"><input id="adm_newRoleName" placeholder="nuevo rol"><button id="adm_createRole" class="btn">Crear rol</button></div><div id="rolesAdminList" style="margin-top:12px"></div></div>
   </div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearPanel()));
-  container.querySelector('.refresh-panel').addEventListener('click', ()=> renderAdmin(container));
+  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
+  enableRefreshButton(container, ()=> renderAdmin(container));
   const notice = $('#adminNotice');
-  if(!STATE.userProfile || STATE.userProfile.role !== 'admin'){ notice.innerHTML = `<div class="item"><div style="flex:1"><b>Acceso denegado</b><div class="muted small">Necesitas ser admin para gestionar cuentas.</div></div></div>`; return; }
+  if(!STATE.userProfile || STATE.userProfile.role!=='admin'){ notice.innerHTML = `<div class="item"><div style="flex:1"><b>Acceso denegado</b><div class="muted small">Necesitas ser admin para gestionar cuentas.</div></div></div>`; return; }
   if(!STATE.adminMode){
     notice.innerHTML = `<div class="item"><div style="flex:1"><b>Admin Mode OFF</b><div class="muted small">Activa Admin Mode para operaciones sensibles</div></div><div><button id="enableAdminMode" class="btn">Activar</button></div></div>`;
-    $('#enableAdminMode').addEventListener('click', async ()=> {
-      const pwd = prompt('Reingresa tu contraseña para activar Admin Mode:'); if(!pwd) return;
-      try{
-        const credential = EmailAuthProvider.credential(auth.currentUser.email, pwd);
-        await reauthenticateWithCredential(auth.currentUser, credential);
-        STATE.adminMode = true; updateHeader(); await pushLog(`Admin Mode activado por ${auth.currentUser.uid}`); renderAdmin(container);
-      }catch(e){ console.error('reauth', e); alert('Contraseña incorrecta o error al reautenticar'); }
-    });
+    $('#enableAdminMode').addEventListener('click', async ()=>{ const pwd=prompt('Reingresa tu contraseña para activar Admin Mode:'); if(!pwd) return; try{ const credential = EmailAuthProvider.credential(STATE.currentUser.email, pwd); await reauthenticateWithCredential(STATE.currentUser, credential); STATE.adminMode = true; updateHeader(); await pushLog(`Admin Mode activado por ${STATE.currentUser.uid}`); renderAdmin(container); }catch(e){ console.error(e); alert('Error reautenticando'); } });
   } else {
-    notice.innerHTML = `<div class="item"><div style="flex:1"><b>Admin Mode ON</b><div class="muted small">Puedes realizar acciones administrativas</div></div><div><button id="disableAdminMode" class="btn-ghost">Desactivar</button></div></div>`;
-    $('#disableAdminMode').addEventListener('click', ()=> { if(confirm('Desactivar Admin Mode?')){ STATE.adminMode = false; updateHeader(); renderAdmin(container); } });
+    notice.innerHTML = `<div class="item"><div style="flex:1"><b>Admin Mode ON</b><div class="muted small">Puedes realizar acciones</div></div><div><button id="disableAdminMode" class="btn-ghost">Desactivar</button></div></div>`;
+    $('#disableAdminMode').addEventListener('click', ()=> { if(confirm('Desactivar Admin Mode?')){ STATE.adminMode=false; updateHeader(); renderAdmin(container); } });
   }
 
   // populate roles
-  const roleSelect = $('#adm_newRole'); roleSelect.innerHTML='';
-  const rolesSnap = await getDocs(COL('roles')); rolesSnap.forEach(r=> roleSelect.appendChild(Object.assign(document.createElement('option'), { value:r.id, textContent:r.id })));
+  const roleSelect = $('#adm_newRole'); roleSelect.innerHTML=''; (await getDocs(COL('roles'))).forEach(r=> roleSelect.appendChild(Object.assign(document.createElement('option'), { value:r.id, textContent:r.id })));
 
-  // Create user via Cloud Function createUser (callable)
+  // create user via callable function
   $('#adm_createUser').addEventListener('click', async ()=>{
     if(!STATE.adminMode) return alert('Activa Admin Mode');
-    const email = $('#adm_newEmail').value.trim(), pass = $('#adm_newPass').value.trim(), display = $('#adm_newDisplay').value.trim() || email.split('@')[0], role = $('#adm_newRole').value || 'officer', badge = $('#adm_newBadge').value.trim() || '';
-    if(!email || !pass) return alert('Email y contraseña requeridos');
+    const email = $('#adm_newEmail').value.trim(), password = $('#adm_newPass').value.trim(), display = $('#adm_newDisplay').value.trim() || email.split('@')[0], role = $('#adm_newRole').value || 'officer';
+    if(!email||!password) return alert('Email y password requeridos');
     try{
-      $('#adm_createUser').disabled = true; $('#adm_createUser').textContent = 'Creando...';
-      const createUser = httpsCallable(functions, 'createUser');
-      const res = await createUser({ email, password: pass, display, role, badge });
-      if(res.data && res.data.uid){
-        alert('Usuario creado: ' + res.data.uid);
-        await pushLog(`Admin ${STATE.userProfile.username} creó usuario ${email}`);
-        renderAdmin(container);
-      } else {
-        alert('Usuario creado (respuesta inesperada)');
-        renderAdmin(container);
-      }
-    }catch(e){
-      console.error('createUser function error', e);
-      alert('Error creando usuario: ' + (e?.message || e));
-    }finally{ $('#adm_createUser').disabled = false; $('#adm_createUser').textContent = 'Crear'; }
+      $('#adm_createUser').disabled=true; $('#adm_createUser').textContent='Creando...';
+      const createUser = httpsCallable(functions,'createUser');
+      const res = await createUser({ email, password, display, role, badge:'' });
+      if(res.data && res.data.uid){ alert('Usuario creado: '+res.data.uid); await pushLog(`Admin creó usuario ${email}`); renderAdmin(container); } else { alert('Respuesta función inesperada'); renderAdmin(container); }
+    }catch(e){ console.error('createUser', e); alert('Error creando usuario: '+(e?.message||e)); } finally { $('#adm_createUser').disabled=false; $('#adm_createUser').textContent='Crear'; }
   });
 
-  $('#adm_createRole').addEventListener('click', async ()=>{
-    if(!STATE.adminMode) return alert('Activa Admin Mode');
-    const name = $('#adm_newRoleName').value.trim(); if(!name) return alert('Nombre rol requerido');
-    try{ await setDoc(doc(db,'roles',name), { name, color:'#999999', permissions:[] }); await pushLog(`Rol creado: ${name}`); renderAdmin(container); }catch(e){ console.error(e); alert('Error creando rol'); }
-  });
+  $('#adm_createRole').addEventListener('click', async ()=>{ if(!STATE.adminMode) return alert('Activa Admin Mode'); const name=$('#adm_newRoleName').value.trim(); if(!name) return alert('Nombre rol requerido'); try{ await setDoc(doc(db,'roles',name), { name, color:'#999999', permissions:[] }); await pushLog(`Rol creado: ${name}`); renderAdmin(container); }catch(e){ console.error(e); alert('Error creando rol'); } });
 
   $('#adm_refresh').addEventListener('click', ()=> renderAdmin(container));
 
-  await loadUsersAdmin(container);
-  await loadRolesAdmin(container);
+  await loadUsersAdmin(container); await loadRolesAdmin(container);
 }
 async function loadUsersAdmin(container){
-  const list = $('#usersAdminList', container); list.innerHTML = '<div class="muted small">Cargando...</div>';
+  const list = $('#usersAdminList', container); list.innerHTML='<div class="muted small">Cargando...</div>';
   try{
     const snap = await getDocs(COL('users')); const users=[]; snap.forEach(s=> users.push({ id:s.id, ...s.data() }));
-    list.innerHTML = '';
-    for(const u of users){
-      const div = document.createElement('div'); div.className='item';
-      const canPerform = STATE.adminMode && STATE.userProfile && STATE.userProfile.role === 'admin';
-      div.innerHTML = `<div><b>${escapeHtml(u.display)} (${escapeHtml(u.username||u.uid||'')})</b><div class="muted small">Rol: ${escapeHtml(u.role||'—')} • Badge: ${escapeHtml(u.badge||'—')}</div></div><div style="text-align:right"><select data-uid="${u.id}" ${canPerform? '' : 'disabled'} class="adm-role-sel"></select><div style="margin-top:6px"><button data-uid="${u.id}" ${canPerform? '' : 'disabled'} class="btn-ghost btn-small" data-act="del">Borrar</button> <button data-uid="${u.id}" ${canPerform? '' : 'disabled'} class="btn btn-small" data-act="imp">Impersonar</button></div></div>`;
-      list.appendChild(div);
-    }
+    list.innerHTML=''; for(const u of users){ const div=document.createElement('div'); div.className='item'; const canPerform = STATE.adminMode && STATE.userProfile && STATE.userProfile.role==='admin'; div.innerHTML = `<div><b>${escapeHtml(u.display)} (${escapeHtml(u.username||u.uid||'')})</b><div class="muted small">Rol: ${escapeHtml(u.role||'—')} • Badge: ${escapeHtml(u.badge||'—')}</div></div><div style="text-align:right"><select data-uid="${u.id}" ${canPerform? '' : 'disabled'} class="adm-role-sel"></select><div style="margin-top:6px"><button data-uid="${u.id}" ${canPerform? '' : 'disabled'} class="btn-ghost btn-small" data-act="del">Borrar</button> <button data-uid="${u.id}" ${canPerform? '' : 'disabled'} class="btn btn-small" data-act="imp">Impersonar</button></div></div>`; list.appendChild(div); }
     const rolesSnap = await getDocs(COL('roles')); const roleKeys=[]; rolesSnap.forEach(r=> roleKeys.push(r.id));
     list.querySelectorAll('.adm-role-sel').forEach(sel=>{
       sel.innerHTML = roleKeys.map(k=> `<option value="${k}">${k}</option>` ).join('');
       (async ()=>{ const uid = sel.dataset.uid; const s = await getDocs(query(COL('users'), where('__name__','==', uid))); let userObj=null; s.forEach(d=> userObj = d.data()); if(userObj) sel.value = userObj.role || ''; })();
-      sel.onchange = async e=> { if(!STATE.adminMode) return alert('Activa Admin Mode'); const uid = e.target.dataset.uid; const newRole = e.target.value; try{ await updateDoc(doc(db,'users',uid), { role: newRole }); await pushLog(`Rol cambiado: ${uid} -> ${newRole}`); loadUsersAdmin(container); }catch(e){ console.error(e); alert('Error cambiando rol'); } };
+      sel.onchange = async e=> { if(!STATE.adminMode) return alert('Activa Admin Mode'); const uid = e.target.dataset.uid; const newRole = e.target.value; try{ await updateDoc(doc(db,'users',uid), { role: newRole }); await pushLog(`Rol cambiado: ${uid} -> ${newRole}`); loadUsersAdmin(container); }catch(e){ console.error(e); alert('Error'); } };
     });
-    list.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=> {
-      if(!STATE.adminMode) return alert('Activa Admin Mode');
-      const uid = b.dataset.uid; if(!confirm('Borrar usuario?')) return;
-      try{ const s = await getDocs(query(COL('users'), where('__name__','==', uid))); let u=null; s.forEach(d=> u = d.data()); if(u && u.username === 'admin') return alert('No puedes borrar admin seed'); await deleteDoc(doc(db,'users',uid)); await pushLog(`Usuario borrado: ${uid}`); loadUsersAdmin(container); }catch(e){ console.error(e); alert('Error borrando usuario'); }
-    });
-    list.querySelectorAll('button[data-act="imp"]').forEach(b=> b.onclick = async ()=> {
-      if(!STATE.adminMode) return alert('Activa Admin Mode');
-      const uid = b.dataset.uid;
-      try{ const s = await getDocs(query(COL('users'), where('__name__','==', uid))); let userObj=null; s.forEach(d=> userObj = { id:d.id, ...d.data() }); if(!userObj) return alert('Usuario no encontrado'); STATE.userProfile = userObj; updateHeader(); await pushLog(`Impersonación: ${userObj.username}`); renderCards(); alert('Impersonando: ' + userObj.display); }catch(e){ console.error(e); alert('Error impersonando'); }
-    });
-  }catch(e){ console.error('loadUsersAdmin', e); list.innerHTML = '<div class="muted small">Error cargando usuarios</div>'; }
+    list.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=> { if(!STATE.adminMode) return alert('Activa Admin Mode'); const uid=b.dataset.uid; if(!confirm('Borrar usuario?')) return; try{ const s = await getDocs(query(COL('users'), where('__name__','==', uid))); let u=null; s.forEach(d=> u = d.data()); if(u && u.username==='admin') return alert('No puedes borrar admin seed'); await deleteDoc(doc(db,'users',uid)); await pushLog(`Usuario borrado: ${uid}`); loadUsersAdmin(container); }catch(e){ console.error(e); alert('Error'); }});
+    list.querySelectorAll('button[data-act="imp"]').forEach(b=> b.onclick = async ()=> { if(!STATE.adminMode) return alert('Activa Admin Mode'); const uid=b.dataset.uid; try{ const s = await getDocs(query(COL('users'), where('__name__','==', uid))); let userObj=null; s.forEach(d=> userObj={ id:d.id, ...d.data() }); if(!userObj) return alert('Usuario no encontrado'); STATE.userProfile = userObj; updateHeader(); await pushLog(`Impersonación: ${userObj.username}`); renderCards(); alert('Impersonando: '+userObj.display); }catch(e){ console.error(e); alert('Error'); }});
+  }catch(e){ console.error('loadUsersAdmin', e); list.innerHTML = '<div class="muted small">Error</div>'; }
 }
 async function loadRolesAdmin(container){
-  const out = $('#rolesAdminList', container); out.innerHTML = '';
+  const out = $('#rolesAdminList', container); out.innerHTML='';
   try{
     const snap = await getDocs(COL('roles'));
-    snap.forEach(s=>{
-      const r = s.data();
-      const div = document.createElement('div'); div.className='item';
-      div.innerHTML = `<div style="flex:1"><b>${s.id}</b><div class="muted small">Permisos: ${(r.permissions||[]).join(', ') || 'Sin permisos'}</div></div><div style="text-align:right"><button data-role="${s.id}" class="btn-ghost" data-act="edit">Editar</button> <button data-role="${s.id}" class="btn" data-act="del">Borrar</button></div>`;
-      out.appendChild(div);
-    });
-    out.querySelectorAll('button[data-act="edit"]').forEach(b=> b.onclick = async ()=> {
-      if(!STATE.adminMode) return alert('Activa Admin Mode');
-      const roleKey = b.dataset.role;
-      const modal = document.createElement('div'); modal.className='overlay';
-      modal.innerHTML = `<div class="modal"><h3>Editar rol: ${roleKey}</h3><div class="muted small">Permisos (separados por comas)</div><textarea id="permArea" style="width:100%;height:100px;margin-top:8px"></textarea><div style="display:flex;gap:8px;margin-top:12px"><button id="saveRole" class="btn">Guardar</button><button id="cancelRole" class="btn-ghost">Cancelar</button></div></div>`;
-      document.body.appendChild(modal);
-      const rSnap = await getDocs(query(COL('roles'), where('__name__','==', roleKey))); let roleObj=null; rSnap.forEach(d=> roleObj = d.data());
-      $('#permArea', modal).value = (roleObj && roleObj.permissions) ? roleObj.permissions.join(',') : '';
-      $('#cancelRole', modal).onclick = ()=> modal.remove();
-      $('#saveRole', modal).onclick = async ()=> {
-        const perms = $('#permArea', modal).value.split(',').map(x=>x.trim()).filter(Boolean);
-        await setDoc(doc(db,'roles',roleKey), { name: roleKey, color: roleObj?.color || '#999999', permissions: perms });
-        await pushLog(`Rol editado: ${roleKey}`); modal.remove(); loadRolesAdmin(container); loadUsersAdmin(container);
-      };
-    });
-    out.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=> {
-      if(!STATE.adminMode) return alert('Activa Admin Mode');
-      const roleKey = b.dataset.role; if(!confirm('Borrar rol? Los usuarios con este rol quedarán con rol vacío')) return;
-      try{ await deleteDoc(doc(db,'roles',roleKey)); const usersSnap = await getDocs(COL('users')); usersSnap.forEach(async u=>{ const d = u.data(); if(d.role === roleKey) await updateDoc(doc(db,'users',u.id), { role: '' }); }); await pushLog(`Rol borrado: ${roleKey}`); loadRolesAdmin(container); loadUsersAdmin(container); }catch(e){ console.error(e); alert('Error borrando rol'); }
-    });
-  }catch(e){ console.error('loadRolesAdmin', e); out.innerHTML = '<div class="muted small">Error cargando roles</div>'; }
+    snap.forEach(s=>{ const r=s.data(); const div=document.createElement('div'); div.className='item'; div.innerHTML = `<div style="flex:1"><b>${s.id}</b><div class="muted small">Permisos: ${(r.permissions||[]).join(', ') || 'Sin permisos'}</div></div><div style="text-align:right"><button data-role="${s.id}" class="btn-ghost" data-act="edit">Editar</button> <button data-role="${s.id}" class="btn" data-act="del">Borrar</button></div>`; out.appendChild(div); });
+    out.querySelectorAll('button[data-act="edit"]').forEach(b=> b.onclick = async ()=> { if(!STATE.adminMode) return alert('Activa Admin Mode'); const roleKey=b.dataset.role; const modal=document.createElement('div'); modal.className='overlay'; modal.innerHTML = `<div class="modal"><h3>Editar rol: ${roleKey}</h3><div class="muted small">Permisos (separados por comas)</div><textarea id="permArea" style="width:100%;height:100px;margin-top:8px"></textarea><div style="display:flex;gap:8px;margin-top:12px"><button id="saveRole" class="btn">Guardar</button><button id="cancelRole" class="btn-ghost">Cancelar</button></div></div>`; document.body.appendChild(modal); const rSnap = await getDocs(query(COL('roles'), where('__name__','==', roleKey))); let roleObj=null; rSnap.forEach(d=> roleObj=d.data()); $('#permArea',modal).value = (roleObj&&roleObj.permissions)?roleObj.permissions.join(',') : ''; $('#cancelRole',modal).onclick = ()=> modal.remove(); $('#saveRole',modal).onclick = async ()=> { const perms = $('#permArea',modal).value.split(',').map(x=>x.trim()).filter(Boolean); await setDoc(doc(db,'roles',roleKey), { name: roleKey, color: roleObj?.color || '#999999', permissions: perms }); await pushLog(`Rol editado: ${roleKey}`); modal.remove(); loadRolesAdmin(container); loadUsersAdmin(container); }; });
+    out.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=> { if(!STATE.adminMode) return alert('Activa Admin Mode'); const roleKey=b.dataset.role; if(!confirm('Borrar rol?')) return; try{ await deleteDoc(doc(db,'roles',roleKey)); const usersSnap = await getDocs(COL('users')); usersSnap.forEach(async u=>{ const d=u.data(); if(d.role===roleKey) await updateDoc(doc(db,'users',u.id), { role: '' }); }); await pushLog(`Rol borrado: ${roleKey}`); loadRolesAdmin(container); loadUsersAdmin(container); }catch(e){ console.error(e); alert('Error'); }});
+  }catch(e){ console.error('loadRolesAdmin', e); out.innerHTML = '<div class="muted small">Error</div>'; }
 }
 
-/* ---------------- Logs ---------------- */
+/* ---- Logs ---- */
 async function renderLogs(container){
   setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center"><div><strong>Auditoría</strong><div class="muted small">Últimas acciones</div></div><div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div></div><div style="margin-top:12px" id="logsList" class="list"></div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearPanel()));
-  container.querySelector('.refresh-panel').addEventListener('click', ()=> renderLogs(container));
+  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
+  enableRefreshButton(container, ()=> renderLogs(container));
   const list = $('#logsList', container);
   if(STATE.unsub.logs) STATE.unsub.logs();
-  STATE.unsub.logs = onSnapshot(query(COL('logs'), orderBy('t','desc')), snap => {
-    list.innerHTML = '';
-    snap.forEach(s=> { const d = s.data(); const it = document.createElement('div'); it.className='item'; it.innerHTML = `<div><div style="font-weight:700">${escapeHtml(d.msg)}</div><div class="muted small">${new Date(d.t).toLocaleString()}</div></div>`; list.appendChild(it); });
-  });
+  STATE.unsub.logs = onSnapshot(query(COL('logs'), orderBy('t','desc')), snap=> { list.innerHTML = ''; snap.forEach(s=>{ const d=s.data(); const it=document.createElement('div'); it.className='item'; it.innerHTML = `<div><div style="font-weight:700">${escapeHtml(d.msg)}</div><div class="muted small">${new Date(d.t).toLocaleString()}</div></div>`; list.appendChild(it); }); });
   STATE.unsub.current = STATE.unsub.logs;
 }
 
-/* ---------------- Fetch doc helper ---------------- */
-async function fetchDoc(collectionName, id){
-  try{
-    const s = await getDocs(query(COL(collectionName), where('__name__','==', id)));
-    let data = null; s.forEach(d=> data = d.data()); return data;
-  }catch(e){ console.warn('fetchDoc', e); return null; }
+/* ================== Radio heartbeat stop helper ================== */
+function stopHeartbeats(){ for(const k in STATE.heartbeatTimers) clearInterval(STATE.heartbeatTimers[k].timer); STATE.heartbeatTimers={}; }
+
+/* ================== createUser callable helper ================== */
+async function createUserViaFunction(payload){
+  try{ const createUser = httpsCallable(functions,'createUser'); const res = await createUser(payload); return res.data; }catch(e){ console.error('createUserViaFunction', e); throw e; }
 }
 
-/* ---------------- AUTH flows: signin only ---------------- */
-$('#btnLogin').addEventListener('click', ()=> { $('#loginModal').style.display='flex'; });
+/* ================== Auth wiring ================== */
+$('#btnLogin').addEventListener('click', ()=> $('#loginModal').style.display='flex');
 $('#btnCloseLogin').addEventListener('click', ()=> { $('#loginModal').style.display='none'; $('#authMsg').textContent=''; });
-
-$('#btnSignIn').addEventListener('click', async ()=>{
+$('#btnSignIn').addEventListener('click', async ()=> {
   const email = $('#authEmail').value.trim(), pass = $('#authPass').value.trim();
   if(!email || !pass){ $('#authMsg').textContent='Email y contraseña requeridos'; return; }
-  try{
-    await signInWithEmailAndPassword(auth, email, pass);
-    $('#authMsg').textContent = 'Autenticando...';
-  }catch(e){ console.error('signIn', e); $('#authMsg').textContent = 'Error al iniciar sesión: ' + (e.message || e.code || ''); }
+  try{ await signInWithEmailAndPassword(auth, email, pass); $('#authMsg').textContent='Autenticando...'; }catch(e){ console.error('signIn', e); $('#authMsg').textContent = 'Error: ' + (e.message||e.code); }
 });
+$('#btnReset').addEventListener('click', async ()=> { const email = $('#authEmail').value.trim(); if(!email) return $('#authMsg').textContent='Introduce tu email'; try{ await sendPasswordResetEmail(auth, email); $('#authMsg').textContent='Email enviado'; }catch(e){ console.error(e); $('#authMsg').textContent='Error: '+e.message; } });
 
-$('#btnReset').addEventListener('click', async ()=>{
-  const email = $('#authEmail').value.trim();
-  if(!email) return $('#authMsg').textContent = 'Introduce tu email';
-  try{ await sendPasswordResetEmail(auth, email); $('#authMsg').textContent = 'Email de recuperación enviado'; }catch(e){ console.error('reset', e); $('#authMsg').textContent = 'Error: ' + e.message; }
-});
-
-/* ---------------- onAuth state: ensure profile doc exists (created by admin) ---------------- */
+/* ================== onAuth state ================== */
 onAuthStateChanged(auth, async user => {
   STATE.currentUser = user || null;
   if(user){
@@ -1019,63 +763,36 @@ onAuthStateChanged(auth, async user => {
       const profRef = doc(db,'users', user.uid);
       const profSnap = await getDoc(profRef);
       if(!profSnap.exists()){
-        // profile missing -> sign out and inform
-        await signOut(auth);
-        STATE.userProfile = null;
-        alert('Tu cuenta no está autorizada. Pide a un admin que cree tu cuenta desde el panel de Administración.');
-        updateHeader();
-        renderCards();
-        return;
+        await signOut(auth); STATE.userProfile=null; STATE.adminMode=false; updateHeader(); alert('Cuenta no autorizada. Pide a un admin crear tu perfil.'); renderCards(); return;
       }
       STATE.userProfile = { id: profSnap.id, uid: user.uid, ...profSnap.data() };
-      updateHeader();
-      renderCards();
+      updateHeader(); renderCards();
     }catch(e){ console.error('onAuthState', e); }
-  } else {
-    STATE.userProfile = null;
-    STATE.adminMode = false;
-    updateHeader();
-    renderCards();
-  }
+  } else { STATE.userProfile=null; STATE.adminMode=false; updateHeader(); renderCards(); }
 });
 
-/* ---------------- Header update & alerts subscription ---------------- */
+/* ================== Header & alerts ================== */
 async function updateHeader(){
   $('#userDisplay').textContent = STATE.userProfile ? `${STATE.userProfile.display} (${STATE.userProfile.role})` : 'No conectado';
-  try{ const s = await getDocs(COL('users')); let cnt=0; s.forEach(d=> { if(d.data().onDuty) cnt++; }); $('#dutyStatus').textContent = `En servicio: ${cnt}`; }catch(e){ $('#dutyStatus').textContent = 'En servicio: —'; }
-  $('#adminModeWrap').style.display = STATE.userProfile && STATE.userProfile.role === 'admin' ? 'inline-block' : 'none';
-  $('#adminModePill').textContent = `Admin: ${STATE.adminMode ? 'ON' : 'OFF'}`;
+  try{ const s = await getDocs(COL('users')); let cnt=0; s.forEach(d=> { if(d.data().onDuty) cnt++; }); $('#dutyStatus').textContent = `En servicio: ${cnt}`; }catch(e){ $('#dutyStatus').textContent='En servicio: —'; }
   updateNotifCount();
 }
 if(STATE.unsub.alertCount) STATE.unsub.alertCount();
 STATE.unsub.alertCount = onSnapshot(COL('alerts'), ()=> updateNotifCount());
+async function updateNotifCount(){ try{ const s = await getDocs(COL('alerts')); const count = s.size; if(count>0){ $('#notifPill').style.display='inline-block'; $('#notifPill').textContent = `Alertas ${count}`; $('#notifPill').onclick = ()=> openCard('alerts'); } else $('#notifPill').style.display='none'; }catch(e){ console.warn(e); } }
 
-async function updateNotifCount(){
-  try{ const s = await getDocs(COL('alerts')); const count = s.size; if(count>0){ $('#notifPill').style.display='inline-block'; $('#notifPill').textContent = `Alertas ${count}`; $('#notifPill').onclick = ()=> openCard('alerts'); } else $('#notifPill').style.display='none'; }catch(e){ console.warn(e); }
-}
+/* ================== Export JSON ================== already wired earlier ================== */
 
-/* ---------------- Export JSON (all collections) ---------------- */
-$('#btnExport').addEventListener('click', async ()=>{
-  try{
-    const collections = ['users','roles','reports','wanted','calls','pda','fines','alerts','radio_channels','radio_messages','assignments','logs'];
-    const data = {};
-    for(const c of collections){ const s = await getDocs(COL(c)); data[c]=[]; s.forEach(d=> data[c].push({ id:d.id, ...d.data() })); }
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
-    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'firestore_export_'+Date.now()+'.json'; document.body.appendChild(a); a.click(); a.remove();
-  }catch(e){ console.error('export', e); alert('Error exportando'); }
-});
-
-/* ---------------- Init ---------------- */
+/* ================== Init ================== */
 (async ()=>{
   await seedIfEmpty();
   renderCards();
   updateHeader();
 })();
 
-/* ---------------- Expose internals for debugging ---------------- */
-window.__APP = { db, auth, functions, STATE, renderCards, openCard };
+/* Expose debug */
+window.__APP = { db, auth, functions, STATE, renderCards, openCard, createUserViaFunction };
 
-/* ---------------- End of file ---------------- */
 </script>
 </body>
 </html>
