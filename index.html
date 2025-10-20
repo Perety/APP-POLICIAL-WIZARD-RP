@@ -1,3 +1,4 @@
+```html name=index.html
 <!doctype html>
 <html lang="es">
 <head>
@@ -16,12 +17,61 @@
   *{box-sizing:border-box}
   html,body{height:100%}
   body{
-    margin:0;background:
+    margin:0;
+    background:
       radial-gradient(900px 350px at 10% 10%, rgba(132,79,252,0.04), transparent),
       linear-gradient(180deg, #03121a 0%, var(--bg) 60%);
     color:#e7eef6; -webkit-font-smoothing:antialiased;
+    position:relative; overflow-x:hidden;
   }
-  .wrap{max-width:1100px;margin:18px auto;padding:18px;display:grid;grid-template-rows:auto 1fr;gap:14px}
+
+  /* Animated police lights background */
+  .police-lights {
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    z-index:0;
+    mix-blend-mode:overlay;
+    opacity:0.12;
+  }
+  .police-lights .stripe {
+    position:absolute;
+    top:0;
+    bottom:0;
+    width:40%;
+    transform:skewX(-12deg);
+    filter:blur(40px);
+    animation: slide 6s linear infinite;
+  }
+  .police-lights .stripe.left { left:-30%; background: linear-gradient(90deg, rgba(2,6,255,0.9), rgba(2,6,255,0.2)); animation-delay:0s; }
+  .police-lights .stripe.right { right:-30%; background: linear-gradient(90deg, rgba(255,10,10,0.9), rgba(255,10,10,0.18)); animation-direction:reverse; animation-delay:1s; }
+  .police-lights .pulse {
+    position:absolute;
+    bottom:8%;
+    left:50%;
+    width:20vmin;
+    height:20vmin;
+    transform:translateX(-50%);
+    border-radius:50%;
+    background: radial-gradient(circle at 30% 30%, rgba(132,79,252,0.6), transparent 30%),
+                radial-gradient(circle at 70% 70%, rgba(110,231,183,0.35), transparent 25%);
+    filter:blur(32px);
+    animation: pulse 4s ease-in-out infinite;
+    opacity:0.5;
+  }
+
+  @keyframes slide {
+    0%{ transform:translateX(-40%) skewX(-12deg) }
+    50%{ transform:translateX(40%) skewX(-12deg) }
+    100%{ transform:translateX(-40%) skewX(-12deg) }
+  }
+  @keyframes pulse {
+    0%{ transform:translateX(-50%) scale(0.9); opacity:0.45 }
+    50%{ transform:translateX(-50%) scale(1.08); opacity:0.7 }
+    100%{ transform:translateX(-50%) scale(0.9); opacity:0.45 }
+  }
+
+  .wrap{max-width:1100px;margin:18px auto;padding:18px;display:grid;grid-template-rows:auto 1fr;gap:14px; position:relative; z-index:1}
   header{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .brand{display:flex;gap:12px;align-items:center}
   .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:900;color:#041018; overflow:hidden}
@@ -56,11 +106,19 @@
   .grid-2{display:grid;grid-template-columns:1fr 320px;gap:12px}
   .role-chip{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,0.02);margin-right:6px;margin-bottom:6px}
   .btn-danger-small{background:rgba(255,60,60,0.14);color:#ff6b6b;border:1px solid rgba(255,60,60,0.18);padding:6px 10px;border-radius:8px;cursor:pointer}
+  .admin-mode-pill{background:linear-gradient(90deg,#ffef00,#ff6b00);color:#041018;padding:6px 10px;border-radius:999px;font-weight:800;cursor:pointer}
   @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} .grid-2{grid-template-columns:1fr} }
   @media (max-width:640px){ .grid{grid-template-columns:1fr} .form-row{flex-direction:column} .modal{width:94%} }
 </style>
 </head>
 <body>
+  <!-- Animated police lights -->
+  <div class="police-lights" aria-hidden="true">
+    <div class="stripe left"></div>
+    <div class="stripe right"></div>
+    <div class="pulse"></div>
+  </div>
+
   <div class="wrap">
     <header>
       <div class="brand">
@@ -76,6 +134,10 @@
         <div class="pill small" id="dutyStatus">En servicio: 0</div>
         <button id="btnExport" class="btn">Exportar</button>
         <button id="btnLogin" class="btn-ghost">Iniciar</button>
+        <!-- Admin mode pill (shown conditionally) -->
+        <div id="adminModeWrap" style="display:none">
+          <span id="adminModePill" class="admin-mode-pill" title="Activar modo administrador">Admin: OFF</span>
+        </div>
       </div>
     </header>
 
@@ -160,7 +222,11 @@
   <!-- Código principal (usa window.__FIRESTORE_DB cuando esté listo) -->
   <script>
   /* ======= PDA / CAD v-Online (single file) =======
-     Mantiene tu login/registro original, añade alerts + borrado en Firestore
+     Añadidos:
+     - Protección y activación de modo admin (re-autenticación)
+     - Ocultar Admin/Audit para no-admins
+     - Nuevo sistema de radios (chat) con Firestore + fallback local
+     - Fondo animado tipo luces policiales (CSS arriba)
   */
 
   /* ---------- Storage helpers (local fallback) ---------- */
@@ -201,6 +267,9 @@
         dispatcher: {name:'Dispatcher', color:'#f97316', permissions:['create_call','assign_call']},
         admin: {name:'Admin', color:'#10b981', permissions:['all']}
       };
+      // simple default channels for radio
+      const radioChannels = [{id:'general', name:'General'},{id:'police', name:'Police'},{id:'medical', name:'Medical'}];
+
       lsSet('users', users);
       lsSet('templates', templates);
       lsSet('reports', reports);
@@ -211,12 +280,18 @@
       lsSet('roles', roles);
       lsSet('logs', [{id:uid('log'), t:now(), msg:'Seed inicial creada'}]);
       lsSet('onDuty', {});
+      lsSet('radio_channels', radioChannels);
       lsSet('inited', true);
     }
   }
 
   /* ---------- App state ---------- */
-  const STATE = { currentUser: lsGet('currentUser', null), expanded: null };
+  const STATE = {
+    currentUser: lsGet('currentUser', null),
+    expanded: null,
+    adminMode: false, // extra layer protecting admin actions (requires re-auth)
+    radio: { selectedChannel: null, unsubMessages: null, unsubChannels: null }
+  };
 
   /* ---------- DOM refs ---------- */
   const cardsRoot = document.getElementById('cardsRoot');
@@ -226,15 +301,21 @@
   const loginModal = document.getElementById('loginModal');
   const btnLogin = document.getElementById('btnLogin');
   const btnExport = document.getElementById('btnExport');
+  const adminModeWrap = document.getElementById('adminModeWrap');
+  const adminModePill = document.getElementById('adminModePill');
 
   /* ---------- Permission helpers ---------- */
   function hasPerm(perm){
-    if(!STATE.currentUser) return perm === 'create_call' ? true : false; // guests can create calls
+    // Guests can create calls only
+    if(!STATE.currentUser) return perm === 'create_call' ? true : false;
     const roles = lsGet('roles', {});
     const roleKey = STATE.currentUser.role;
     const role = roles[roleKey];
     if(!role) return false;
-    if(role.permissions && role.permissions.includes('all')) return true;
+    // Admins require adminMode to be active for full-power permissions
+    if(role.permissions && role.permissions.includes('all')){
+      return STATE.adminMode === true;
+    }
     return role.permissions && role.permissions.includes(perm);
   }
 
@@ -247,13 +328,18 @@
     {id:'fines', title:'Multas', desc:'Generar sanciones', icon:'💸'},
     {id:'service', title:'Servicio', desc:'Entrar / Salir de servicio', icon:'🟢'},
     {id:'alerts', title:'Alertas (Verde/Amarilla/Roja)', desc:'Crear y gestionar alertas', icon:'⚠️'},
+    {id:'radio', title:'Radios', desc:'Chat por canales (radio escrita)', icon:'📡'},
     {id:'admin', title:'Administración', desc:'Roles y usuarios (avanzado)', icon:'⚙️'},
     {id:'logs', title:'Auditoría', desc:'Historial de acciones', icon:'📜'}
   ];
 
   function renderCards(){
     cardsRoot.innerHTML = '';
+    // hide admin and logs for non-admin users (role must be 'admin')
+    const cur = STATE.currentUser;
+    const isAdmin = cur && cur.role === 'admin';
     CARDS.forEach(c=>{
+      if((c.id === 'admin' || c.id === 'logs') && !isAdmin) return; // hidden
       const el = document.createElement('div'); el.className='card'; el.dataset.id=c.id;
       el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
         <div><div class="title">${c.title}</div><div class="desc">${c.desc}</div></div>
@@ -269,8 +355,43 @@
     });
   }
 
+  /* ---------- Admin mode handling (extra security) ---------- */
+  function updateAdminUI(){
+    const cur = STATE.currentUser;
+    const isAdmin = cur && cur.role === 'admin';
+    adminModeWrap.style.display = isAdmin ? 'inline-block' : 'none';
+    adminModePill.textContent = `Admin: ${STATE.adminMode ? 'ON' : 'OFF'}`;
+    adminModePill.style.opacity = STATE.adminMode ? '1' : '0.7';
+  }
+  adminModePill.addEventListener('click', async ()=>{
+    // toggle admin mode, require current admin password to enable
+    if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){ modalAlert('Error','Solo admin puede activar modo admin'); return; }
+    if(STATE.adminMode){
+      // disable immediately
+      STATE.adminMode = false; updateAdminUI(); pushLogLocal(`Admin mode desactivado por ${STATE.currentUser.username}`);
+      renderCards();
+      return;
+    }
+    // ask for password (simple prompt)
+    const pass = prompt('Reingresa la contraseña de admin para activar modo administrador:');
+    if(!pass) return;
+    // verify against stored password (local seed)
+    const users = lsGet('users', []);
+    const found = users.find(u=>u.username === STATE.currentUser.username);
+    if(!found || found.password !== pass){ modalAlert('Error','Contraseña incorrecta'); return; }
+    STATE.adminMode = true;
+    updateAdminUI();
+    pushLogLocal(`Admin mode activado por ${STATE.currentUser.username}`);
+    renderCards();
+  });
+
   /* ---------- Open card ---------- */
   function openCard(id){
+    // Protect admin card entry: require admin role + adminMode
+    if(id === 'admin' && (!STATE.currentUser || STATE.currentUser.role !== 'admin' || !STATE.adminMode)){
+      modalAlert('Acceso denegado','Acceso a Administración: necesitas ser admin y activar el modo administrador.');
+      return;
+    }
     STATE.expanded = id;
     expandedRoot.innerHTML = '';
     const panel = document.createElement('div'); panel.className='expanded';
@@ -282,7 +403,12 @@
     else if(id==='service') renderService(panel);
     else if(id==='alerts') renderAlerts(panel);
     else if(id==='admin') renderAdmin(panel);
-    else if(id==='logs') renderLogs(panel);
+    else if(id==='logs') {
+      // Allow only admins with adminMode
+      if(!STATE.currentUser || STATE.currentUser.role !== 'admin' || !STATE.adminMode){ modalAlert('Acceso denegado','Solo admin con modo admin puede ver auditoría.'); return; }
+      renderLogs(panel);
+    }
+    else if(id==='radio') renderRadio(panel);
     expandedRoot.appendChild(panel);
     window.scrollTo({ top: panel.offsetTop-20, behavior:'smooth' });
   }
@@ -516,7 +642,7 @@
     if(!off || !amt){ modalAlert('Error','Infractor e importe requeridos'); return; }
     const arr=lsGet('fines',[]); arr.unshift({id:uid('f'), offender:off, amount:amt, reason, author:STATE.currentUser?STATE.currentUser.display:'Invitado', created_at:now()}); lsSet('fines',arr); pushLogLocal(`Multa creada: ${off} ${amt}€`); loadFines();
   }
-  function loadFines(){ const list=document.getElementById('finesList'); if(!list) return; const arr=lsGet('fines',[]); list.innerHTML=''; if(!arr.length){ list.innerHTML='<div class="muted small">No hay multas</div>'; return; } arr.forEach(f=>{ const it=document.createElement('div'); it.className='item'; it.innerHTML=`<div style="flex:1"><b>${f.offender} • ${f.amount}€</b><div class="muted small">${f.reason}</div></div><div class="muted tiny">${new Date(f.created_at).toLocaleString()}</div>`; const btns=document.createElement('div'); btns.style.marginLeft='12px'; if(STATE.currentUser && (STATE.currentUser.role==='admin' || STATE.currentUser.display===f.author || hasPerm('delete_reports'))){ const del=document.createElement('button'); del.className='btn'; del.textContent='Borrar'; del.onclick=()=>{ if(confirm('Borrar multa?')){ deleteFine(f.id); } }; btns.appendChild(del); } it.appendChild(btns); list.appendChild(it); }); }
+  function loadFines(){ const list=document.getElementById('finesList'); if(!list) return; const arr=lsGet('fines',[]); list.innerHTML=''; if(!arr.length){ list.innerHTML='<div class="muted small">No hay multas</div>'; return; } arr.forEach(f=>{ const it=document.createElement('div'); it.className='item'; it.innerHTML=`<div style="flex:1"><b>${f.offender} • ${f.amount}€</b><div class="muted small">${f.reason}</div></div><div class="muted tiny">${new Date(f.created_at).toLocaleString()}</div>`; const btns=document.createElement('div'); btns.style.marginLeft='12px'; if(STATE.currentUser && (STATE.currentUser.role==='admin' || STATE.currentUser.display===f.author || hasPerm('delete_reports'))){ const del=document.createElement('button'); del.className='btn'; del.textContent='Borrar'; del.onclick =()=>{ if(confirm('Borrar multa?')){ deleteFine(f.id); } }; btns.appendChild(del); } it.appendChild(btns); list.appendChild(it); }); }
   function deleteFine(id){ let arr=lsGet('fines',[]); arr=arr.filter(x=>x.id!==id); lsSet('fines',arr); pushLogLocal(`Multa ${id} borrada`); loadFines(); }
 
   /* ========== Service (on duty) ========== */
@@ -533,7 +659,7 @@
     container.querySelector('#toggleDuty').onclick = ()=>{ if(!STATE.currentUser){ modalAlert('Error','Inicia sesión'); return; } const map = lsGet('onDuty', {}); map[STATE.currentUser.id] = !map[STATE.currentUser.id]; lsSet('onDuty', map); box.textContent = map[STATE.currentUser.id] ? 'En servicio' : 'Fuera de servicio'; pushLogLocal(`${STATE.currentUser.display} ${map[STATE.currentUser.id] ? 'entró' : 'salió'} de servicio`); updateHeader(); loadDutyList(); };
     loadDutyList();
   }
-  function loadDutyList(){ const list=document.getElementById('dutyList'); if(!list) return; const on=lsGet('onDuty',{}); const users=lsGet('users',[]); const active = Object.keys(on).filter(k=>on[k]).map(id=> users.find(u=>u.id===id)?.display || id); list.innerHTML = active.map(a=>`<div class="item">${a}</div>`).join('') || '<div class="muted small">Nadie en servicio</div>'; updateHeader(); }
+  function loadDutyList(){ const list=document.getElementById('dutyList'); if(!list) return; const on=lsGet('onDuty',{}); const users=lsGet('users', []); const active = Object.keys(on).filter(k=>on[k]).map(id=> users.find(u=>u.id===id)?.display || id); list.innerHTML = active.map(a=>`<div class="item">${a}</div>`).join('') || '<div class="muted small">Nadie en servicio</div>'; updateHeader(); }
 
   /* ========== ALERTS (Firestore-backed) ========== */
   // Nota: esta sección usa Firestore. Requiere que window.__FIRESTORE_DB esté inicializado por el script module arriba.
@@ -569,7 +695,7 @@
     if(window.__FIRESTORE_READY && window.__FIRESTORE_DB){
       try{
         const db = window.__FIRESTORE_DB;
-        const q = query(collection(db, 'alerts'), /*orderBy?*/);
+        const q = query(collection(db, 'alerts'), orderBy('created_at','desc'));
         const snap = await getDocs(q);
         const arr = [];
         snap.forEach(docSnap => {
@@ -587,7 +713,7 @@
               <div style="text-align:right"><div class="muted tiny">${a.created_at? new Date(a.created_at).toLocaleString() : ''}</div></div>`;
             const btns = document.createElement('div'); btns.style.marginLeft='12px';
             // borrar individual (admin or author)
-            if(STATE.currentUser && (STATE.currentUser.role==='admin' || a.author === (STATE.currentUser && STATE.currentUser.username))){
+            if(STATE.currentUser && (STATE.currentUser.role==='admin' && STATE.adminMode || a.author === (STATE.currentUser && STATE.currentUser.username))){
               const del = document.createElement('button'); del.className='btn-danger-small'; del.style.marginLeft='6px'; del.textContent='Borrar';
               del.onclick = async ()=>{ if(confirm('Borrar alerta?')){ await deleteAlertFirestore(a._id); await loadAlertsFirestore(); } };
               btns.appendChild(del);
@@ -597,7 +723,7 @@
           });
         }
         // add "Borrar todas" button discreetly for admins
-        if(STATE.currentUser && STATE.currentUser.role==='admin'){
+        if(STATE.currentUser && STATE.currentUser.role==='admin' && STATE.adminMode){
           const btnAll = document.createElement('button'); btnAll.className='btn-danger-small'; btnAll.style.marginTop='8px'; btnAll.textContent='🗑 Borrar todas las alertas';
           btnAll.onclick = async ()=>{ if(confirm('¿Borrar todas las alertas de Firestore? Esta acción no se puede deshacer.')){ await deleteAllAlertsFirestore(); await loadAlertsFirestore(); } };
           footer.appendChild(btnAll);
@@ -618,7 +744,7 @@
             <div style="text-align:right"><div class="muted tiny">${a.created_at? new Date(a.created_at).toLocaleString() : ''}</div></div>`;
           list.appendChild(it);
         });
-        if(STATE.currentUser && STATE.currentUser.role==='admin'){
+        if(STATE.currentUser && STATE.currentUser.role==='admin' && STATE.adminMode){
           const btnAll = document.createElement('button'); btnAll.className='btn-danger-small'; btnAll.style.marginTop='8px'; btnAll.textContent='🗑 Borrar todas las alertas (local)';
           btnAll.onclick = ()=>{ if(confirm('Borrar todas las alertas locales?')){ lsSet('alerts', []); pushLogLocal('Borradas todas las alertas (local)'); loadAlertsFirestore(); } };
           footer.appendChild(btnAll);
@@ -674,7 +800,7 @@
 
   // BORRAR TODAS las alertas en Firestore (admin only)
   async function deleteAllAlertsFirestore(){
-    if(!STATE.currentUser || STATE.currentUser.role!=='admin'){ modalAlert('Error','Solo admin puede borrar todas las alertas'); return; }
+    if(!STATE.currentUser || STATE.currentUser.role!=='admin' || !STATE.adminMode){ modalAlert('Error','Solo admin (modo admin activado) puede borrar todas las alertas'); return; }
     if(!window.__FIRESTORE_READY || !window.__FIRESTORE_DB){
       // fallback
       lsSet('alerts', []); pushLogLocal('Borradas todas las alertas (local fallback)'); return;
@@ -752,8 +878,10 @@
     });
     ul.querySelectorAll('button[data-act="imp"]').forEach(b=> b.onclick = ()=>{
       const uid = b.dataset.uid; const u = lsGet('users',[]).find(x=>x.id===uid); if(!u) return;
-      // impersonar: no quitar permisos admin, pero marcar currentUser como impersonation (we keep role)
+      // impersonar: require adminMode for this action
+      if(!STATE.currentUser || STATE.currentUser.role !== 'admin' || !STATE.adminMode){ modalAlert('Error','Solo admin con modo admin puede impersonar'); return; }
       STATE.currentUser = {...u, impersonated: true}; lsSet('currentUser', STATE.currentUser); updateHeader(); pushLogLocal(`Impersonación: ${u.username}`); alert('Ahora eres: '+u.display);
+      renderCards();
     });
   }
 
@@ -761,14 +889,14 @@
     let users = lsGet('users',[]); const u = users.find(x=>x.id===uid); if(!u) return; u.role=newRole; lsSet('users', users); pushLogLocal(`Rol cambiado: ${u.username} -> ${newRole}`); loadUsersAdmin();
   }
   function adminCreateUser(){
-    if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){ modalAlert('Error','Solo admin puede crear usuarios aquí'); return; }
+    if(!STATE.currentUser || STATE.currentUser.role !== 'admin' || !STATE.adminMode){ modalAlert('Error','Solo admin (modo admin) puede crear usuarios aquí'); return; }
     const username=document.getElementById('adm_newUser').value.trim(); const display=document.getElementById('adm_newDisplay').value.trim()||username; const pass=document.getElementById('adm_newPass').value.trim()||'1234'; const role=document.getElementById('adm_newRole').value;
     if(!username){ modalAlert('Error','username requerido'); return; }
     let users=lsGet('users',[]); if(users.find(u=>u.username===username)){ modalAlert('Error','Usuario ya existe'); return; }
     const u={id:uid('u'), username, display, badge:'', password:pass, role}; users.unshift(u); lsSet('users',users); pushLogLocal(`Usuario admin creado: ${username}`); loadUsersAdmin();
   }
   function adminCreateRole(){
-    if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){ modalAlert('Error','Solo admin puede crear roles'); return; }
+    if(!STATE.currentUser || STATE.currentUser.role !== 'admin' || !STATE.adminMode){ modalAlert('Error','Solo admin (modo admin) puede crear roles'); return; }
     const name=document.getElementById('adm_newRoleName').value.trim(); if(!name){ modalAlert('Error','Nombre rol requerido'); return; }
     const roles = lsGet('roles', {}); if(roles[name]){ modalAlert('Error','Rol ya existe'); return; }
     roles[name] = { name, color:'#999999', permissions:[] }; lsSet('roles', roles); pushLogLocal(`Rol creado: ${name}`); loadRolesAdmin(); loadUsersAdmin();
@@ -847,7 +975,7 @@
 
   /* ========== Login / Register (tu sistema original) ========== */
   document.getElementById('btnLogin').onclick = ()=> openLoginModal();
-  document.getElementById('btnExport').onclick = ()=> exportAllLocal;
+  btnExport.onclick = exportAllLocal;
 
   function openLoginModal(){ loginModal.style.display='flex'; document.getElementById('loginUser').focus(); }
   function closeLoginModal(){ loginModal.style.display='none'; document.getElementById('loginPass').value=''; document.getElementById('loginUser').value=''; document.getElementById('loginError').style.display='none'; }
@@ -860,7 +988,7 @@
     const u = document.getElementById('loginUser').value.trim(); const p = document.getElementById('loginPass').value.trim();
     const users = lsGet('users', []);
     const found = users.find(x=>x.username === u && x.password === p);
-    if(found){ STATE.currentUser = {...found}; lsSet('currentUser', STATE.currentUser); updateHeader(); closeLoginModal(); pushLogLocal(`Sesión iniciada: ${found.username}`); modalAlert('OK','Sesión iniciada: ' + found.display); }
+    if(found){ STATE.currentUser = {...found}; lsSet('currentUser', STATE.currentUser); updateHeader(); closeLoginModal(); pushLogLocal(`Sesión iniciada: ${found.username}`); modalAlert('OK','Sesión iniciada: ' + found.display); renderCards(); }
     else { document.getElementById('loginError').style.display='block'; document.getElementById('loginError').textContent='Usuario o contraseña incorrectos'; }
   };
 
@@ -877,11 +1005,210 @@
     document.getElementById('regUser').value=''; document.getElementById('regName').value=''; document.getElementById('regPass').value='';
   };
 
+  /* ========== Radio system (Firestore-backed live chat with channels) ========== */
+  async function renderRadio(container){
+    container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>Radios</strong><div class="muted small">Chat por canales (live). Usa el canal correcto según tu unidad.</div></div>
+      <div><button class="btn btn-small" id="closeRadio">Cerrar</button></div>
+    </div>
+    <div style="margin-top:12px;display:flex;gap:12px">
+      <div style="flex:1">
+        <div style="display:flex;gap:8px;align-items:center">
+          <select id="radioChannelSelect"></select>
+          <input id="radioNewChannel" placeholder="Nuevo canal (ej: police-1)"/>
+          <button id="radioCreateChannel" class="btn-ghost">Crear</button>
+          <div style="margin-left:auto" class="muted tiny">Mensajes se sincronizan en Firestore</div>
+        </div>
+        <div id="radioMessages" style="margin-top:12px;max-height:380px;overflow:auto" class="list"></div>
+        <div style="margin-top:8px;display:flex;gap:8px">
+          <input id="radioMsgInput" placeholder="Escribe mensaje..." />
+          <button id="radioSend" class="btn">Enviar</button>
+        </div>
+      </div>
+      <div style="width:300px">
+        <h4>Canales</h4>
+        <div id="radioChannelsList" class="list"></div>
+      </div>
+    </div>`;
+    container.querySelector('#closeRadio').onclick = ()=> closeExpanded();
+    container.querySelector('#radioCreateChannel').onclick = createRadioChannel;
+    container.querySelector('#radioSend').onclick = sendRadioMessage;
+    document.getElementById('radioChannelSelect').onchange = (e)=> switchRadioChannel(e.target.value);
+
+    await loadRadioChannels();
+    // choose default
+    const defaultChannels = lsGet('radio_channels', []);
+    if(defaultChannels && defaultChannels.length) switchRadioChannel(defaultChannels[0].id);
+  }
+
+  async function loadRadioChannels(){
+    // Load channels from Firestore (if ready) or localStorage fallback
+    const channelsListEl = document.getElementById('radioChannelsList');
+    const selectEl = document.getElementById('radioChannelSelect');
+    if(!channelsListEl || !selectEl) return;
+    channelsListEl.innerHTML = '<div class="muted small">Cargando...</div>';
+    selectEl.innerHTML = '';
+
+    if(window.__FIRESTORE_READY && window.__FIRESTORE_DB){
+      try{
+        // subscribe to radio_channels collection if available
+        const db = window.__FIRESTORE_DB;
+        // Use onSnapshot to keep channels updated in real-time
+        if(STATE.radio.unsubChannels) STATE.radio.unsubChannels();
+        STATE.radio.unsubChannels = onSnapshot(collection(db,'radio_channels'), snap => {
+          const arr = [];
+          snap.forEach(s => { const d = s.data(); d._id = s.id; arr.push(d); });
+          // merge with local fallback if empty
+          if(!arr.length) arr.push(...(lsGet('radio_channels',[])||[]));
+          lsSet('radio_channels', arr.map(x=>({id:x._id||x.id, name:x.name||x.id})));
+          renderChannelListUI(arr);
+        }, err => {
+          console.error('onSnapshot radio_channels', err);
+          // fallback to local
+          renderChannelListUI(lsGet('radio_channels',[]));
+        });
+      } catch(e){ console.error('loadRadioChannels', e); renderChannelListUI(lsGet('radio_channels',[])); }
+    } else {
+      renderChannelListUI(lsGet('radio_channels',[]));
+    }
+  }
+
+  function renderChannelListUI(arr){
+    const channelsListEl = document.getElementById('radioChannelsList');
+    const selectEl = document.getElementById('radioChannelSelect');
+    if(!channelsListEl || !selectEl) return;
+    channelsListEl.innerHTML = '';
+    selectEl.innerHTML = '';
+    (arr || []).forEach(ch=>{
+      const id = ch._id || ch.id;
+      const name = ch.name || id;
+      const it = document.createElement('div'); it.className='item'; it.innerHTML = `<div style="flex:1"><b>${name}</b><div class="muted small">${id}</div></div><div><button class="btn-ghost" data-id="${id}">Unirse</button></div>`;
+      it.querySelector('button').onclick = ()=> switchRadioChannel(id);
+      channelsListEl.appendChild(it);
+      const opt = document.createElement('option'); opt.value = id; opt.textContent = name; selectEl.appendChild(opt);
+    });
+  }
+
+  async function createRadioChannel(){
+    const val = document.getElementById('radioNewChannel').value.trim();
+    if(!val) return;
+    const newChan = { name: val, created_at: Date.now() };
+    if(window.__FIRESTORE_READY && window.__FIRESTORE_DB){
+      try{
+        const db = window.__FIRESTORE_DB;
+        await addDoc(collection(db,'radio_channels'), newChan);
+        pushLogLocal(`Canal radio creado: ${val}`);
+        document.getElementById('radioNewChannel').value = '';
+        await loadRadioChannels();
+      } catch(e){ console.error('createRadioChannel', e); modalAlert('Error','No se pudo crear canal en Firestore (ver consola)'); }
+    } else {
+      const arr = lsGet('radio_channels', []) || [];
+      arr.unshift({id: val, name: val});
+      lsSet('radio_channels', arr);
+      pushLogLocal(`Canal radio (local) creado: ${val}`);
+      renderChannelListUI(arr);
+    }
+  }
+
+  async function switchRadioChannel(channelId){
+    if(!channelId) return;
+    STATE.radio.selectedChannel = channelId;
+    // unsubscribe previous messages listener
+    if(STATE.radio.unsubMessages) try{ STATE.radio.unsubMessages(); }catch(e){}
+    // render header selection
+    const sel = document.getElementById('radioChannelSelect'); if(sel) sel.value = channelId;
+    const list = document.getElementById('radioMessages'); if(!list) return;
+    list.innerHTML = '<div class="muted small">Cargando mensajes...</div>';
+    // if Firestore available, listen for messages in real-time
+    if(window.__FIRESTORE_READY && window.__FIRESTORE_DB){
+      try{
+        const db = window.__FIRESTORE_DB;
+        // subscribe to radio_messages and filter client-side
+        STATE.radio.unsubMessages = onSnapshot(query(collection(db,'radio_messages'), orderBy('created_at','asc')), snap => {
+          const msgs = [];
+          snap.forEach(s => {
+            const d = s.data();
+            d._id = s.id;
+            if((d.channel || '') === channelId) msgs.push(d);
+          });
+          renderRadioMessages(msgs);
+        }, err => {
+          console.error('radio messages snapshot', err);
+          // fallback to local messages
+          const arr = (lsGet('radio_messages',[])||[]).filter(m=>m.channel===channelId);
+          renderRadioMessages(arr);
+        });
+        // initial manual load for immediate UI
+        const qSnap = await getDocs(query(collection(db,'radio_messages'), orderBy('created_at','asc')));
+        const msgs = [];
+        qSnap.forEach(s => { const d = s.data(); d._id = s.id; if((d.channel||'')===channelId) msgs.push(d); });
+        if(msgs.length) renderRadioMessages(msgs);
+      } catch(e){
+        console.error('switchRadioChannel', e);
+        const arr = (lsGet('radio_messages',[])||[]).filter(m=>m.channel===channelId);
+        renderRadioMessages(arr);
+      }
+    } else {
+      const arr = (lsGet('radio_messages',[])||[]).filter(m=>m.channel===channelId);
+      renderRadioMessages(arr);
+    }
+  }
+
+  function renderRadioMessages(msgs){
+    const list = document.getElementById('radioMessages');
+    if(!list) return;
+    list.innerHTML = '';
+    if(!msgs || !msgs.length) { list.innerHTML = '<div class="muted small">Sin mensajes</div>'; return; }
+    msgs.forEach(m=>{
+      const it = document.createElement('div'); it.className='item';
+      it.innerHTML = `<div style="flex:1"><b>${m.author||'Anon'}</b><div class="muted small">${m.text}</div></div><div style="text-align:right"><div class="muted tiny">${new Date(m.created_at).toLocaleString()}</div></div>`;
+      list.appendChild(it);
+    });
+    // scroll to bottom
+    list.scrollTop = list.scrollHeight;
+  }
+
+  async function sendRadioMessage(){
+    const txt = document.getElementById('radioMsgInput').value.trim();
+    if(!txt) return;
+    const channelId = STATE.radio.selectedChannel;
+    if(!channelId){ modalAlert('Error','Selecciona un canal'); return; }
+    const payload = {
+      channel: channelId,
+      text: txt,
+      author: STATE.currentUser ? STATE.currentUser.display : 'Invitado',
+      author_username: STATE.currentUser ? STATE.currentUser.username : 'guest',
+      created_at: Date.now()
+    };
+    if(window.__FIRESTORE_READY && window.__FIRESTORE_DB){
+      try{
+        await addDoc(collection(window.__FIRESTORE_DB,'radio_messages'), payload);
+        pushLogLocal(`Mensaje radio (${channelId}) por ${payload.author_username}`);
+        document.getElementById('radioMsgInput').value = '';
+      } catch(e){
+        console.error('sendRadioMessage', e);
+        modalAlert('Error','No se pudo enviar mensaje (ver consola)');
+      }
+    } else {
+      const arr = lsGet('radio_messages',[]) || [];
+      arr.push({...payload, id:uid('rm')});
+      lsSet('radio_messages', arr);
+      pushLogLocal(`Mensaje radio (local) ${channelId}`);
+      document.getElementById('radioMsgInput').value = '';
+      switchRadioChannel(channelId);
+    }
+  }
+
+  /* ========== Administration (roles & users) end ========== */
+
+  /* ========== Logs (mini header) ========== */
+  function renderLogsMini(){ const onMap = lsGet('onDuty', {}); const users = lsGet('users', []); const active = Object.keys(onMap).filter(k=>onMap[k]).map(id=> users.find(u=>u.id===id)?.display || id); dutyStatus.textContent = `En servicio: ${active.length}`; userDisplay.textContent = STATE.currentUser ? `${STATE.currentUser.display} (${STATE.currentUser.role})` : 'No conectado'; updateAdminUI(); }
+
   /* ========== Header helpers ========== */
   function closeExpanded(){ STATE.expanded=null; expandedRoot.innerHTML=''; window.scrollTo({top:0,behavior:'smooth'}); }
-  function updateHeader(){ STATE.currentUser = lsGet('currentUser', STATE.currentUser); const u = STATE.currentUser; userDisplay.textContent = u? `${u.display} (${u.role})` : 'No conectado'; const on = lsGet('onDuty', {}); const users = lsGet('users', []); const active = Object.keys(on).filter(k=>on[k]).map(id=> users.find(u=>u.id===id)?.display || id); dutyStatus.textContent = `En servicio: ${active.length}`; }
+  function updateHeader(){ STATE.currentUser = lsGet('currentUser', STATE.currentUser); const u = STATE.currentUser; userDisplay.textContent = u? `${u.display} (${u.role})` : 'No conectado'; const on = lsGet('onDuty', {}); const users = lsGet('users', []); const active = Object.keys(on).filter(k=>on[k]).map(id=> users.find(u=>u.id===id)?.display || id); dutyStatus.textContent = `En servicio: ${active.length}`; updateAdminUI(); }
   btnLogin.addEventListener('click', ()=>{
-    if(STATE.currentUser){ if(confirm('Cerrar sesión?')){ lsSet('currentUser', null); STATE.currentUser=null; updateHeader(); pushLogLocal('Sesión cerrada'); } } else openLoginModal();
+    if(STATE.currentUser){ if(confirm('Cerrar sesión?')){ lsSet('currentUser', null); STATE.currentUser=null; STATE.adminMode=false; updateHeader(); pushLogLocal('Sesión cerrada'); renderCards(); } } else openLoginModal();
   });
 
   /* ---------- Export/Import (local) ---------- */
@@ -889,7 +1216,8 @@
     const data = {
       users: lsGet('users',[]), roles: lsGet('roles',{}), templates: lsGet('templates',{}),
       reports: lsGet('reports',[]), wanted: lsGet('wanted',[]), calls: lsGet('calls',[]),
-      pda: lsGet('pda',[]), fines: lsGet('fines',[]), logs: lsGet('logs',[])
+      pda: lsGet('pda',[]), fines: lsGet('fines',[]), logs: lsGet('logs',[]),
+      radio_channels: lsGet('radio_channels',[]), radio_messages: lsGet('radio_messages',[])
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
     const url = URL.createObjectURL(blob);
@@ -905,11 +1233,11 @@
     updateHeader();
     renderLogsMini();
   }
-  function renderLogsMini(){ const onMap = lsGet('onDuty', {}); const users = lsGet('users', []); const active = Object.keys(onMap).filter(k=>onMap[k]).map(id=> users.find(u=>u.id===id)?.display || id); dutyStatus.textContent = `En servicio: ${active.length}`; userDisplay.textContent = STATE.currentUser ? `${STATE.currentUser.display} (${STATE.currentUser.role})` : 'No conectado'; }
 
-  // run init
+  // Make sure admin UI is shown/hidden correctly on load
   initUI();
 
   </script>
 </body>
 </html>
+```
