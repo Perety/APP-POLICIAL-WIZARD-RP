@@ -1,4 +1,3 @@
-```html name=index.html
 <!doctype html>
 <html lang="es">
 <head>
@@ -18,63 +17,41 @@
   html,body{height:100%}
   body{
     margin:0;
+    color:#e7eef6; -webkit-font-smoothing:antialiased;
+    position:relative; overflow-x:hidden;
     background:
       radial-gradient(900px 350px at 10% 10%, rgba(132,79,252,0.04), transparent),
       linear-gradient(180deg, #03121a 0%, var(--bg) 60%);
-    color:#e7eef6; -webkit-font-smoothing:antialiased;
-    position:relative; overflow-x:hidden;
   }
 
-  /* Animated police lights background */
-  .police-lights {
-    position:fixed;
-    inset:0;
-    pointer-events:none;
-    z-index:0;
-    mix-blend-mode:overlay;
-    opacity:0.12;
+  /* Animated decorative background */
+  .bg-animated {
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+    background:
+      linear-gradient(120deg, rgba(132,79,252,0.02), rgba(6,17,25,0.02) 30%, rgba(110,231,183,0.01));
+    overflow:hidden;
   }
-  .police-lights .stripe {
-    position:absolute;
-    top:0;
-    bottom:0;
-    width:40%;
-    transform:skewX(-12deg);
-    filter:blur(40px);
-    animation: slide 6s linear infinite;
+  .bg-animated .stripe {
+    position:absolute; top:-40%; bottom:-40%; width:30%;
+    transform:rotate(-12deg);
+    filter:blur(40px) saturate(120%);
+    animation: stripeMove 6s ease-in-out infinite;
+    opacity:0.14;
   }
-  .police-lights .stripe.left { left:-30%; background: linear-gradient(90deg, rgba(2,6,255,0.9), rgba(2,6,255,0.2)); animation-delay:0s; }
-  .police-lights .stripe.right { right:-30%; background: linear-gradient(90deg, rgba(255,10,10,0.9), rgba(255,10,10,0.18)); animation-direction:reverse; animation-delay:1s; }
-  .police-lights .pulse {
-    position:absolute;
-    bottom:8%;
-    left:50%;
-    width:20vmin;
-    height:20vmin;
-    transform:translateX(-50%);
-    border-radius:50%;
-    background: radial-gradient(circle at 30% 30%, rgba(132,79,252,0.6), transparent 30%),
-                radial-gradient(circle at 70% 70%, rgba(110,231,183,0.35), transparent 25%);
-    filter:blur(32px);
-    animation: pulse 4s ease-in-out infinite;
-    opacity:0.5;
+  .bg-animated .stripe.r { right:-25%; background:linear-gradient(90deg, rgba(2,6,255,0.95), rgba(2,6,255,0.08)); animation-direction:reverse; animation-duration:5.2s; }
+  .bg-animated .stripe.b { left:-25%; background:linear-gradient(90deg, rgba(255,10,10,0.95), rgba(255,10,10,0.06)); animation-duration:5.6s; opacity:0.12; }
+  @keyframes stripeMove {
+    0%{ transform:translateX(-60%) rotate(-12deg); }
+    50%{ transform:translateX(60%) rotate(-12deg); }
+    100%{ transform:translateX(-60%) rotate(-12deg); }
   }
+  .bg-dots { position:absolute; inset:0; background-image: radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px); background-size: 80px 80px; opacity:0.06; transform: translateZ(0); }
 
-  @keyframes slide {
-    0%{ transform:translateX(-40%) skewX(-12deg) }
-    50%{ transform:translateX(40%) skewX(-12deg) }
-    100%{ transform:translateX(-40%) skewX(-12deg) }
-  }
-  @keyframes pulse {
-    0%{ transform:translateX(-50%) scale(0.9); opacity:0.45 }
-    50%{ transform:translateX(-50%) scale(1.08); opacity:0.7 }
-    100%{ transform:translateX(-50%) scale(0.9); opacity:0.45 }
-  }
-
+  /* UI */
   .wrap{max-width:1100px;margin:18px auto;padding:18px;display:grid;grid-template-rows:auto 1fr;gap:14px; position:relative; z-index:1}
   header{display:flex;align-items:center;justify-content:space-between;gap:12px}
   .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:900;color:#041018; overflow:hidden}
+  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:900;color:#041018; overflow:hidden; box-shadow: 0 6px 22px rgba(132,79,252,0.12); border:1px solid rgba(255,255,255,0.03) }
   .logo img{width:100%;height:100%;object-fit:cover;border-radius:10px}
   h1{margin:0;font-size:18px}
   .subtitle{color:var(--muted);font-size:13px}
@@ -84,17 +61,17 @@
   .btn{background:var(--accent);color:#fff;padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:800}
   .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:7px 10px;border-radius:10px;cursor:pointer}
   .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-  .card{background:var(--card);border-radius:var(--radius);padding:18px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(2,6,10,0.6);cursor:pointer;overflow:hidden;position:relative;display:flex;flex-direction:column;gap:12px;min-height:120px;transition:transform .22s,box-shadow .22s}
-  .card:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(2,6,10,0.75)}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));backdrop-filter: blur(6px);border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.04);box-shadow:0 10px 30px rgba(2,6,10,0.55);cursor:pointer;overflow:hidden;position:relative;display:flex;flex-direction:column;gap:12px;min-height:120px;transition:transform .22s,box-shadow .22s,border-color .22s}
+  .card:hover{transform:translateY(-6px);box-shadow:0 22px 48px rgba(2,6,10,0.8); border-color: rgba(132,79,252,0.12)}
   .title{font-weight:900;font-size:16px}
   .desc{color:var(--muted);font-size:13px}
   .icon{width:56px;height:56px;border-radius:10px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center;font-size:22px}
-  .expanded{margin-top:14px;border-radius:var(--radius);padding:18px;background:var(--card);border:1px solid rgba(255,255,255,0.03)}
+  .expanded{margin-top:14px;border-radius:12px;padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);backdrop-filter: blur(8px)}
   .form-row{display:flex;gap:8px}
-  input,textarea,select,button{width:100%;padding:10px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+  input,textarea,select,button{width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:rgba(0,0,0,0.18);color:inherit}
   textarea{min-height:110px;resize:vertical}
   .list{display:flex;flex-direction:column;gap:10px}
-  .item{padding:10px;border-radius:10px;background:var(--glass);display:flex;justify-content:space-between;align-items:center}
+  .item{padding:10px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));display:flex;justify-content:space-between;align-items:center}
   .muted{color:var(--muted)}
   .danger{background:linear-gradient(90deg,#ff8a80,#ff5252);color:#041018;padding:6px 8px;border-radius:8px}
   .ok{background:linear-gradient(90deg,#48c774,#34d399);color:#041018;padding:6px 8px;border-radius:8px}
@@ -109,14 +86,30 @@
   .admin-mode-pill{background:linear-gradient(90deg,#ffef00,#ff6b00);color:#041018;padding:6px 10px;border-radius:999px;font-weight:800;cursor:pointer}
   @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} .grid-2{grid-template-columns:1fr} }
   @media (max-width:640px){ .grid{grid-template-columns:1fr} .form-row{flex-direction:column} .modal{width:94%} }
+
+  /* Radio styles */
+  .radio-wrap { display:flex; gap:12px; align-items:flex-start; }
+  .radio-left { flex:1; display:flex; flex-direction:column; gap:8px; }
+  .radio-right { width:300px; }
+  .radio-topbar { display:flex; gap:8px; align-items:center; }
+  .radio-channel-badge { padding:6px 10px; border-radius:999px; background:rgba(255,255,255,0.03); font-weight:700; color:var(--muted); display:inline-flex; align-items:center; gap:8px; }
+  .radio-messages { background: linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01)); padding:12px; border-radius:10px; max-height:380px; overflow:auto; display:flex; flex-direction:column; gap:8px; }
+  .radio-msg { display:flex; gap:10px; align-items:flex-start; max-width:85%; }
+  .radio-msg.me { margin-left:auto; flex-direction:row-reverse; }
+  .radio-avatar { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-weight:800; background:linear-gradient(90deg, rgba(132,79,252,0.12), rgba(110,231,183,0.08)); color:#fff; font-size:14px; flex-shrink:0; }
+  .radio-bubble { padding:10px 12px; border-radius:10px; background:rgba(0,0,0,0.34); color:inherit; box-shadow: 0 6px 18px rgba(0,0,0,0.35); }
+  .radio-bubble.me { background: linear-gradient(90deg,var(--accent),var(--accent2)); color:#041018; }
+  .radio-meta { font-size:11px; color:var(--muted); margin-top:4px; }
+  .radio-channel-list .item { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+  .radio-actions { display:flex; gap:8px; align-items:center; }
+  .radio-search { width:100%; padding:8px; border-radius:8px; border:1px solid rgba(255,255,255,0.03); background:rgba(0,0,0,0.12) }
 </style>
 </head>
 <body>
-  <!-- Animated police lights -->
-  <div class="police-lights" aria-hidden="true">
-    <div class="stripe left"></div>
-    <div class="stripe right"></div>
-    <div class="pulse"></div>
+  <div class="bg-animated" aria-hidden="true">
+    <div class="stripe r" style="height:180%;"></div>
+    <div class="stripe b" style="height:160%;"></div>
+    <div class="bg-dots"></div>
   </div>
 
   <div class="wrap">
@@ -134,7 +127,6 @@
         <div class="pill small" id="dutyStatus">En servicio: 0</div>
         <button id="btnExport" class="btn">Exportar</button>
         <button id="btnLogin" class="btn-ghost">Iniciar</button>
-        <!-- Admin mode pill (shown conditionally) -->
         <div id="adminModeWrap" style="display:none">
           <span id="adminModePill" class="admin-mode-pill" title="Activar modo administrador">Admin: OFF</span>
         </div>
@@ -148,7 +140,7 @@
     <footer>Hecho para Daynight RP • Datos en Firestore • Copia este index.html</footer>
   </div>
 
-  <!-- LOGIN / REGISTER modal (tu sistema original) -->
+  <!-- LOGIN / REGISTER modal -->
   <div id="loginModal" class="overlay" style="display:none">
     <div class="modal">
       <h3>Entrar / Registrarse</h3>
@@ -192,11 +184,9 @@
 
   <!-- Carga Firebase (modular v9) e inicialización -->
   <script type="module">
-    // Import modular SDK (cliente)
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
     import { getFirestore, collection, getDocs, deleteDoc, doc, addDoc, setDoc, onSnapshot, query, orderBy } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-    // --- Configuración de Firebase (la que me proporcionaste) ---
     const firebaseConfig = {
       apiKey: "AIzaSyCskczYgGtlPPBEIZiE5PuY7s_cfE_3Chg",
       authDomain: "wizard-rp.firebaseapp.com",
@@ -207,42 +197,24 @@
       measurementId: "G-KX5Y56CG0R"
     };
 
-    // Inicializa
     const firebaseApp = initializeApp(firebaseConfig);
     const db = getFirestore(firebaseApp);
 
-    // Hacemos disponible db en window para que el script non-module lo use
     window.__FIRESTORE_DB = db;
     window.__FIRESTORE_READY = true;
-
-    // También podemos escuchar cambios en alerts y logs y sincronizar en tiempo real
-    // (El resto del código chequeará __FIRESTORE_READY antes de hacer operaciones)
+    window.__FIRESTORE_helpers = { collection, getDocs, deleteDoc, doc, addDoc, setDoc, onSnapshot, query, orderBy };
   </script>
 
-  <!-- Código principal (usa window.__FIRESTORE_DB cuando esté listo) -->
+  <!-- Código principal -->
   <script>
-  /* ======= PDA / CAD v-Online (single file) =======
-     Añadidos:
-     - Protección y activación de modo admin (re-autenticación)
-     - Ocultar Admin/Audit para no-admins
-     - Nuevo sistema de radios (chat) con Firestore + fallback local
-     - Fondo animado tipo luces policiales (CSS arriba)
-  */
-
-  /* ---------- Storage helpers (local fallback) ---------- */
-  const PREFIX = 'pda_v5_'; // prefijo local
-  function lsGet(k, fallback){
-    try{ const v = localStorage.getItem(PREFIX+k); return v ? JSON.parse(v) : fallback; } catch(e){ return fallback; }
-  }
+  const PREFIX = 'pda_v5_';
+  function lsGet(k, fallback){ try{ const v = localStorage.getItem(PREFIX+k); return v ? JSON.parse(v) : fallback; } catch(e){ return fallback; } }
   function lsSet(k,v){ try{ localStorage.setItem(PREFIX+k, JSON.stringify(v)); }catch(e){} }
   function lsRm(k){ try{ localStorage.removeItem(PREFIX+k); }catch(e){} }
-
-  /* ---------- small utils ---------- */
   function uid(pref='id'){ return pref + '_' + Math.random().toString(36).slice(2,9); }
   function now(){ return Date.now(); }
   function modalAlert(title,msg){ alert(title + "\n\n" + msg); }
 
-  /* ---------- Initial seed ---------- */
   function seedIfNeeded(){
     if(!lsGet('inited', false)){
       const users = [
@@ -253,8 +225,6 @@
       const templates = {
         report: "Título: {{title}}\\nHechos: {{facts}}\\nAcciones: {{actions}}\\nOficial: {{author}}",
         pda: "Nombre: {{name}}\\nAlias: {{alias}}\\nNotas: {{notes}}",
-        call: "Remitente: {{caller}}\\nMensaje: {{message}}\\nUbicación: {{location}}",
-        fine: "Offender: {{offender}}\\nImporte: {{amount}}\\nMotivo: {{reason}}"
       };
       const reports = [{id:uid('rep'), title:'Robo en tienda', description:'Robo con arma blanco. Sospechoso huyó.', author:'Admin', created_at:now()-3600*1000}];
       const wanted = [{id:uid('w'), name:'Mario Rata', description:'Robo coches', bounty:500, created_at:now()-20000}];
@@ -267,7 +237,6 @@
         dispatcher: {name:'Dispatcher', color:'#f97316', permissions:['create_call','assign_call']},
         admin: {name:'Admin', color:'#10b981', permissions:['all']}
       };
-      // simple default channels for radio
       const radioChannels = [{id:'general', name:'General'},{id:'police', name:'Police'},{id:'medical', name:'Medical'}];
 
       lsSet('users', users);
@@ -285,15 +254,13 @@
     }
   }
 
-  /* ---------- App state ---------- */
   const STATE = {
     currentUser: lsGet('currentUser', null),
     expanded: null,
-    adminMode: false, // extra layer protecting admin actions (requires re-auth)
+    adminMode: false,
     radio: { selectedChannel: null, unsubMessages: null, unsubChannels: null }
   };
 
-  /* ---------- DOM refs ---------- */
   const cardsRoot = document.getElementById('cardsRoot');
   const expandedRoot = document.getElementById('expandedRoot');
   const userDisplay = document.getElementById('userDisplay');
@@ -304,22 +271,18 @@
   const adminModeWrap = document.getElementById('adminModeWrap');
   const adminModePill = document.getElementById('adminModePill');
 
-  /* ---------- Permission helpers ---------- */
   function hasPerm(perm){
-    // Guests can create calls only
     if(!STATE.currentUser) return perm === 'create_call' ? true : false;
     const roles = lsGet('roles', {});
     const roleKey = STATE.currentUser.role;
     const role = roles[roleKey];
     if(!role) return false;
-    // Admins require adminMode to be active for full-power permissions
     if(role.permissions && role.permissions.includes('all')){
       return STATE.adminMode === true;
     }
     return role.permissions && role.permissions.includes(perm);
   }
 
-  /* ---------- Cards ---------- */
   const CARDS = [
     {id:'pda', title:'PDA / Fichas', desc:'Buscar y crear fichas PDA', icon:'🚓'},
     {id:'calls', title:'Dispatch / Llamadas', desc:'Crear/Asignar llamadas', icon:'📞'},
@@ -335,11 +298,10 @@
 
   function renderCards(){
     cardsRoot.innerHTML = '';
-    // hide admin and logs for non-admin users (role must be 'admin')
     const cur = STATE.currentUser;
     const isAdmin = cur && cur.role === 'admin';
     CARDS.forEach(c=>{
-      if((c.id === 'admin' || c.id === 'logs') && !isAdmin) return; // hidden
+      if((c.id === 'admin' || c.id === 'logs') && !isAdmin) return;
       const el = document.createElement('div'); el.className='card'; el.dataset.id=c.id;
       el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
         <div><div class="title">${c.title}</div><div class="desc">${c.desc}</div></div>
@@ -355,7 +317,7 @@
     });
   }
 
-  /* ---------- Admin mode handling (extra security) ---------- */
+  /* Admin Mode UI + logic */
   function updateAdminUI(){
     const cur = STATE.currentUser;
     const isAdmin = cur && cur.role === 'admin';
@@ -363,35 +325,39 @@
     adminModePill.textContent = `Admin: ${STATE.adminMode ? 'ON' : 'OFF'}`;
     adminModePill.style.opacity = STATE.adminMode ? '1' : '0.7';
   }
-  adminModePill.addEventListener('click', async ()=>{
-    // toggle admin mode, require current admin password to enable
-    if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){ modalAlert('Error','Solo admin puede activar modo admin'); return; }
-    if(STATE.adminMode){
-      // disable immediately
-      STATE.adminMode = false; updateAdminUI(); pushLogLocal(`Admin mode desactivado por ${STATE.currentUser.username}`);
-      renderCards();
-      return;
-    }
-    // ask for password (simple prompt)
+  function promptEnableAdminMode(){
+    if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){ modalAlert('Error','Solo admin puede activar modo admin'); return false; }
     const pass = prompt('Reingresa la contraseña de admin para activar modo administrador:');
-    if(!pass) return;
-    // verify against stored password (local seed)
+    if(!pass) return false;
     const users = lsGet('users', []);
     const found = users.find(u=>u.username === STATE.currentUser.username);
-    if(!found || found.password !== pass){ modalAlert('Error','Contraseña incorrecta'); return; }
+    if(!found || found.password !== pass){ modalAlert('Error','Contraseña incorrecta'); return false; }
     STATE.adminMode = true;
     updateAdminUI();
     pushLogLocal(`Admin mode activado por ${STATE.currentUser.username}`);
     renderCards();
-  });
-
-  /* ---------- Open card ---------- */
-  function openCard(id){
-    // Protect admin card entry: require admin role + adminMode
-    if(id === 'admin' && (!STATE.currentUser || STATE.currentUser.role !== 'admin' || !STATE.adminMode)){
-      modalAlert('Acceso denegado','Acceso a Administración: necesitas ser admin y activar el modo administrador.');
+    return true;
+  }
+  adminModePill.addEventListener('click', async ()=>{
+    if(STATE.adminMode){
+      if(confirm('Desactivar Admin Mode?')){ STATE.adminMode = false; updateAdminUI(); pushLogLocal(`Admin mode desactivado por ${STATE.currentUser?STATE.currentUser.username:'?'}`); renderCards(); }
       return;
     }
+    promptEnableAdminMode();
+  });
+
+  /*
+    Admin Mode behavior:
+    - Admin Mode is an extra protection. Admin users can open the Admin panel while Admin Mode is OFF,
+      but destructive operations (create/delete roles & users, impersonate, delete-all) require Admin Mode ON.
+    - This avoids situations where clicking a button "no hace nada" — instead, the panel explains the requirement
+      and offers a button to enable Admin Mode (re-auth).
+  */
+
+  function openCard(id){
+    // we allow admin panel open even if adminMode is OFF but only to admins
+    if(id === 'admin' && (!STATE.currentUser || STATE.currentUser.role !== 'admin')){ modalAlert('Acceso denegado','Acceso a Administración: necesitas ser admin.'); return; }
+    if(id === 'logs' && (!STATE.currentUser || STATE.currentUser.role !== 'admin' || !STATE.adminMode)){ modalAlert('Acceso denegado','Solo admin con Admin Mode puede ver la auditoría. Activa Admin Mode para ver los logs.'); return; }
     STATE.expanded = id;
     expandedRoot.innerHTML = '';
     const panel = document.createElement('div'); panel.className='expanded';
@@ -403,17 +369,13 @@
     else if(id==='service') renderService(panel);
     else if(id==='alerts') renderAlerts(panel);
     else if(id==='admin') renderAdmin(panel);
-    else if(id==='logs') {
-      // Allow only admins with adminMode
-      if(!STATE.currentUser || STATE.currentUser.role !== 'admin' || !STATE.adminMode){ modalAlert('Acceso denegado','Solo admin con modo admin puede ver auditoría.'); return; }
-      renderLogs(panel);
-    }
+    else if(id==='logs') renderLogs(panel);
     else if(id==='radio') renderRadio(panel);
     expandedRoot.appendChild(panel);
     window.scrollTo({ top: panel.offsetTop-20, behavior:'smooth' });
   }
 
-  /* ========== PDA (search/create) ========== */
+  /* ========== PDA (unchanged) ========== */
   function renderPDA(container){
     const templates = lsGet('templates', {});
     container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
@@ -444,10 +406,8 @@
     res.innerHTML = arr.map(p=>`<div class="item"><div style="flex:1"><b>${(p.title||'Ficha')}</b><div class="muted small">${(p.text||'').slice(0,140)}</div></div>
       <div><button class="btn-ghost" onclick="(function(){const ev = new Event('viewPDACustom'); ev.detail='${p.id}'; window.dispatchEvent(ev);})();">Ver</button> <button class="btn-ghost" onclick="(function(){const ev = new Event('delPDACustom'); ev.detail='${p.id}'; window.dispatchEvent(ev);})();">Borrar</button></div></div>`).join('') || '<div class="muted small">Sin fichas</div>';
   }
-  // events for inline onclick that call inner functions
   window.addEventListener('viewPDACustom', (e)=> viewPDA(e.detail));
   window.addEventListener('delPDACustom', (e)=> delPDA(e.detail));
-
   function searchPDA(q){
     q = (q||'').toLowerCase().trim();
     const arr = lsGet('pda', []);
@@ -504,7 +464,6 @@
     calls.unshift(c); lsSet('calls', calls); pushLogLocal(`Llamada creada por ${caller}`);
     document.getElementById('callMsg').value=''; document.getElementById('callFrom').value='';
     loadCalls();
-    // Optionally push to Firestore alerts if wanted
   }
   function loadCalls(){
     const list = document.getElementById('callsList'); if(!list) return;
@@ -662,7 +621,6 @@
   function loadDutyList(){ const list=document.getElementById('dutyList'); if(!list) return; const on=lsGet('onDuty',{}); const users=lsGet('users', []); const active = Object.keys(on).filter(k=>on[k]).map(id=> users.find(u=>u.id===id)?.display || id); list.innerHTML = active.map(a=>`<div class="item">${a}</div>`).join('') || '<div class="muted small">Nadie en servicio</div>'; updateHeader(); }
 
   /* ========== ALERTS (Firestore-backed) ========== */
-  // Nota: esta sección usa Firestore. Requiere que window.__FIRESTORE_DB esté inicializado por el script module arriba.
   async function renderAlerts(container){
     container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
       <div><strong>Alertas</strong><div class="muted small">Crear alertas de la ciudad - Verde / Amarilla / Roja</div></div>
@@ -679,11 +637,8 @@
     container.querySelector('#closeA2').onclick = ()=> closeExpanded();
     container.querySelector('#createAlertBtn').onclick = createAlertFirestore;
     container.querySelector('#refreshAlerts').onclick = loadAlertsFirestore;
-    // carga inicial
     await loadAlertsFirestore();
   }
-
-  // carga alertas desde Firestore, si no hay Firestore usa localStorage
   async function loadAlertsFirestore(){
     const list = document.getElementById('alertsList');
     const footer = document.getElementById('alertsFooter');
@@ -691,12 +646,11 @@
     list.innerHTML = '<div class="muted small">Cargando...</div>';
     footer.innerHTML = '';
 
-    // If Firestore ready -> read collection 'alerts'
     if(window.__FIRESTORE_READY && window.__FIRESTORE_DB){
       try{
         const db = window.__FIRESTORE_DB;
-        const q = query(collection(db, 'alerts'), orderBy('created_at','desc'));
-        const snap = await getDocs(q);
+        const q = window.__FIRESTORE_helpers.query(window.__FIRESTORE_helpers.collection(db, 'alerts'), window.__FIRESTORE_helpers.orderBy('created_at','desc'));
+        const snap = await window.__FIRESTORE_helpers.getDocs(q);
         const arr = [];
         snap.forEach(docSnap => {
           const d = docSnap.data();
@@ -706,13 +660,11 @@
         if(!arr.length){ list.innerHTML = '<div class="muted small">No hay alertas</div>'; }
         else {
           list.innerHTML = '';
-          arr.sort((a,b)=> (b.created_at||0) - (a.created_at||0));
           arr.forEach(a=>{
             const it = document.createElement('div'); it.className='item';
             it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${a.title||'(sin título)'} <span class="muted tiny">[${a.level||'—'}]</span></div><div class="muted small">${(a.message||'').slice(0,200)}</div></div>
               <div style="text-align:right"><div class="muted tiny">${a.created_at? new Date(a.created_at).toLocaleString() : ''}</div></div>`;
             const btns = document.createElement('div'); btns.style.marginLeft='12px';
-            // borrar individual (admin or author)
             if(STATE.currentUser && (STATE.currentUser.role==='admin' && STATE.adminMode || a.author === (STATE.currentUser && STATE.currentUser.username))){
               const del = document.createElement('button'); del.className='btn-danger-small'; del.style.marginLeft='6px'; del.textContent='Borrar';
               del.onclick = async ()=>{ if(confirm('Borrar alerta?')){ await deleteAlertFirestore(a._id); await loadAlertsFirestore(); } };
@@ -722,7 +674,6 @@
             list.appendChild(it);
           });
         }
-        // add "Borrar todas" button discreetly for admins
         if(STATE.currentUser && STATE.currentUser.role==='admin' && STATE.adminMode){
           const btnAll = document.createElement('button'); btnAll.className='btn-danger-small'; btnAll.style.marginTop='8px'; btnAll.textContent='🗑 Borrar todas las alertas';
           btnAll.onclick = async ()=>{ if(confirm('¿Borrar todas las alertas de Firestore? Esta acción no se puede deshacer.')){ await deleteAllAlertsFirestore(); await loadAlertsFirestore(); } };
@@ -733,7 +684,6 @@
         list.innerHTML = '<div class="muted small">Error cargando alertas (ver consola)</div>';
       }
     } else {
-      // fallback local
       const arr = lsGet('alerts', []);
       if(!arr || !arr.length) list.innerHTML = '<div class="muted small">No hay alertas</div>';
       else {
@@ -752,8 +702,6 @@
       }
     }
   }
-
-  // crear alerta -> guarda en Firestore con campos: title, message, level, author, created_at
   async function createAlertFirestore(){
     if(!STATE.currentUser){ modalAlert('Error','Inicia sesión para crear alertas'); return; }
     const lvl = document.getElementById('alertLevel').value;
@@ -769,51 +717,40 @@
     };
     if(window.__FIRESTORE_READY && window.__FIRESTORE_DB){
       try{
-        const db = window.__FIRESTORE_DB;
-        await addDoc(collection(db,'alerts'), payload);
-        // log
-        await addDoc(collection(db,'logs'), { t: Date.now(), msg: `Alerta creada: ${title} (nivel ${lvl}) por ${STATE.currentUser.username}` });
+        await window.__FIRESTORE_helpers.addDoc(window.__FIRESTORE_helpers.collection(window.__FIRESTORE_DB,'alerts'), payload);
+        await window.__FIRESTORE_helpers.addDoc(window.__FIRESTORE_helpers.collection(window.__FIRESTORE_DB,'logs'), { t: Date.now(), msg: `Alerta creada: ${title} (nivel ${lvl}) por ${STATE.currentUser.username}` });
         pushLogLocal(`Alerta creada: ${title}`);
         document.getElementById('alertTitle').value=''; document.getElementById('alertMsg').value='';
         await loadAlertsFirestore();
       } catch(err){ console.error('createAlertFirestore', err); modalAlert('Error','No se pudo crear la alerta (ver consola)'); }
     } else {
-      // fallback local
       const arr = lsGet('alerts', []); arr.unshift({...payload, id: uid('a')}); lsSet('alerts', arr); pushLogLocal(`Alerta (local) creada: ${title}`); loadAlertsFirestore();
     }
   }
-
-  // borrar una alerta por id en Firestore
   async function deleteAlertFirestore(id){
     if(!id) return;
     if(window.__FIRESTORE_READY && window.__FIRESTORE_DB){
       try{
-        const db = window.__FIRESTORE_DB;
-        await deleteDoc(doc(db, 'alerts', id));
-        await addDoc(collection(db,'logs'), { t: Date.now(), msg: `Alerta ${id} borrada por ${STATE.currentUser?STATE.currentUser.username:'?'} ` });
+        await window.__FIRESTORE_helpers.deleteDoc(window.__FIRESTORE_helpers.doc(window.__FIRESTORE_DB, 'alerts', id));
+        await window.__FIRESTORE_helpers.addDoc(window.__FIRESTORE_helpers.collection(window.__FIRESTORE_DB,'logs'), { t: Date.now(), msg: `Alerta ${id} borrada por ${STATE.currentUser?STATE.currentUser.username:'?'} ` });
         pushLogLocal(`Alerta ${id} borrada`);
       } catch(err){ console.error('deleteAlertFirestore', err); modalAlert('Error','No se pudo borrar la alerta (ver consola)'); }
     } else {
       let arr = lsGet('alerts', []); arr = arr.filter(x=>x.id!==id); lsSet('alerts', arr); pushLogLocal(`Alerta local ${id} borrada`);
     }
   }
-
-  // BORRAR TODAS las alertas en Firestore (admin only)
   async function deleteAllAlertsFirestore(){
-    if(!STATE.currentUser || STATE.currentUser.role!=='admin' || !STATE.adminMode){ modalAlert('Error','Solo admin (modo admin activado) puede borrar todas las alertas'); return; }
+    if(!STATE.currentUser || STATE.currentUser.role!=='admin' || !STATE.adminMode){ modalAlert('Error','Solo admin (Admin Mode) puede borrar todas las alertas'); return; }
     if(!window.__FIRESTORE_READY || !window.__FIRESTORE_DB){
-      // fallback
       lsSet('alerts', []); pushLogLocal('Borradas todas las alertas (local fallback)'); return;
     }
     try{
       const db = window.__FIRESTORE_DB;
-      const snap = await getDocs(collection(db,'alerts'));
+      const snap = await window.__FIRESTORE_helpers.getDocs(window.__FIRESTORE_helpers.collection(db,'alerts'));
       const ids = [];
       snap.forEach(s=> ids.push(s.id));
-      // delete each doc
-      for(const id of ids){ await deleteDoc(doc(db,'alerts', id)); }
-      // log in logs collection
-      await addDoc(collection(db,'logs'), { t: Date.now(), msg: `ADMIN borró todas las alertas (${ids.length})` });
+      for(const id of ids){ await window.__FIRESTORE_helpers.deleteDoc(window.__FIRESTORE_helpers.doc(db,'alerts', id)); }
+      await window.__FIRESTORE_helpers.addDoc(window.__FIRESTORE_helpers.collection(db,'logs'), { t: Date.now(), msg: `ADMIN borró todas las alertas (${ids.length})` });
       pushLogLocal(`ADMIN borró todas las alertas (${ids.length})`);
       modalAlert('Hecho', `Se han borrado ${ids.length} alertas`);
     } catch(err){ console.error('deleteAllAlertsFirestore', err); modalAlert('Error','No se pudo borrar todas las alertas (ver consola)'); }
@@ -821,9 +758,13 @@
 
   /* ========== Administration (roles & users) ========== */
   function renderAdmin(container){
+    const isAdminMode = STATE.adminMode;
     container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
       <div><strong>Administración</strong><div class="muted small">Gestiona roles, permisos y usuarios</div></div>
       <div><button class="btn btn-small" id="closeA">Cerrar</button></div>
+    </div>
+    <div style="margin-top:12px">
+      <div id="adminNotice" style="margin-bottom:12px"></div>
     </div>
     <div style="margin-top:12px;display:flex;gap:12px">
       <div style="flex:1">
@@ -843,6 +784,30 @@
       </div>
     </div>`;
     container.querySelector('#closeA').onclick = ()=> closeExpanded();
+
+    const adminNotice = container.querySelector('#adminNotice');
+    if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){
+      adminNotice.innerHTML = `<div class="item"><div style="flex:1"><b>Acceso denegado</b><div class="muted small">Necesitas ser admin para gestionar cuentas.</div></div></div>`;
+      return;
+    }
+    // If admin but adminMode is off, show notice and an enable button; actions will be disabled
+    if(!isAdminMode){
+      adminNotice.innerHTML = `<div class="item"><div style="flex:1"><b>Admin Mode OFF</b><div class="muted small">Activa Admin Mode para realizar operaciones sensibles (crear/borrar/impersonar/editar permisos).</div></div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <button id="enableAdminMode" class="btn">Activar Admin Mode</button>
+          <button id="explainAdminMode" class="btn-ghost">¿Qué es esto?</button>
+        </div>
+      </div>`;
+      adminNotice.querySelector('#enableAdminMode').onclick = ()=> { promptEnableAdminMode(); renderAdmin(container); };
+      adminNotice.querySelector('#explainAdminMode').onclick = ()=> {
+        modalAlert('Admin Mode','Admin Mode requiere reingresar la contraseña del admin y actúa como protección adicional para operaciones destructivas. Actívalo cuando vayas a administrar usuarios, roles o logs.');
+      };
+    } else {
+      adminNotice.innerHTML = `<div class="item"><div style="flex:1"><b>Admin Mode ON</b><div class="muted small">Puedes realizar acciones administrativas. Cuidado con lo que borras.</div></div>
+        <div><button id="disableAdminMode" class="btn-danger-small">Desactivar</button></div></div>`;
+      adminNotice.querySelector('#disableAdminMode').onclick = ()=> { if(confirm('Desactivar Admin Mode?')){ STATE.adminMode=false; updateAdminUI(); renderAdmin(container); } };
+    }
+
     container.querySelector('#adm_createUser').onclick = adminCreateUser;
     container.querySelector('#adm_refresh').onclick = ()=>renderAdmin(container);
     container.querySelector('#adm_createRole').onclick = adminCreateRole;
@@ -855,51 +820,60 @@
     const ul = document.getElementById('usersAdminList'); ul.innerHTML = '';
     if(!users.length){ ul.innerHTML = '<div class="muted small">No hay usuarios</div>'; return; }
     users.forEach((u,i)=>{
+      const canPerform = STATE.adminMode && STATE.currentUser && STATE.currentUser.role==='admin';
+      const roleOptions = Object.keys(lsGet('roles',{})).map(r=>`<option value="${r}" ${u.role===r?'selected':''}>${r}</option>`).join('');
       const div = document.createElement('div'); div.className='item';
       div.innerHTML = `<div><b>${u.display} (${u.username})</b><div class="muted small">Rol: <span class="role-chip">${u.role}</span> • Badge: ${u.badge||'—'}</div></div>
         <div style="text-align:right">
-          <select data-uid="${u.id}" class="adm_role_sel">${Object.keys(lsGet('roles',{})).map(r=>`<option value="${r}" ${u.role===r?'selected':''}>${r}</option>`).join('')}</select>
-          <div style="margin-top:6px"><button class="btn-ghost btn-small" data-uid="${u.id}" data-act="del">Borrar</button> <button class="btn btn-small" data-uid="${u.id}" data-act="imp">Impersonar</button></div>
+          <select data-uid="${u.id}" class="adm_role_sel" ${canPerform? '': 'disabled'}>${roleOptions}</select>
+          <div style="margin-top:6px"><button class="btn-ghost btn-small" data-uid="${u.id}" data-act="del" ${canPerform? '': 'disabled'}>Borrar</button> <button class="btn btn-small" data-uid="${u.id}" data-act="imp" ${canPerform? '': 'disabled'}>Impersonar</button></div>
         </div>`;
       ul.appendChild(div);
     });
-    // attach events
     ul.querySelectorAll('.adm_role_sel').forEach(sel=>{
-      sel.onchange = (e)=>{ const uid = e.target.dataset.uid; changeUserRole(uid, e.target.value); };
+      sel.onchange = (e)=>{ const uid = e.target.dataset.uid; if(!STATE.adminMode){ modalAlert('Admin Mode requerido','Activa Admin Mode para cambiar roles'); renderUsersDisabledWarning(); return; } changeUserRole(uid, e.target.value); };
     });
     ul.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = ()=>{
       const uid = b.dataset.uid;
+      if(!STATE.adminMode){ modalAlert('Admin Mode requerido','Activa Admin Mode para borrar usuarios'); return; }
       if(!confirm('Borrar usuario?')) return;
       let arr = lsGet('users', []); const u = arr.find(x=>x.id===uid);
       if(u && u.username==='admin'){ modalAlert('Error','No puedes borrar admin seed'); return; }
-      // remove from onDuty if present
       let on = lsGet('onDuty', {}); if(on[uid]){ delete on[uid]; lsSet('onDuty', on); }
       arr = arr.filter(x=>x.id!==uid); lsSet('users', arr); pushLogLocal(`Usuario borrado: ${uid}`); loadUsersAdmin();
     });
     ul.querySelectorAll('button[data-act="imp"]').forEach(b=> b.onclick = ()=>{
       const uid = b.dataset.uid; const u = lsGet('users',[]).find(x=>x.id===uid); if(!u) return;
-      // impersonar: require adminMode for this action
-      if(!STATE.currentUser || STATE.currentUser.role !== 'admin' || !STATE.adminMode){ modalAlert('Error','Solo admin con modo admin puede impersonar'); return; }
-      STATE.currentUser = {...u, impersonated: true}; lsSet('currentUser', STATE.currentUser); updateHeader(); pushLogLocal(`Impersonación: ${u.username}`); alert('Ahora eres: '+u.display);
-      renderCards();
+      if(!STATE.adminMode){ modalAlert('Admin Mode requerido','Activa Admin Mode para impersonar'); return; }
+      STATE.currentUser = {...u, impersonated: true}; lsSet('currentUser', STATE.currentUser); updateHeader(); pushLogLocal(`Impersonación: ${u.username}`); modalAlert('Impersonar', 'Ahora eres: '+u.display); renderCards(); renderAdmin(expandedRoot.querySelector('.expanded') || document.createElement('div'));
     });
+  }
+  function renderUsersDisabledWarning(){
+    // small visual hint to activate Admin Mode
+    const usersBox = document.getElementById('usersAdminList');
+    if(!usersBox) return;
+    const note = document.createElement('div'); note.className='muted small'; note.textContent = 'Acciones administrativas requieren Admin Mode.';
+    usersBox.prepend(note);
+    setTimeout(()=>{ if(note && note.parentNode) note.remove(); }, 3500);
   }
 
   function changeUserRole(uid,newRole){
+    if(!STATE.adminMode){ modalAlert('Admin Mode requerido','Activa Admin Mode para cambiar roles'); return; }
     let users = lsGet('users',[]); const u = users.find(x=>x.id===uid); if(!u) return; u.role=newRole; lsSet('users', users); pushLogLocal(`Rol cambiado: ${u.username} -> ${newRole}`); loadUsersAdmin();
   }
   function adminCreateUser(){
-    if(!STATE.currentUser || STATE.currentUser.role !== 'admin' || !STATE.adminMode){ modalAlert('Error','Solo admin (modo admin) puede crear usuarios aquí'); return; }
+    if(!STATE.currentUser || STATE.currentUser.role !== 'admin' || !STATE.adminMode){ modalAlert('Error','Solo admin (Admin Mode) puede crear usuarios aquí'); return; }
     const username=document.getElementById('adm_newUser').value.trim(); const display=document.getElementById('adm_newDisplay').value.trim()||username; const pass=document.getElementById('adm_newPass').value.trim()||'1234'; const role=document.getElementById('adm_newRole').value;
     if(!username){ modalAlert('Error','username requerido'); return; }
     let users=lsGet('users',[]); if(users.find(u=>u.username===username)){ modalAlert('Error','Usuario ya existe'); return; }
     const u={id:uid('u'), username, display, badge:'', password:pass, role}; users.unshift(u); lsSet('users',users); pushLogLocal(`Usuario admin creado: ${username}`); loadUsersAdmin();
   }
   function adminCreateRole(){
-    if(!STATE.currentUser || STATE.currentUser.role !== 'admin' || !STATE.adminMode){ modalAlert('Error','Solo admin (modo admin) puede crear roles'); return; }
+    if(!STATE.currentUser || STATE.currentUser.role !== 'admin' || !STATE.adminMode){ modalAlert('Error','Solo admin (Admin Mode) puede crear roles'); return; }
     const name=document.getElementById('adm_newRoleName').value.trim(); if(!name){ modalAlert('Error','Nombre rol requerido'); return; }
     const roles = lsGet('roles', {}); if(roles[name]){ modalAlert('Error','Rol ya existe'); return; }
     roles[name] = { name, color:'#999999', permissions:[] }; lsSet('roles', roles); pushLogLocal(`Rol creado: ${name}`); loadRolesAdmin(); loadUsersAdmin();
+    document.getElementById('adm_newRoleName').value='';
   }
   function loadRolesAdmin(){
     const roles = lsGet('roles', {}); const out = document.getElementById('rolesAdminList'); out.innerHTML = '';
@@ -916,9 +890,10 @@
       const roleKey = b.dataset.role; openRoleEditor(roleKey);
     });
     out.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = ()=>{
-      const roleKey = b.dataset.role; if(!confirm('Borrar rol? (Los usuarios con este rol quedarán con rol vacío)')) return;
+      const roleKey = b.dataset.role;
+      if(!STATE.adminMode){ modalAlert('Admin Mode requerido','Activa Admin Mode para borrar roles'); return; }
+      if(!confirm('Borrar rol? (Los usuarios con este rol quedarán con rol vacío)')) return;
       let roles = lsGet('roles', {}); delete roles[roleKey]; lsSet('roles', roles);
-      // remove role from users
       let users = lsGet('users', []); users.forEach(u=>{ if(u.role===roleKey) u.role=''; }); lsSet('users', users);
       pushLogLocal(`Rol borrado: ${roleKey}`); loadRolesAdmin(); loadUsersAdmin();
     });
@@ -928,7 +903,8 @@
     const roles = lsGet('roles', {});
     const role = roles[roleKey];
     if(!role){ modalAlert('Error','Rol no existe'); return; }
-    // build modal overlay
+    // Require Admin Mode to edit
+    if(!STATE.adminMode){ modalAlert('Admin Mode requerido','Activa Admin Mode para editar permisos de rol'); return; }
     const modal = document.createElement('div'); modal.className='overlay';
     modal.innerHTML = `<div class="modal">
       <h3>Editar rol: ${roleKey}</h3>
@@ -951,13 +927,9 @@
   }
 
   /* ========== Logs (local) ========== */
-  function pushLogLocal(msg){ // local log + (attempt to push to Firestore logs if available)
-    const logs = lsGet('logs', []); logs.unshift({id:uid('log'), t:now(), msg}); lsSet('logs', logs);
-    // try send to Firestore (best-effort)
-    if(window.__FIRESTORE_READY && window.__FIRESTORE_DB){
-      try{
-        addDoc(collection(window.__FIRESTORE_DB, 'logs'), { t: Date.now(), msg });
-      } catch(e){ /* ignore */ }
+  function pushLogLocal(msg){ const logs = lsGet('logs', []); logs.unshift({id:uid('log'), t:now(), msg}); lsSet('logs', logs);
+    if(window.__FIRESTORE_READY && window.__FIRESTORE_DB && window.__FIRESTORE_helpers){
+      try{ window.__FIRESTORE_helpers.addDoc(window.__FIRESTORE_helpers.collection(window.__FIRESTORE_DB, 'logs'), { t: Date.now(), msg }); } catch(e){ /* ignore */ }
     }
     renderLogsMini();
   }
@@ -973,7 +945,7 @@
     logs.slice(0,200).forEach(l=>{ const it = document.createElement('div'); it.className='item'; it.innerHTML = `<div><div style="font-weight:700">${l.msg}</div><div class="muted small">${new Date(l.t).toLocaleString()}</div></div>`; list.appendChild(it); });
   }
 
-  /* ========== Login / Register (tu sistema original) ========== */
+  /* ========== Login / Register ========== */
   document.getElementById('btnLogin').onclick = ()=> openLoginModal();
   btnExport.onclick = exportAllLocal;
 
@@ -1005,66 +977,77 @@
     document.getElementById('regUser').value=''; document.getElementById('regName').value=''; document.getElementById('regPass').value='';
   };
 
-  /* ========== Radio system (Firestore-backed live chat with channels) ========== */
+  /* ========== Radio system (improved UI) ========== */
   async function renderRadio(container){
     container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
       <div><strong>Radios</strong><div class="muted small">Chat por canales (live). Usa el canal correcto según tu unidad.</div></div>
       <div><button class="btn btn-small" id="closeRadio">Cerrar</button></div>
     </div>
-    <div style="margin-top:12px;display:flex;gap:12px">
-      <div style="flex:1">
-        <div style="display:flex;gap:8px;align-items:center">
-          <select id="radioChannelSelect"></select>
-          <input id="radioNewChannel" placeholder="Nuevo canal (ej: police-1)"/>
-          <button id="radioCreateChannel" class="btn-ghost">Crear</button>
-          <div style="margin-left:auto" class="muted tiny">Mensajes se sincronizan en Firestore</div>
+    <div style="margin-top:12px" class="radio-wrap">
+      <div class="radio-left">
+        <div class="radio-topbar">
+          <select id="radioChannelSelect" class="radio-search"></select>
+          <div class="radio-actions">
+            <input id="radioNewChannel" placeholder="Nuevo canal (ej: police-1)" style="min-width:180px;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.03);background:rgba(0,0,0,0.12)"/>
+            <button id="radioCreateChannel" class="btn-ghost">Crear</button>
+            <button id="radioRefresh" class="btn-ghost">Refrescar</button>
+          </div>
         </div>
-        <div id="radioMessages" style="margin-top:12px;max-height:380px;overflow:auto" class="list"></div>
-        <div style="margin-top:8px;display:flex;gap:8px">
+
+        <div id="radioMessages" class="radio-messages" style="margin-top:12px"></div>
+
+        <div style="display:flex;gap:8px;margin-top:8px">
           <input id="radioMsgInput" placeholder="Escribe mensaje..." />
           <button id="radioSend" class="btn">Enviar</button>
         </div>
       </div>
-      <div style="width:300px">
-        <h4>Canales</h4>
-        <div id="radioChannelsList" class="list"></div>
+
+      <div class="radio-right">
+        <h4 style="margin:0 0 8px 0">Canales</h4>
+        <input id="radioSearchChannels" class="radio-search" placeholder="Buscar canales..." style="margin-bottom:8px"/>
+        <div id="radioChannelsList" class="list radio-channel-list"></div>
       </div>
     </div>`;
+
     container.querySelector('#closeRadio').onclick = ()=> closeExpanded();
     container.querySelector('#radioCreateChannel').onclick = createRadioChannel;
     container.querySelector('#radioSend').onclick = sendRadioMessage;
+    container.querySelector('#radioRefresh').onclick = loadRadioChannels;
     document.getElementById('radioChannelSelect').onchange = (e)=> switchRadioChannel(e.target.value);
+    document.getElementById('radioMsgInput').addEventListener('keydown', (e)=> { if(e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendRadioMessage(); } });
+
+    document.getElementById('radioSearchChannels').addEventListener('input', (e)=>{
+      const q = (e.target.value||'').toLowerCase();
+      const items = document.querySelectorAll('#radioChannelsList .item');
+      items.forEach(it=>{
+        const name = it.dataset.name || '';
+        it.style.display = name.toLowerCase().includes(q) ? '' : 'none';
+      });
+    });
 
     await loadRadioChannels();
-    // choose default
     const defaultChannels = lsGet('radio_channels', []);
     if(defaultChannels && defaultChannels.length) switchRadioChannel(defaultChannels[0].id);
   }
 
   async function loadRadioChannels(){
-    // Load channels from Firestore (if ready) or localStorage fallback
     const channelsListEl = document.getElementById('radioChannelsList');
     const selectEl = document.getElementById('radioChannelSelect');
     if(!channelsListEl || !selectEl) return;
     channelsListEl.innerHTML = '<div class="muted small">Cargando...</div>';
     selectEl.innerHTML = '';
 
-    if(window.__FIRESTORE_READY && window.__FIRESTORE_DB){
+    if(window.__FIRESTORE_READY && window.__FIRESTORE_DB && window.__FIRESTORE_helpers){
       try{
-        // subscribe to radio_channels collection if available
-        const db = window.__FIRESTORE_DB;
-        // Use onSnapshot to keep channels updated in real-time
         if(STATE.radio.unsubChannels) STATE.radio.unsubChannels();
-        STATE.radio.unsubChannels = onSnapshot(collection(db,'radio_channels'), snap => {
+        STATE.radio.unsubChannels = window.__FIRESTORE_helpers.onSnapshot(window.__FIRESTORE_helpers.collection(window.__FIRESTORE_DB,'radio_channels'), snap => {
           const arr = [];
-          snap.forEach(s => { const d = s.data(); d._id = s.id; arr.push(d); });
-          // merge with local fallback if empty
+          snap.forEach(s => { const d = s.data(); arr.push({id: s.id, name: d.name}); });
           if(!arr.length) arr.push(...(lsGet('radio_channels',[])||[]));
-          lsSet('radio_channels', arr.map(x=>({id:x._id||x.id, name:x.name||x.id})));
+          lsSet('radio_channels', arr);
           renderChannelListUI(arr);
         }, err => {
           console.error('onSnapshot radio_channels', err);
-          // fallback to local
           renderChannelListUI(lsGet('radio_channels',[]));
         });
       } catch(e){ console.error('loadRadioChannels', e); renderChannelListUI(lsGet('radio_channels',[])); }
@@ -1080,11 +1063,13 @@
     channelsListEl.innerHTML = '';
     selectEl.innerHTML = '';
     (arr || []).forEach(ch=>{
-      const id = ch._id || ch.id;
+      const id = ch.id || ch._id || ch.name;
       const name = ch.name || id;
-      const it = document.createElement('div'); it.className='item'; it.innerHTML = `<div style="flex:1"><b>${name}</b><div class="muted small">${id}</div></div><div><button class="btn-ghost" data-id="${id}">Unirse</button></div>`;
+      const it = document.createElement('div'); it.className='item'; it.dataset.name = name;
+      it.innerHTML = `<div style="flex:1"><b>${name}</b><div class="muted small">${id}</div></div><div style="display:flex;gap:8px"><button class="btn-ghost" data-id="${id}">Unirse</button></div>`;
       it.querySelector('button').onclick = ()=> switchRadioChannel(id);
       channelsListEl.appendChild(it);
+
       const opt = document.createElement('option'); opt.value = id; opt.textContent = name; selectEl.appendChild(opt);
     });
   }
@@ -1093,10 +1078,9 @@
     const val = document.getElementById('radioNewChannel').value.trim();
     if(!val) return;
     const newChan = { name: val, created_at: Date.now() };
-    if(window.__FIRESTORE_READY && window.__FIRESTORE_DB){
+    if(window.__FIRESTORE_READY && window.__FIRESTORE_DB && window.__FIRESTORE_helpers){
       try{
-        const db = window.__FIRESTORE_DB;
-        await addDoc(collection(db,'radio_channels'), newChan);
+        await window.__FIRESTORE_helpers.addDoc(window.__FIRESTORE_helpers.collection(window.__FIRESTORE_DB,'radio_channels'), newChan);
         pushLogLocal(`Canal radio creado: ${val}`);
         document.getElementById('radioNewChannel').value = '';
         await loadRadioChannels();
@@ -1113,33 +1097,27 @@
   async function switchRadioChannel(channelId){
     if(!channelId) return;
     STATE.radio.selectedChannel = channelId;
-    // unsubscribe previous messages listener
     if(STATE.radio.unsubMessages) try{ STATE.radio.unsubMessages(); }catch(e){}
-    // render header selection
     const sel = document.getElementById('radioChannelSelect'); if(sel) sel.value = channelId;
     const list = document.getElementById('radioMessages'); if(!list) return;
     list.innerHTML = '<div class="muted small">Cargando mensajes...</div>';
-    // if Firestore available, listen for messages in real-time
-    if(window.__FIRESTORE_READY && window.__FIRESTORE_DB){
+
+    if(window.__FIRESTORE_READY && window.__FIRESTORE_DB && window.__FIRESTORE_helpers){
       try{
         const db = window.__FIRESTORE_DB;
-        // subscribe to radio_messages and filter client-side
-        STATE.radio.unsubMessages = onSnapshot(query(collection(db,'radio_messages'), orderBy('created_at','asc')), snap => {
+        const helpers = window.__FIRESTORE_helpers;
+        if(STATE.radio.unsubMessages) STATE.radio.unsubMessages();
+        STATE.radio.unsubMessages = helpers.onSnapshot(helpers.collection(db,'radio_messages'), snap => {
           const msgs = [];
-          snap.forEach(s => {
-            const d = s.data();
-            d._id = s.id;
-            if((d.channel || '') === channelId) msgs.push(d);
-          });
+          snap.forEach(s => { const d = s.data(); d._id = s.id; if((d.channel||'') === channelId) msgs.push(d); });
+          msgs.sort((a,b)=> (a.created_at||0) - (b.created_at||0));
           renderRadioMessages(msgs);
         }, err => {
           console.error('radio messages snapshot', err);
-          // fallback to local messages
           const arr = (lsGet('radio_messages',[])||[]).filter(m=>m.channel===channelId);
           renderRadioMessages(arr);
         });
-        // initial manual load for immediate UI
-        const qSnap = await getDocs(query(collection(db,'radio_messages'), orderBy('created_at','asc')));
+        const qSnap = await helpers.getDocs(helpers.query(helpers.collection(db,'radio_messages'), helpers.orderBy('created_at','asc')));
         const msgs = [];
         qSnap.forEach(s => { const d = s.data(); d._id = s.id; if((d.channel||'')===channelId) msgs.push(d); });
         if(msgs.length) renderRadioMessages(msgs);
@@ -1160,16 +1138,20 @@
     list.innerHTML = '';
     if(!msgs || !msgs.length) { list.innerHTML = '<div class="muted small">Sin mensajes</div>'; return; }
     msgs.forEach(m=>{
-      const it = document.createElement('div'); it.className='item';
-      it.innerHTML = `<div style="flex:1"><b>${m.author||'Anon'}</b><div class="muted small">${m.text}</div></div><div style="text-align:right"><div class="muted tiny">${new Date(m.created_at).toLocaleString()}</div></div>`;
+      const me = (STATE.currentUser && (STATE.currentUser.display === m.author || STATE.currentUser.username === m.author_username));
+      const it = document.createElement('div'); it.className = 'radio-msg ' + (me ? 'me' : '');
+      const avatar = document.createElement('div'); avatar.className='radio-avatar'; avatar.textContent = (m.author||'G').split(' ').map(s=>s[0]||'').slice(0,2).join('').toUpperCase();
+      const bubble = document.createElement('div'); bubble.className = 'radio-bubble ' + (me ? 'me' : '');
+      bubble.innerHTML = `<div style="font-weight:700">${m.author||'Anon'}</div><div>${escapeHtml(m.text||'')}</div><div class="radio-meta">${new Date(m.created_at||0).toLocaleString()}</div>`;
+      it.appendChild(avatar); it.appendChild(bubble);
       list.appendChild(it);
     });
-    // scroll to bottom
     list.scrollTop = list.scrollHeight;
   }
 
   async function sendRadioMessage(){
-    const txt = document.getElementById('radioMsgInput').value.trim();
+    const input = document.getElementById('radioMsgInput');
+    const txt = input.value.trim();
     if(!txt) return;
     const channelId = STATE.radio.selectedChannel;
     if(!channelId){ modalAlert('Error','Selecciona un canal'); return; }
@@ -1180,11 +1162,11 @@
       author_username: STATE.currentUser ? STATE.currentUser.username : 'guest',
       created_at: Date.now()
     };
-    if(window.__FIRESTORE_READY && window.__FIRESTORE_DB){
+    if(window.__FIRESTORE_READY && window.__FIRESTORE_DB && window.__FIRESTORE_helpers){
       try{
-        await addDoc(collection(window.__FIRESTORE_DB,'radio_messages'), payload);
+        await window.__FIRESTORE_helpers.addDoc(window.__FIRESTORE_helpers.collection(window.__FIRESTORE_DB,'radio_messages'), payload);
         pushLogLocal(`Mensaje radio (${channelId}) por ${payload.author_username}`);
-        document.getElementById('radioMsgInput').value = '';
+        input.value = '';
       } catch(e){
         console.error('sendRadioMessage', e);
         modalAlert('Error','No se pudo enviar mensaje (ver consola)');
@@ -1194,24 +1176,17 @@
       arr.push({...payload, id:uid('rm')});
       lsSet('radio_messages', arr);
       pushLogLocal(`Mensaje radio (local) ${channelId}`);
-      document.getElementById('radioMsgInput').value = '';
+      input.value = '';
       switchRadioChannel(channelId);
     }
   }
 
-  /* ========== Administration (roles & users) end ========== */
+  function escapeHtml(str){ return (str+'').replace(/[&<>"']/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[s])); }
 
-  /* ========== Logs (mini header) ========== */
+  /* ---------- Header & misc ---------- */
+  function pushLogLocalSimple(msg){ pushLogLocal(msg); }
   function renderLogsMini(){ const onMap = lsGet('onDuty', {}); const users = lsGet('users', []); const active = Object.keys(onMap).filter(k=>onMap[k]).map(id=> users.find(u=>u.id===id)?.display || id); dutyStatus.textContent = `En servicio: ${active.length}`; userDisplay.textContent = STATE.currentUser ? `${STATE.currentUser.display} (${STATE.currentUser.role})` : 'No conectado'; updateAdminUI(); }
 
-  /* ========== Header helpers ========== */
-  function closeExpanded(){ STATE.expanded=null; expandedRoot.innerHTML=''; window.scrollTo({top:0,behavior:'smooth'}); }
-  function updateHeader(){ STATE.currentUser = lsGet('currentUser', STATE.currentUser); const u = STATE.currentUser; userDisplay.textContent = u? `${u.display} (${u.role})` : 'No conectado'; const on = lsGet('onDuty', {}); const users = lsGet('users', []); const active = Object.keys(on).filter(k=>on[k]).map(id=> users.find(u=>u.id===id)?.display || id); dutyStatus.textContent = `En servicio: ${active.length}`; updateAdminUI(); }
-  btnLogin.addEventListener('click', ()=>{
-    if(STATE.currentUser){ if(confirm('Cerrar sesión?')){ lsSet('currentUser', null); STATE.currentUser=null; STATE.adminMode=false; updateHeader(); pushLogLocal('Sesión cerrada'); renderCards(); } } else openLoginModal();
-  });
-
-  /* ---------- Export/Import (local) ---------- */
   function exportAllLocal(){
     const data = {
       users: lsGet('users',[]), roles: lsGet('roles',{}), templates: lsGet('templates',{}),
@@ -1225,19 +1200,16 @@
     pushLogLocal('Datos exportados (local)');
   }
 
-  /* ---------- Init ---------- */
-  function initUI(){
-    seedIfNeeded();
-    renderCards();
-    STATE.currentUser = lsGet('currentUser', STATE.currentUser);
-    updateHeader();
-    renderLogsMini();
-  }
+  function updateHeader(){ STATE.currentUser = lsGet('currentUser', STATE.currentUser); const u = STATE.currentUser; userDisplay.textContent = u? `${u.display} (${u.role})` : 'No conectado'; const on = lsGet('onDuty', {}); const users = lsGet('users', []); const active = Object.keys(on).filter(k=>on[k]).map(id=> users.find(u=>u.id===id)?.display || id); dutyStatus.textContent = `En servicio: ${active.length}`; updateAdminUI(); }
 
-  // Make sure admin UI is shown/hidden correctly on load
-  initUI();
+  function closeExpanded(){ STATE.expanded=null; expandedRoot.innerHTML=''; window.scrollTo({top:0,behavior:'smooth'}); }
+
+  /* Init */
+  seedIfNeeded();
+  renderCards();
+  STATE.currentUser = lsGet('currentUser', STATE.currentUser);
+  updateHeader();
 
   </script>
 </body>
 </html>
-```
