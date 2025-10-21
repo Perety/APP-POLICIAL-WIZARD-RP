@@ -1,361 +1,830 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PDA | Daynight RP</title>
-  <style>
-    :root {
-      --bg: #0a0a14;
-      --panel: rgba(255,255,255,0.04);
-      --border: rgba(255,255,255,0.07);
-      --text: #f3f3f3;
-      --muted: #a0a0b0;
-      --accent: #8f5cff;
-      --accent2: #00d1ff;
-      --success: #3ef6a0;
-      --danger: #ff4e6d;
-      --radius: 12px;
-      --shadow: 0 10px 30px rgba(0,0,0,0.4);
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>PDA — Daynight RP (Neon Accent, Firestore-ready)</title>
+<meta name="description" content="PDA/CAD minimal, BOLO, Multas, Alertas, notifs estilo FiveM.">
 
-    body {
-      font-family: "Inter", sans-serif;
-      background: radial-gradient(circle at 20% 20%, rgba(143,92,255,0.1), transparent 50%), var(--bg);
-      color: var(--text);
-      margin: 0;
-      padding: 0;
-      overflow-x: hidden;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-    }
+<style>
+  /* ================= Theme: Neon Accent (clean, professional) ================= */
+  :root{
+    --bg:#030417;
+    --panel: rgba(255,255,255,0.03);
+    --glass: rgba(255,255,255,0.025);
+    --border: rgba(255,255,255,0.05);
+    --muted:#9fb3bd;
+    --text:#e9f9ff;
+    --accent1:#7c3aed; /* violet */
+    --accent2:#06b6e4; /* cyan */
+    --success:#30d39a;
+    --danger:#ff6b6b;
+    --radius:12px;
+    --shadow: 0 18px 48px rgba(2,6,10,0.6);
+  }
 
-    header {
-      padding: 20px 40px;
-      border-bottom: 1px solid var(--border);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: rgba(0,0,0,0.3);
-      backdrop-filter: blur(10px);
-    }
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; -webkit-font-smoothing:antialiased}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(800px 360px at 12% 12%, rgba(124,58,237,0.06), transparent 25%),
+      linear-gradient(180deg,var(--bg), #071428 60%);
+    color:var(--text);
+    padding:20px;
+  }
 
-    header h1 {
-      font-size: 1.2rem;
-      letter-spacing: 0.05em;
-      color: var(--accent2);
-    }
+  /* subtle grain */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none;
+    background-image: linear-gradient(135deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+    background-size: 6px 6px; opacity:0.6; mix-blend-mode: overlay;
+  }
 
-    main {
-      flex: 1;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 20px;
-      padding: 30px 40px;
-    }
+  /* Layout */
+  .wrap{max-width:1100px;margin:0 auto}
+  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
+  .brand h1{margin:0;font-size:18px;letter-spacing:0.6px}
+  .subtitle{font-size:12px;color:var(--muted)}
 
-    .panel {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+  .controls{display:flex;gap:8px;align-items:center}
+  .pill{background:var(--glass);padding:8px 10px;border-radius:999px;color:var(--muted);font-weight:700;font-size:13px}
 
-    .panel:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 60px rgba(143,92,255,0.25);
-    }
+  .btn{background:linear-gradient(90deg,var(--accent1),var(--accent2));border:none;padding:8px 12px;border-radius:10px;color:#02141a;cursor:pointer;font-weight:800}
+  .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);padding:7px 10px;border-radius:10px;cursor:pointer}
+  .btn-sm{padding:6px 8px;border-radius:8px;font-size:13px}
 
-    .panel-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
+  /* Grid of panels */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:640px){ .grid{grid-template-columns:1fr} }
 
-    .panel-header h2 {
-      font-size: 1rem;
-      color: var(--accent);
-      margin: 0;
-    }
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:var(--radius);
+    padding:14px;
+    box-shadow:var(--shadow);
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
+  }
+  .panel:hover{ transform:translateY(-6px); box-shadow:0 30px 80px rgba(0,0,0,0.6); border-color: rgba(124,58,237,0.12) }
 
-    .panel-body {
-      font-size: 0.9rem;
-      color: var(--muted);
-      flex: 1;
-      overflow-y: auto;
-      scrollbar-width: thin;
-      padding-right: 4px;
-    }
+  .panel-header{display:flex;justify-content:space-between;align-items:center}
+  .panel-title{font-weight:900;color:var(--accent1);font-size:15px}
+  .panel-sub{font-size:13px;color:var(--muted)}
 
-    .btn {
-      background: linear-gradient(90deg, var(--accent), var(--accent2));
-      border: none;
-      border-radius: 8px;
-      color: #fff;
-      padding: 6px 12px;
-      cursor: pointer;
-      font-weight: 600;
-      transition: background 0.2s ease;
-    }
+  .panel-body{flex:1; overflow:auto; font-size:14px; color:var(--muted); padding-right:6px}
+  .list{display:flex;flex-direction:column;gap:8px}
 
-    .btn:hover {
-      filter: brightness(1.1);
-    }
+  .list .item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
+  .item-left{max-width:72%}
+  .item-title{font-weight:800;color:var(--text)}
+  .item-meta{font-size:13px;color:var(--muted);margin-top:4px}
 
-    .btn-ghost {
-      background: transparent;
-      border: 1px solid var(--border);
-      color: var(--muted);
-      border-radius: 8px;
-      padding: 6px 10px;
-      cursor: pointer;
-      transition: color 0.2s ease, border-color 0.2s ease;
-    }
+  .panel-actions{display:flex;gap:8px;justify-content:flex-end;align-items:center}
 
-    .btn-ghost:hover {
-      color: var(--accent);
-      border-color: var(--accent);
-    }
+  footer{margin-top:18px;padding:12px;text-align:center;color:var(--muted);font-size:13px}
 
-    .item {
-      background: rgba(255,255,255,0.02);
-      border-radius: 8px;
-      padding: 10px;
-      margin-bottom: 8px;
-      border: 1px solid rgba(255,255,255,0.04);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+  /* notifications (FiveM-like toasts) */
+  #toasts{position:fixed; right:18px; top:80px; z-index:99999; display:flex;flex-direction:column;gap:10px; width:320px; pointer-events:none}
+  .toast{pointer-events:auto;display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;background:linear-gradient(90deg,var(--accent2),var(--accent1));color:#02141a;font-weight:800;box-shadow:0 12px 34px rgba(0,0,0,0.6);animation:toastIn .22s ease both}
+  @keyframes toastIn{from{opacity:0;transform:translateY(-8px) scale(.98)}to{opacity:1;transform:none}}
+  .toast .t-body{font-weight:600;color:rgba(2,20,26,0.95)}
+  .toast .t-close{margin-left:auto;background:transparent;border:none;color:rgba(2,20,26,0.85);font-weight:900;cursor:pointer}
 
-    .item strong {
-      color: var(--accent2);
-    }
+  /* small helpers */
+  .muted{color:var(--muted)}
+  .hidden{display:none}
 
-    footer {
-      text-align: center;
-      padding: 20px;
-      color: var(--muted);
-      font-size: 0.8rem;
-      border-top: 1px solid var(--border);
-      background: rgba(0,0,0,0.4);
-      backdrop-filter: blur(10px);
-    }
+  /* refresh pulse */
+  .pulse{animation:pulse .9s ease}
+  @keyframes pulse{0%{box-shadow:0 0 0 rgba(124,58,237,0.12)}70%{box-shadow:0 0 30px rgba(124,58,237,0.04)}100%{box-shadow:none}}
 
-    /* FiveM-like notifications */
-    #notifications {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 9999;
-    }
-
-    .notif {
-      background: linear-gradient(120deg, rgba(143,92,255,0.9), rgba(0,209,255,0.9));
-      color: white;
-      padding: 10px 16px;
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      font-weight: 600;
-      animation: notifIn 0.4s ease, notifOut 0.4s ease 3.5s forwards;
-    }
-
-    @keyframes notifIn {
-      from { opacity: 0; transform: translateY(-10px) scale(0.95); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
-
-    @keyframes notifOut {
-      to { opacity: 0; transform: translateY(-10px); }
-    }
-
-  </style>
+  /* modal */
+  .modal-back{position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,0.5);z-index:999999}
+  .modal{background:var(--panel);border-radius:12px;padding:16px;min-width:320px;max-width:760px;box-shadow:var(--shadow)}
+  .form-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+  input,textarea,select{background:transparent;border:1px solid var(--border);color:var(--text);padding:8px;border-radius:8px;width:100%}
+</style>
 </head>
 <body>
-  <header>
-    <h1>📋 Daynight RP - PDA</h1>
-    <button id="refreshAll" class="btn-ghost">Refrescar Todo</button>
-  </header>
-
-  <main>
-    <div class="panel" id="panelWanted">
-      <div class="panel-header">
-        <h2>BOLO / Wanted</h2>
-        <button class="btn-ghost" onclick="refreshWanted()">⟳</button>
+  <div class="wrap" role="main">
+    <header>
+      <div class="brand">
+        <div class="logo" aria-hidden="true">
+          <!-- simple icon -->
+          <svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="0" y="0" width="24" height="24" rx="5" fill="white" fill-opacity="0.06"/>
+            <path d="M6 7h12M6 12h12M6 17h12" stroke="white" stroke-opacity="0.9" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div>
+          <h1>PDA — Daynight RP</h1>
+          <div class="subtitle">BOLO | Multas | Alertas — Notifs estilo FiveM</div>
+        </div>
       </div>
-      <div class="panel-body" id="wantedList"></div>
-      <button class="btn" onclick="newWanted()">Nuevo BOLO</button>
-    </div>
 
-    <div class="panel" id="panelFines">
-      <div class="panel-header">
-        <h2>Multas</h2>
-        <button class="btn-ghost" onclick="refreshFines()">⟳</button>
+      <div class="controls">
+        <div id="userDisplay" class="pill">No conectado</div>
+        <button id="refreshAll" class="btn-ghost">Refrescar Todo</button>
+        <button id="exportBtn" class="btn">Exportar</button>
       </div>
-      <div class="panel-body" id="finesList"></div>
-      <button class="btn" onclick="newFine()">Nueva Multa</button>
-    </div>
+    </header>
 
-    <div class="panel" id="panelAlerts">
-      <div class="panel-header">
-        <h2>Alertas</h2>
-        <button class="btn-ghost" onclick="refreshAlerts()">⟳</button>
+    <section class="grid" id="panelsRoot">
+      <!-- Panels will be rendered into this grid, but we include initial markup for clarity -->
+      <div class="panel" id="panel-wanted">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">BOLO / Wanted</div>
+            <div class="panel-sub muted">Listados y prioridades</div>
+          </div>
+          <div class="panel-actions">
+            <button class="btn-ghost btn-sm" data-refresh="wanted">⟳</button>
+            <button class="btn btn-sm" data-open="wanted">Abrir</button>
+          </div>
+        </div>
+        <div class="panel-body" id="wantedPreview">
+          <div class="muted">Cargando...</div>
+        </div>
       </div>
-      <div class="panel-body" id="alertsList"></div>
-      <button class="btn" onclick="newAlert()">Enviar Alerta</button>
-    </div>
-  </main>
 
-  <footer>Interfaz CAD Profesional - Estilo Neon Accent | Daynight RP</footer>
+      <div class="panel" id="panel-fines">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Multas</div>
+            <div class="panel-sub muted">Gestionar multas y pagos</div>
+          </div>
+          <div class="panel-actions">
+            <button class="btn-ghost btn-sm" data-refresh="fines">⟳</button>
+            <button class="btn btn-sm" data-open="fines">Abrir</button>
+          </div>
+        </div>
+        <div class="panel-body" id="finesPreview">
+          <div class="muted">Cargando...</div>
+        </div>
+      </div>
 
-  <div id="notifications"></div>
+      <div class="panel" id="panel-alerts">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">Alertas</div>
+            <div class="panel-sub muted">Enviar alertas a la ciudad</div>
+          </div>
+          <div class="panel-actions">
+            <button class="btn-ghost btn-sm" data-refresh="alerts">⟳</button>
+            <button class="btn btn-sm" data-open="alerts">Abrir</button>
+          </div>
+        </div>
+        <div class="panel-body" id="alertsPreview">
+          <div class="muted">Cargando...</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Expanded panel area -->
+    <div id="expandedRoot" style="margin-top:14px"></div>
+
+    <footer>Interfaz profesional • Mantén Firebase inicializado en otro script (este archivo detecta la presencia)</footer>
+  </div>
+
+  <!-- Toasts -->
+  <div id="toasts" aria-live="polite" aria-atomic="true"></div>
 
   <script>
-    const wantedList = document.getElementById('wantedList');
-    const finesList = document.getElementById('finesList');
-    const alertsList = document.getElementById('alertsList');
-    const notifs = document.getElementById('notifications');
+/* ========================= PDA / CAD main script =========================
+   - Uses Firestore if already initialized in your app (supports modular & compat)
+   - Adds Refresh buttons, BOLO/Wanted, Multas, Alertas
+   - Notifications styled like FiveM (toasts)
+   - Keeps clean minimal neon-accent aesthetic and original structure
+   ===================================================================== */
 
-    const state = {
-      wanted: [],
-      fines: [],
-      alerts: []
+(function(){
+  /* ---------------- Firestore adapter (detect modular vs compat) ---------------- */
+  const FireDB = (function(){
+    const hasModular = (typeof getFirestore === 'function' && typeof collection === 'function');
+    const hasCompat = (typeof firebase !== 'undefined' && firebase.firestore);
+    let dbMod = null;
+    if(hasModular){
+      try { dbMod = getFirestore(); } catch(e){ dbMod = null; }
+    }
+
+    function available(){ return !!(hasModular || hasCompat); }
+
+    return {
+      available: available(),
+      hasModular, hasCompat, dbMod,
+      COL(name){
+        if(hasModular && dbMod) return collection(dbMod, name);
+        if(hasCompat) return firebase.firestore().collection(name);
+        return null;
+      },
+      async getAll(name){
+        try{
+          if(hasModular && dbMod){
+            if(typeof getDocs !== 'function') throw new Error('Missing getDocs import for modular SDK');
+            const snap = await getDocs(collection(dbMod, name));
+            const out = []; snap.forEach(d=> out.push({ id:d.id, ...d.data() }));
+            return out;
+          } else if(hasCompat){
+            const snap = await firebase.firestore().collection(name).get();
+            const out = []; snap.forEach(d=> out.push({ id:d.id, ...d.data() }));
+            return out;
+          }
+        }catch(e){ console.warn('FireDB.getAll error', e); }
+        return null;
+      },
+      async add(name, data){
+        try{
+          if(hasModular && dbMod){
+            if(typeof addDoc !== 'function') throw new Error('Missing addDoc import for modular SDK');
+            const res = await addDoc(collection(dbMod, name), data);
+            return { id: res.id, ...data };
+          } else if(hasCompat){
+            const ref = await firebase.firestore().collection(name).add(data);
+            return { id: ref.id, ...data };
+          }
+        }catch(e){ console.warn('FireDB.add error', e); }
+        return null;
+      },
+      async del(name, id){
+        try{
+          if(hasModular && dbMod){
+            if(typeof deleteDoc !== 'function' || typeof doc !== 'function') throw new Error('Missing deleteDoc/doc import');
+            await deleteDoc(doc(dbMod, name, id));
+            return true;
+          } else if(hasCompat){
+            await firebase.firestore().collection(name).doc(id).delete();
+            return true;
+          }
+        }catch(e){ console.warn('FireDB.del error', e); }
+        return false;
+      },
+      async update(name, id, patch){
+        try{
+          if(hasModular && dbMod){
+            if(typeof updateDoc !== 'function' || typeof doc !== 'function') throw new Error('Missing updateDoc/doc import');
+            await updateDoc(doc(dbMod, name, id), patch);
+            return true;
+          } else if(hasCompat){
+            await firebase.firestore().collection(name).doc(id).update(patch);
+            return true;
+          }
+        }catch(e){ console.warn('FireDB.update error', e); }
+        return false;
+      },
+      listen(name, onChange){
+        try{
+          if(hasModular && dbMod){
+            if(typeof onSnapshot !== 'function') { console.warn('onSnapshot missing for modular'); return null; }
+            const q = collection(dbMod, name);
+            return onSnapshot(q, snap => { const out=[]; snap.forEach(d=> out.push({ id:d.id, ...d.data() })); onChange(out); });
+          } else if(hasCompat){
+            return firebase.firestore().collection(name).onSnapshot(snap => { const out=[]; snap.forEach(d=> out.push({ id:d.id, ...d.data() })); onChange(out); });
+          }
+        }catch(e){ console.warn('FireDB.listen error', e); }
+        return null;
+      }
     };
+  })();
 
-    /* ========== UTILIDADES ========== */
-    function notify(msg) {
-      const div = document.createElement('div');
-      div.className = 'notif';
-      div.textContent = msg;
-      notifs.appendChild(div);
-      setTimeout(() => div.remove(), 4000);
+  /* ---------------- State ---------------- */
+  const STATE = {
+    currentUser: null,
+    wanted: [],
+    fines: [],
+    alerts: []
+  };
+
+  const COLLECTIONS = {
+    wanted: 'wanted',
+    fines: 'fines',
+    alerts: 'alerts',
+    users: 'users'
+  };
+
+  /* ---------------- DOM refs ---------------- */
+  const wantedPreview = document.getElementById('wantedPreview');
+  const finesPreview = document.getElementById('finesPreview');
+  const alertsPreview = document.getElementById('alertsPreview');
+  const expandedRoot = document.getElementById('expandedRoot');
+  const toasts = document.getElementById('toasts');
+  const userDisplay = document.getElementById('userDisplay');
+
+  /* ---------------- Notifications (FiveM-like) ---------------- */
+  let TOAST_ID = 0;
+  function notify(type, title, text, ttl=3500){
+    // type: info|success|warn|danger
+    const id = ++TOAST_ID;
+    const el = document.createElement('div');
+    el.className = 'toast';
+    el.dataset.id = id;
+    const emoji = type==='danger' ? '⚠️' : type==='success' ? '✅' : type==='warn' ? '🚨' : 'ℹ️';
+    el.innerHTML = `<div style="font-weight:900">${emoji} ${title}</div><div class="t-body" style="margin-left:8px">${text || ''}</div><button class="t-close" aria-label="Cerrar">×</button>`;
+    toasts.prepend(el);
+    el.querySelector('.t-close').addEventListener('click', ()=> removeToast(id));
+    if(ttl>0) setTimeout(()=> removeToast(id), ttl);
+    return id;
+  }
+  function removeToast(id){
+    const t = toasts.querySelector(`.toast[data-id="${id}"]`);
+    if(!t) return;
+    t.style.opacity = '0'; t.style.transform = 'translateY(-8px)';
+    setTimeout(()=> { if(t.parentNode) t.remove(); }, 220);
+  }
+
+  /* ---------------- Helpers ---------------- */
+  function el(tag, props={}, children=[]){
+    const e = document.createElement(tag);
+    Object.entries(props).forEach(([k,v])=>{
+      if(k === 'class') e.className = v;
+      else if(k.startsWith('data-')) e.setAttribute(k, v);
+      else if(k === 'html') e.innerHTML = v;
+      else e[k]=v;
+    });
+    (Array.isArray(children) ? children : [children]).forEach(c=>{
+      if(typeof c === 'string') e.appendChild(document.createTextNode(c));
+      else if(c instanceof Node) e.appendChild(c);
+    });
+    return e;
+  }
+
+  function escapeHtml(s){ if(s===undefined||s===null) return ''; return String(s).replace(/[&<>"']/g, m=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]); }
+
+  /* ---------------- Panel: previews (first-load) ---------------- */
+  function renderWantedPreview(){
+    wantedPreview.innerHTML = '';
+    const list = el('div',{class:'list'});
+    const sample = STATE.wanted.slice(0,5);
+    if(sample.length===0) list.appendChild(el('div',{class:'muted'}, 'Sin BOLOs activos'));
+    else sample.forEach(w=>{
+      const itm = el('div',{class:'item'}, [
+        el('div',{class:'item-left'}, [
+          el('div',{class:'item-title', html:escapeHtml(w.name || w.name === 0 ? w.name : 'No identificado')}),
+          el('div',{class:'item-meta', html:escapeHtml((w.reason||'') + (w.priority ? ' • ' + w.priority : ''))})
+        ]),
+        el('div',{}, [
+          el('button',{class:'btn-ghost btn-sm', onclick:()=> openWantedView(w.id)}, 'Ver')
+        ])
+      ]);
+      list.appendChild(itm);
+    });
+    wantedPreview.appendChild(list);
+  }
+
+  function renderFinesPreview(){
+    finesPreview.innerHTML = '';
+    const list = el('div',{class:'list'});
+    const sample = STATE.fines.slice(0,5);
+    if(sample.length===0) list.appendChild(el('div',{class:'muted'}, 'Sin multas'));
+    else sample.forEach(f=>{
+      const itm = el('div',{class:'item'}, [
+        el('div',{class:'item-left'}, [
+          el('div',{class:'item-title', html:escapeHtml(f.owner || '—')}),
+          el('div',{class:'item-meta', html:escapeHtml((f.reason||'') + (f.amount ? ' • ' + f.amount + '€' : ''))})
+        ]),
+        el('div',{}, [
+          el('button',{class:'btn-ghost btn-sm', onclick:()=> openFineView(f.id)}, 'Ver')
+        ])
+      ]);
+      list.appendChild(itm);
+    });
+    finesPreview.appendChild(list);
+  }
+
+  function renderAlertsPreview(){
+    alertsPreview.innerHTML = '';
+    const list = el('div',{class:'list'});
+    const sample = STATE.alerts.slice(0,5);
+    if(sample.length===0) list.appendChild(el('div',{class:'muted'}, 'Sin alertas enviadas'));
+    else sample.forEach(a=>{
+      const itm = el('div',{class:'item'}, [
+        el('div',{class:'item-left'}, [
+          el('div',{class:'item-title', html:escapeHtml(a.title || 'Alerta')}),
+          el('div',{class:'item-meta', html:escapeHtml(a.msg || '')})
+        ]),
+        el('div',{}, [
+          el('button',{class:'btn-ghost btn-sm', onclick:()=> viewAlert(a.id)}, 'Ver')
+        ])
+      ]);
+      list.appendChild(itm);
+    });
+    alertsPreview.appendChild(list);
+  }
+
+  /* ---------------- Expanded panels (Wanted / Fines / Alerts) ---------------- */
+  function clearExpanded(){
+    if(!expandedRoot.firstElementChild) return;
+    const node = expandedRoot.firstElementChild;
+    node.style.animation = 'panelOut .18s ease forwards';
+    setTimeout(()=> expandedRoot.innerHTML='', 190);
+  }
+
+  function openPanel(type){
+    clearExpanded();
+    const panel = el('div',{class:'panel expanded'});
+    panel.style.animation = 'none';
+    const header = el('div',{class:'panel-header'}, [
+      el('div',{}, [ el('div',{class:'panel-title', html: type==='wanted' ? 'BOLO / Wanted' : type==='fines' ? 'Multas' : 'Alertas'}), el('div',{class:'panel-sub muted', html: type==='wanted' ? 'Gestiona BOLOs' : type==='fines' ? 'Gestiona Multas' : 'Enviar alertas'}) ]),
+      el('div',{class:'panel-actions'}, [
+        el('button',{class:'btn-ghost btn-sm', onclick:()=> refreshOne(type)}, '⟳'),
+        el('button',{class:'btn btn-sm', onclick:()=> clearExpanded()}, 'Cerrar')
+      ])
+    ]);
+    const body = el('div',{class:'panel-body'});
+    panel.appendChild(header);
+    panel.appendChild(body);
+
+    // content by type
+    if(type === 'wanted') {
+      body.appendChild(renderWantedPanelBody());
+    } else if(type === 'fines'){
+      body.appendChild(renderFinesPanelBody());
+    } else if(type === 'alerts'){
+      body.appendChild(renderAlertsPanelBody());
     }
 
-    /* ========== BOLO / Wanted ========== */
-    async function refreshWanted() {
-      wantedList.innerHTML = '';
-      if (typeof getFirestore === 'function') {
-        const snap = await getDocs(collection(getFirestore(), 'wanted'));
-        state.wanted = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      }
-      if (!state.wanted.length) state.wanted = [{ name: "John Doe", reason: "Sospechoso de robo", priority: "Alta" }];
-      state.wanted.forEach(w => {
-        const el = document.createElement('div');
-        el.className = 'item';
-        el.innerHTML = `<div><strong>${w.name}</strong><div>${w.reason}</div></div>
-                        <button class="btn-ghost" onclick="delWanted('${w.id}')">Eliminar</button>`;
-        wantedList.appendChild(el);
+    expandedRoot.appendChild(panel);
+    panel.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+
+  function renderWantedPanelBody(){
+    const container = el('div',{});
+    const toolbar = el('div',{style:'display:flex;justify-content:space-between;align-items:center;gap:8px'}, [
+      el('div',{}, [ el('input',{id:'searchWanted', placeholder:'Buscar por nombre o motivo', style:'padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);width:100%'}) ]),
+      el('div',{}, [ el('button',{class:'btn btn-sm', onclick:()=> triggerNewWanted()}, 'Nuevo BOLO'), el('button',{class:'btn-ghost btn-sm', onclick:()=> refreshOne('wanted')}, 'Refrescar') ])
+    ]);
+    const list = el('div',{class:'list', id:'wantedListFull', style:'margin-top:12px;max-height:380px;overflow:auto'});
+
+    container.appendChild(toolbar);
+    container.appendChild(list);
+
+    // initial render
+    function renderList(items){
+      list.innerHTML = '';
+      if(!items.length) list.appendChild(el('div',{class:'muted'}, 'Sin BOLOs activos'));
+      else items.forEach(w=>{
+        const it = el('div',{class:'item'}, [
+          el('div',{class:'item-left'}, [ el('div',{class:'item-title', html:escapeHtml(w.name||'—')}), el('div',{class:'item-meta', html:escapeHtml((w.reason||'') + (w.priority ? ' • ' + w.priority : ''))}) ]),
+          el('div',{}, [
+            el('button',{class:'btn-sm btn-ghost', onclick:()=> viewWanted(w.id)}, 'Ver'),
+            el('button',{class:'btn-sm btn', onclick:()=> removeWanted(w.id)}, 'Borrar')
+          ])
+        ]);
+        list.appendChild(it);
       });
-      notify("BOLOs actualizados");
     }
 
-    async function newWanted() {
-      const name = prompt("Nombre del sospechoso:");
-      const reason = prompt("Motivo:");
-      const data = { name, reason, createdAt: new Date().toISOString() };
-      if (typeof getFirestore === 'function') {
-        await addDoc(collection(getFirestore(), 'wanted'), data);
-      }
-      state.wanted.push(data);
-      refreshWanted();
-      notify("Nuevo BOLO añadido");
-    }
+    renderList(STATE.wanted);
 
-    async function delWanted(id) {
-      if (typeof getFirestore === 'function' && id) await deleteDoc(doc(getFirestore(), 'wanted', id));
-      state.wanted = state.wanted.filter(w => w.id !== id);
-      refreshWanted();
-      notify("BOLO eliminado");
-    }
-
-    /* ========== MULTAS ========== */
-    async function refreshFines() {
-      finesList.innerHTML = '';
-      if (typeof getFirestore === 'function') {
-        const snap = await getDocs(collection(getFirestore(), 'fines'));
-        state.fines = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      }
-      if (!state.fines.length) state.fines = [{ owner: "Carlos Díaz", reason: "Exceso de velocidad", amount: 250 }];
-      state.fines.forEach(f => {
-        const el = document.createElement('div');
-        el.className = 'item';
-        el.innerHTML = `<div><strong>${f.owner}</strong><div>${f.reason} • ${f.amount || 0}€</div></div>
-                        <button class="btn-ghost" onclick="delFine('${f.id}')">Eliminar</button>`;
-        finesList.appendChild(el);
-      });
-      notify("Multas actualizadas");
-    }
-
-    async function newFine() {
-      const owner = prompt("Titular de la multa:");
-      const reason = prompt("Motivo:");
-      const amount = prompt("Importe (€):");
-      const data = { owner, reason, amount, createdAt: new Date().toISOString() };
-      if (typeof getFirestore === 'function') {
-        await addDoc(collection(getFirestore(), 'fines'), data);
-      }
-      state.fines.push(data);
-      refreshFines();
-      notify("Nueva multa añadida");
-    }
-
-    async function delFine(id) {
-      if (typeof getFirestore === 'function' && id) await deleteDoc(doc(getFirestore(), 'fines', id));
-      state.fines = state.fines.filter(f => f.id !== id);
-      refreshFines();
-      notify("Multa eliminada");
-    }
-
-    /* ========== ALERTAS ========== */
-    async function refreshAlerts() {
-      alertsList.innerHTML = '';
-      if (typeof getFirestore === 'function') {
-        const snap = await getDocs(collection(getFirestore(), 'alerts'));
-        state.alerts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-      }
-      if (!state.alerts.length) state.alerts = [{ title: "Patrulla requerida", msg: "Central solicita apoyo en sector norte" }];
-      state.alerts.forEach(a => {
-        const el = document.createElement('div');
-        el.className = 'item';
-        el.innerHTML = `<div><strong>${a.title || 'Alerta'}</strong><div>${a.msg || ''}</div></div>`;
-        alertsList.appendChild(el);
-      });
-      notify("Alertas actualizadas");
-    }
-
-    async function newAlert() {
-      const title = prompt("Título de la alerta:");
-      const msg = prompt("Mensaje:");
-      const data = { title, msg, createdAt: new Date().toISOString() };
-      if (typeof getFirestore === 'function') {
-        await addDoc(collection(getFirestore(), 'alerts'), data);
-      }
-      state.alerts.push(data);
-      refreshAlerts();
-      notify("Nueva alerta enviada");
-    }
-
-    /* ========== GENERAL ========== */
-    document.getElementById('refreshAll').addEventListener('click', () => {
-      refreshWanted();
-      refreshFines();
-      refreshAlerts();
-      notify("Todo actualizado");
+    // search behavior
+    container.querySelector('#searchWanted').addEventListener('input', function(e){
+      const q = (e.target.value || '').toLowerCase().trim();
+      if(!q) renderList(STATE.wanted);
+      else renderList(STATE.wanted.filter(x => (x.name||'').toLowerCase().includes(q) || (x.reason||'').toLowerCase().includes(q)));
     });
 
-    refreshWanted();
-    refreshFines();
-    refreshAlerts();
+    return container;
+  }
+
+  function renderFinesPanelBody(){
+    const container = el('div',{});
+    const toolbar = el('div',{style:'display:flex;justify-content:space-between;align-items:center;gap:8px'}, [
+      el('div',{}, [ el('input',{id:'searchFines', placeholder:'Buscar por titular o motivo', style:'padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);width:100%'}) ]),
+      el('div',{}, [ el('button',{class:'btn btn-sm', onclick:()=> triggerNewFine()}, 'Nueva Multa'), el('button',{class:'btn-ghost btn-sm', onclick:()=> refreshOne('fines')}, 'Refrescar') ])
+    ]);
+    const list = el('div',{class:'list', id:'finesListFull', style:'margin-top:12px;max-height:380px;overflow:auto'});
+
+    container.appendChild(toolbar);
+    container.appendChild(list);
+
+    function renderList(items){
+      list.innerHTML = '';
+      if(!items.length) list.appendChild(el('div',{class:'muted'}, 'Sin multas'));
+      else items.forEach(f=>{
+        const it = el('div',{class:'item'}, [
+          el('div',{class:'item-left'}, [ el('div',{class:'item-title', html:escapeHtml(f.owner||'—')}), el('div',{class:'item-meta', html:escapeHtml((f.reason||'') + (f.amount ? ' • ' + f.amount + '€' : ''))}) ]),
+          el('div',{}, [
+            el('button',{class:'btn-sm btn-ghost', onclick:()=> viewFine(f.id)}, f.paid ? 'Reembolsar' : 'Pagar'),
+            el('button',{class:'btn-sm btn', onclick:()=> removeFine(f.id)}, 'Eliminar')
+          ])
+        ]);
+        list.appendChild(it);
+      });
+    }
+
+    renderList(STATE.fines);
+
+    container.querySelector('#searchFines').addEventListener('input', function(e){
+      const q = (e.target.value || '').toLowerCase().trim();
+      if(!q) renderList(STATE.fines);
+      else renderList(STATE.fines.filter(x => (x.owner||'').toLowerCase().includes(q) || (x.reason||'').toLowerCase().includes(q)));
+    });
+
+    return container;
+  }
+
+  function renderAlertsPanelBody(){
+    const container = el('div',{});
+    const toolbar = el('div',{style:'display:flex;justify-content:space-between;align-items:center;gap:8px'}, [
+      el('div',{}, [ el('input',{id:'searchAlerts', placeholder:'Buscar por título o mensaje', style:'padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);width:100%'}) ]),
+      el('div',{}, [ el('button',{class:'btn btn-sm', onclick:()=> triggerNewAlert()}, 'Nueva Alerta'), el('button',{class:'btn-ghost btn-sm', onclick:()=> refreshOne('alerts')}, 'Refrescar') ])
+    ]);
+    const list = el('div',{class:'list', id:'alertsListFull', style:'margin-top:12px;max-height:380px;overflow:auto'});
+
+    container.appendChild(toolbar);
+    container.appendChild(list);
+
+    function renderList(items){
+      list.innerHTML = '';
+      if(!items.length) list.appendChild(el('div',{class:'muted'}, 'Sin alertas'));
+      else items.forEach(a=>{
+        const it = el('div',{class:'item'}, [
+          el('div',{class:'item-left'}, [ el('div',{class:'item-title', html:escapeHtml(a.title||'Alerta')}), el('div',{class:'item-meta', html:escapeHtml(a.msg||'')}) ]),
+          el('div',{}, [ el('button',{class:'btn-sm btn-ghost', onclick:()=> viewAlert(a.id)}, 'Ver') ])
+        ]);
+        list.appendChild(it);
+      });
+    }
+
+    renderList(STATE.alerts);
+
+    container.querySelector('#searchAlerts').addEventListener('input', function(e){
+      const q = (e.target.value || '').toLowerCase().trim();
+      if(!q) renderList(STATE.alerts);
+      else renderList(STATE.alerts.filter(x => (x.title||'').toLowerCase().includes(q) || (x.msg||'').toLowerCase().includes(q)));
+    });
+
+    return container;
+  }
+
+  /* ---------------- View / CRUD actions (Wanted) ---------------- */
+  async function loadWanted(){
+    try {
+      const dbdata = await FireDB.getAll(COLLECTIONS.wanted);
+      if(dbdata) STATE.wanted = dbdata;
+    } catch(e){ console.warn('loadWanted error', e); }
+    renderWantedPreview();
+  }
+
+  async function triggerNewWanted(){
+    const name = prompt('Nombre del sujeto:') || '';
+    if(!name) return;
+    const reason = prompt('Motivo:') || '';
+    const priority = prompt('Prioridad (Alta/Media/Baja):') || '';
+    const doc = { name, reason, priority, createdAt: new Date().toISOString() };
+    if(FireDB.available){
+      const created = await FireDB.add(COLLECTIONS.wanted, doc);
+      if(created) STATE.wanted.unshift(created);
+      else { doc.id = `bolo${Date.now().toString().slice(-5)}`; STATE.wanted.unshift(doc); notify('warn','BOLO guardado local','Firestore no respondió'); }
+    } else {
+      doc.id = `bolo${Date.now().toString().slice(-5)}`;
+      STATE.wanted.unshift(doc);
+    }
+    renderWantedPreview();
+    notify('success','BOLO creado', name);
+  }
+
+  async function removeWanted(id){
+    if(!id) return;
+    if(FireDB.available){
+      const ok = await FireDB.del(COLLECTIONS.wanted, id);
+      if(!ok){ notify('danger','Error','No se pudo borrar desde Firestore'); return; }
+    }
+    STATE.wanted = STATE.wanted.filter(x=> x.id !== id);
+    const listFull = document.getElementById('wantedListFull'); if(listFull) listFull.dispatchEvent(new Event('refreshList') );
+    renderWantedPreview();
+    notify('info','BOLO eliminado', id || '');
+  }
+
+  function viewWanted(id){
+    const w = STATE.wanted.find(x=>x.id===id) || {};
+    const body = `<h3>${escapeHtml(w.name||'—')}</h3>
+      <p><b>Motivo:</b> ${escapeHtml(w.reason||'')}</p>
+      <p><b>Prioridad:</b> ${escapeHtml(w.priority||'')}</p>
+      <p class="muted small">${escapeHtml(w.notes||'')}</p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button id="closeModal" class="btn-ghost btn-sm">Cerrar</button>
+      </div>`;
+    const m = createModal(body);
+    m.querySelector('#closeModal').addEventListener('click', ()=> m.remove());
+  }
+
+  function openWantedView(id){
+    openPanel('wanted');
+    // small delay for rendering, then if id provided scroll into view / highlight
+    setTimeout(()=> {
+      if(!id) return;
+      const list = document.getElementById('wantedListFull');
+      if(list) {
+        // no exact mapping element ids, so leave as is — user can search
+      }
+    }, 300);
+  }
+
+  /* ---------------- Fines (Multas) CRUD ---------------- */
+  async function loadFines(){
+    try {
+      const dbdata = await FireDB.getAll(COLLECTIONS.fines);
+      if(dbdata) STATE.fines = dbdata;
+    } catch(e){ console.warn('loadFines error', e); }
+    renderFinesPreview();
+  }
+
+  async function triggerNewFine(){
+    const owner = prompt('Titular de la multa:') || '';
+    if(!owner) return;
+    const reason = prompt('Motivo:') || '';
+    const amountRaw = prompt('Importe (€):') || '0';
+    const amount = parseFloat(amountRaw) || 0;
+    const doc = { owner, reason, amount, paid: false, createdAt: new Date().toISOString() };
+    if(FireDB.available){
+      const created = await FireDB.add(COLLECTIONS.fines, doc);
+      if(created) STATE.fines.unshift(created);
+      else { doc.id = `fine${Date.now().toString().slice(-6)}`; STATE.fines.unshift(doc); notify('warn','Multa local','Firestore no respondió'); }
+    } else {
+      doc.id = `fine${Date.now().toString().slice(-6)}`; STATE.fines.unshift(doc);
+    }
+    renderFinesPreview();
+    notify('success','Multa creada', owner + ' • ' + amount + '€');
+  }
+
+  async function removeFine(id){
+    if(!id) return;
+    if(FireDB.available){
+      const ok = await FireDB.del(COLLECTIONS.fines, id);
+      if(!ok){ notify('danger','Error','No se pudo borrar desde Firestore'); return; }
+    }
+    STATE.fines = STATE.fines.filter(x=> x.id !== id);
+    renderFinesPreview();
+    notify('info','Multa eliminada', id || '');
+  }
+
+  function viewFine(id){
+    const f = STATE.fines.find(x=>x.id===id) || {};
+    const body = `<h3>${escapeHtml(f.owner||'—')}</h3>
+      <p><b>Motivo:</b> ${escapeHtml(f.reason||'')}</p>
+      <p><b>Importe:</b> ${escapeHtml(String(f.amount||0))}€</p>
+      <p><b>Estado:</b> ${f.paid ? 'Pagada' : 'Pendiente'}</p>
+      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+        <button id="togglePay" class="btn btn-sm">${f.paid ? 'Marcar sin pagar' : 'Marcar pagada'}</button>
+        <button id="closeModal" class="btn-ghost btn-sm">Cerrar</button>
+      </div>`;
+    const m = createModal(body);
+    m.querySelector('#closeModal').addEventListener('click', ()=> m.remove());
+    m.querySelector('#togglePay').addEventListener('click', async ()=>{
+      const newPaid = !f.paid;
+      if(FireDB.available){
+        const ok = await FireDB.update(COLLECTIONS.fines, id, { paid: newPaid });
+        if(!ok) { notify('danger','Error','No se pudo actualizar en Firestore'); return; }
+      }
+      f.paid = newPaid;
+      m.remove();
+      renderFinesPreview();
+      notify('success','Estado de multa actualizado', f.owner + ' • ' + (f.paid ? 'Pagada' : 'Pendiente'));
+    });
+  }
+
+  function openFineView(id){
+    openPanel('fines');
+  }
+
+  /* ---------------- Alerts ---------------- */
+  async function loadAlerts(){
+    try {
+      const dbdata = await FireDB.getAll(COLLECTIONS.alerts);
+      if(dbdata) STATE.alerts = dbdata;
+    } catch(e){ console.warn('loadAlerts error', e); }
+    renderAlertsPreview();
+  }
+
+  async function triggerNewAlert(){
+    const title = prompt('Título de la alerta:') || 'Alerta';
+    const msg = prompt('Mensaje:') || '';
+    const doc = { title, msg, createdAt: new Date().toISOString() };
+    if(FireDB.available){
+      const created = await FireDB.add(COLLECTIONS.alerts, doc);
+      if(created) STATE.alerts.unshift(created);
+      else { doc.id = `alert${Date.now().toString().slice(-6)}`; STATE.alerts.unshift(doc); notify('warn','Alerta local','Firestore no respondió'); }
+    } else {
+      doc.id = `alert${Date.now().toString().slice(-6)}`; STATE.alerts.unshift(doc);
+    }
+    renderAlertsPreview();
+    notify('warn','Alerta enviada', title);
+  }
+
+  function viewAlert(id){
+    const a = STATE.alerts.find(x=>x.id===id) || {};
+    const body = `<h3>${escapeHtml(a.title||'Alerta')}</h3><p>${escapeHtml(a.msg||'')}</p><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button id="closeModal" class="btn-ghost btn-sm">Cerrar</button></div>`;
+    const m = createModal(body);
+    m.querySelector('#closeModal').addEventListener('click', ()=> m.remove());
+  }
+
+  /* ---------------- Utilities: modal & export ---------------- */
+  function createModal(innerHtml){
+    const wrap = el('div',{class:'modal-back'});
+    const box = el('div',{class:'modal', html: innerHtml});
+    wrap.appendChild(box);
+    document.body.appendChild(wrap);
+    wrap.addEventListener('click', function(e){ if(e.target === wrap) wrap.remove(); });
+    return wrap;
+  }
+
+  async function exportData(){
+    const data = { wanted: STATE.wanted, fines: STATE.fines, alerts: STATE.alerts };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'pda_export_' + Date.now() + '.json'; document.body.appendChild(a); a.click(); a.remove();
+    notify('success','Exportado','Datos descargados');
+  }
+
+  /* ---------------- Refresh and wiring ---------------- */
+  async function refreshOne(name){
+    const hostEl = document.querySelector(`[data-refresh="${name}"]`)?.closest('.panel');
+    if(hostEl) { hostEl.classList.add('pulse'); setTimeout(()=> hostEl.classList.remove('pulse'), 900); }
+    try{
+      if(name === 'wanted') await loadWanted();
+      if(name === 'fines') await loadFines();
+      if(name === 'alerts') await loadAlerts();
+    }catch(e){ console.warn('refreshOne error', e); }
+    notify('info','Refrescado', `Panel ${name} actualizado`);
+  }
+
+  async function refreshAll(){
+    const panels = document.querySelectorAll('.panel');
+    panels.forEach(p=> p.classList.add('pulse'));
+    setTimeout(()=> panels.forEach(p=> p.classList.remove('pulse')), 900);
+    await Promise.all([loadWanted(), loadFines(), loadAlerts()]);
+    notify('info','Refrescado','Todos los paneles actualizados');
+  }
+
+  // wire initial buttons
+  document.querySelectorAll('[data-refresh]').forEach(btn=>{
+    btn.addEventListener('click', (e)=> {
+      const name = btn.getAttribute('data-refresh');
+      refreshOne(name);
+    });
+  });
+  document.querySelectorAll('[data-open]').forEach(btn=>{
+    btn.addEventListener('click', (e)=> {
+      const name = btn.getAttribute('data-open');
+      openPanel(name);
+    });
+  });
+
+  document.getElementById('refreshAll').addEventListener('click', refreshAll);
+  document.getElementById('exportBtn').addEventListener('click', exportData);
+
+  /* ---------------- Initial load and optional realtime listeners ---------------- */
+  (async function init(){
+    // try realtime listeners if FireDB supports it (best-effort)
+    if(FireDB.available){
+      try {
+        // set current user display based on your auth (if available)
+        if(typeof firebase !== 'undefined' && firebase.auth) {
+          const u = firebase.auth().currentUser;
+          if(u) userDisplay.textContent = u.displayName || u.email || 'Usuario';
+        }
+        // attempt to register listeners (if onSnapshot imported)
+        try {
+          const unsubWanted = FireDB.listen(COLLECTIONS.wanted, arr => { STATE.wanted = arr; renderWantedPreview(); });
+          const unsubFines = FireDB.listen(COLLECTIONS.fines, arr => { STATE.fines = arr; renderFinesPreview(); });
+          const unsubAlerts = FireDB.listen(COLLECTIONS.alerts, arr => { STATE.alerts = arr; renderAlertsPreview(); });
+          // if nulls returned, fall back to manual fetch
+          if(!unsubWanted && !unsubFines && !unsubAlerts){
+            await Promise.all([loadWanted(), loadFines(), loadAlerts()]);
+          }
+        } catch(e){
+          // modular onSnapshot etc may be missing imports: fallback to fetch
+          await Promise.all([loadWanted(), loadFines(), loadAlerts()]);
+        }
+        notify('success','Firestore detectado','Conexión activa (si la SDK está inicializada y los imports modulares existen)');
+      } catch(e){
+        console.warn('Realtime init error', e);
+        await Promise.all([loadWanted(), loadFines(), loadAlerts()]);
+        notify('warn','Firestore detectado parcialmente','Se han usado fetchs (exports/imports modulares podrían faltar)');
+      }
+    } else {
+      // no firestore: demo/local mode
+      await Promise.all([loadWanted(), loadFines(), loadAlerts()]);
+      notify('warn','Sin Firestore','Modo demo/local activo');
+    }
+
+    // initial render of previews
+    renderWantedPreview();
+    renderFinesPreview();
+    renderAlertsPreview();
+  })();
+
+  /* ---------------- Expose some functions for console debugging if needed ---------------- */
+  window.PDA = {
+    STATE, loadWanted, loadFines, loadAlerts, openPanel, notify, FireDB
+  };
+
+})();
   </script>
 </body>
 </html>
