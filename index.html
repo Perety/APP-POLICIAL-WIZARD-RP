@@ -3,1013 +3,942 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Daynight RP — PDA / CAD (Mejorado)</title>
+<title>Daynight RP — PDA / CAD · Full</title>
+<meta name="description" content="PDA / CAD completo: BOLO, Multas, Alertas, Notifs FiveM, Firestore-ready">
+
+<!-- ====== FONTS (system fallback) ====== -->
 <style>
+  /* ---------- VARIABLES & THEME ---------- */
   :root{
-    --bg-1:#06121a; --bg-2:#071729;
-    --muted:#9fb3bd; --text:#e6f0f6;
-    --accent:#7c3aed; --accent-2:#06b6a4;
-    --danger:#ff6b6b;
+    --bg-1:#030617; --bg-2:#071523;
     --glass: rgba(255,255,255,0.03);
-    --card-grad: linear-gradient(180deg, rgba(255,255,255,0.014), rgba(255,255,255,0.006));
-    --radius:12px;
-    --shadow: 0 14px 40px rgba(2,6,10,0.6);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+    --card: linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0.006));
+    --muted: #a9c0c8;
+    --text: #e9f7fb;
+    --accent1: #5b22ff;
+    --accent2: #00d4b4;
+    --danger: #ff6b6b;
+    --radius:16px;
+    --shadow-1: 0 20px 50px rgba(3,6,14,0.7);
   }
-  *{box-sizing:border-box}
-  html,body{height:100%;margin:0;background:
-    radial-gradient(800px 300px at 12% 8%, rgba(124,58,237,0.06), transparent),
-    linear-gradient(180deg,var(--bg-2) 0%, var(--bg-1) 60%); color:var(--text); -webkit-font-smoothing:antialiased;}
-  a{color:var(--accent)}
 
-  /* Background / Decoration */
-  .bg { position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
-  .nebula { position:absolute; width:60vmax; height:60vmax; left:-10vmin; top:-8vmin; background:
-    radial-gradient(circle at 30% 30%, rgba(124,58,237,0.24), transparent 30%),
-    radial-gradient(circle at 70% 70%, rgba(6,182,164,0.12), transparent 25%);
-    filter: blur(56px) saturate(120%); transform: translateZ(0); animation: float 12s ease-in-out infinite; opacity:0.95; }
-  .nebula.r { right:-10vmin; left:auto; top:6vmin; background:
-    radial-gradient(circle at 70% 20%, rgba(255,80,120,0.20), transparent 30%),
-    radial-gradient(circle at 30% 80%, rgba(110,231,183,0.12), transparent 25%);
-    animation-duration:10s; animation-direction:reverse; }
-  .gridOverlay { position:absolute; inset:0; background-image:
-    linear-gradient(transparent 96%, rgba(255,255,255,0.01) 96%),
-    linear-gradient(90deg, transparent 96%, rgba(255,255,255,0.01) 96%); background-size: 320px 320px; opacity:0.03; }
-  .stripes { position:absolute; inset:0; opacity:0.12; filter: blur(18px) saturate(120%);
+  html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial}
+  body{
     background:
-      linear-gradient(90deg, rgba(124,58,237,0.06) 0 20%, transparent 20% 50%),
-      linear-gradient(90deg, rgba(255,40,80,0.05) 50% 70%, transparent 70% 100%);
-    mix-blend-mode:overlay; animation: stripesShift 6s linear infinite; }
-  @keyframes float { 0%{ transform:translateY(-8px) } 50%{ transform:translateY(8px) } 100%{ transform:translateY(-8px) } }
-  @keyframes stripesShift { 0%{ background-position:0 0, 100% 0 } 50%{ background-position:50% 0, 50% 0 } 100%{ background-position:0 0, 100% 0 } }
+      radial-gradient(1000px 400px at 12% 8%, rgba(91,34,255,0.06), transparent),
+      linear-gradient(180deg,var(--bg-1),var(--bg-2));
+    color:var(--text); padding:26px; -webkit-font-smoothing:antialiased;
+  }
 
-  /* Layout */
-  .wrap{max-width:1150px;margin:22px auto;padding:20px;display:grid;grid-template-rows:auto 1fr;gap:18px;position:relative;z-index:2}
-  header{display:flex;align-items:center;justify-content:space-between;gap:18px}
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:60px;height:60px;border-radius:12px;background:linear-gradient(135deg,var(--accent-2),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:900;color:#031018}
-  h1{margin:0;font-size:18px}
+  /* grain */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none;
+    background-image: linear-gradient(130deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+    background-size: 6px 6px; opacity:0.6; mix-blend-mode: overlay;
+  }
+
+  .wrap{max-width:1280px;margin:0 auto}
+  header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
+  .brand{display:flex;gap:14px;align-items:center}
+  .logo{width:72px;height:72px;border-radius:14px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:grid;place-items:center;overflow:hidden;border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 48px rgba(2,6,24,0.6)}
+  .brand h1{margin:0;font-size:20px}
   .subtitle{color:var(--muted);font-size:13px}
 
   .top-right{display:flex;gap:10px;align-items:center}
-  .pill{background:var(--glass);padding:8px 12px;border-radius:999px;font-weight:700;color:var(--muted)}
-  .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#031018;padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:800;box-shadow:0 8px 24px rgba(20,10,40,0.12)}
-  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:7px 10px;border-radius:10px;cursor:pointer}
-  .notif-pill{background:linear-gradient(90deg,var(--accent-2),var(--accent)); padding:6px 10px;border-radius:999px;font-weight:800;color:#031018;cursor:pointer}
+  .pill{background:var(--glass);padding:8px 12px;border-radius:999px;color:var(--muted);font-weight:700}
+  .btn{background:linear-gradient(90deg,var(--accent1),var(--accent2));border:none;padding:8px 12px;border-radius:12px;color:#041018;cursor:pointer;font-weight:800;box-shadow:0 10px 28px rgba(30,8,80,0.14)}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:7px 10px;border-radius:10px;color:var(--muted);cursor:pointer}
+  .icon-btn{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);cursor:pointer}
 
-  /* Cards grid */
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  /* LAYOUT */
+  .top-row{display:grid;grid-template-columns:1fr 360px;gap:14px;margin-bottom:14px}
+  @media (max-width:1100px){ .top-row{grid-template-columns:1fr} }
+
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
   @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} }
   @media (max-width:640px){ .grid{grid-template-columns:1fr} }
 
-  /* Card styles */
+  /* CARD */
   .card{
-    background:var(--card-grad); border-radius:var(--radius); padding:18px; border:1px solid rgba(255,255,255,0.04);
-    box-shadow:var(--shadow); display:flex;flex-direction:column; gap:12px; min-height:120px; transition:transform .18s,box-shadow .18s,border-color .18s; position:relative; overflow:hidden;
+    background:var(--card); border-radius:var(--radius); padding:16px; border:1px solid rgba(255,255,255,0.04);
+    box-shadow:var(--shadow-1); display:flex;flex-direction:column; gap:10px; position:relative; overflow:hidden; transition: transform .28s cubic-bezier(.2,.9,.2,.99), box-shadow .28s, border-color .28s;
   }
-  .card .card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
-  .card .title{font-weight:900;font-size:16px}
-  .card .desc{color:var(--muted);font-size:13px}
-  .card:hover{transform:translateY(-8px); box-shadow:0 30px 60px rgba(0,0,0,0.7); border-color:rgba(140,80,240,0.12)}
-  .card.active{outline:2px solid rgba(124,58,237,0.18); transform:translateY(-6px) scale(1.01)}
+  .card:hover{transform:translateY(-6px); box-shadow:0 40px 100px rgba(2,6,18,0.75); border-color:rgba(120,50,255,0.14)}
+  .ribbon{
+    position:absolute; left:-40px; top:-38px; transform:rotate(-18deg);
+    background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(120,50,255,0.06));
+    width:220px;height:80px; filter: blur(8px); opacity:0.6; pointer-events:none;
+  }
+  .card-head{display:flex;align-items:center;justify-content:space-between}
+  .title{font-weight:900;font-size:15px}
+  .desc{color:var(--muted);font-size:13px}
 
-  /* Expanded panel */
-  #expandedRoot .expanded { margin-top:12px; border-radius:12px; padding:18px; background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.006)); border:1px solid rgba(255,255,255,0.04); box-shadow:0 16px 44px rgba(0,0,0,0.55); animation: panelIn .28s ease both; }
-  @keyframes panelIn { from{opacity:0; transform:translateY(8px)} to{opacity:1; transform:none} }
+  .card-actions{display:flex;gap:8px;align-items:center}
+  .btn-small{padding:6px 8px;border-radius:8px;font-size:13px}
 
-  /* Lists / item cards (clear boxes) */
-  .list{display:flex;flex-direction:column;gap:10px}
-  .item{padding:12px;border-radius:10px;background:rgba(255,255,255,0.012);border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:space-between;gap:12px}
+  /* EXPANDED */
+  #expandedRoot .expanded{
+    margin-top:12px;border-radius:12px;padding:16px;background:linear-gradient(180deg, rgba(255,255,255,0.016), rgba(0,0,0,0.03));
+    border:1px solid rgba(255,255,255,0.03); box-shadow:0 30px 44px rgba(0,0,0,0.55); animation: panelIn .28s both;
+  }
+  @keyframes panelIn{from{opacity:0;transform:translateY(12px) scale(.995}}to{opacity:1;transform:none}}@keyframes panelOut{from{opacity:1}to{opacity:0;transform:translateY(8px)}}
 
-  /* Inputs */
-  input, textarea, select { background: rgba(0,0,0,0.18); border:1px solid rgba(255,255,255,0.03); padding:10px; border-radius:8px; color:inherit; font:inherit }
-  textarea{min-height:100px; resize:vertical}
+  /* TOASTS */
+  #toasts{position:fixed; right:20px; top:84px; z-index:99999; display:flex;flex-direction:column; gap:10px; width:360px; pointer-events:none}
+  .toast{pointer-events:auto;display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 30px rgba(2,6,10,0.6);color:var(--text);animation: toastIn .22s ease both}
+  @keyframes toastIn{from{opacity:0;transform:translateY(-8px) scale(.98)}to{opacity:1;transform:none}}
+  .t-left{font-weight:900;font-size:13px}
+  .t-body{font-size:13px;color:var(--muted)}
+  .t-close{margin-left:auto;background:transparent;border:none;color:var(--muted);cursor:pointer;font-weight:900}
 
-  /* Radio */
-  .radio-wrap{display:flex;gap:12px;align-items:flex-start}
-  .radio-left{flex:1;display:flex;flex-direction:column;gap:10px}
-  .radio-right{width:320px}
-  .radio-messages{max-height:380px;overflow:auto;padding:12px;border-radius:10px;background:rgba(0,0,0,0.14);border:1px solid rgba(255,255,255,0.02)}
-  .radio-msg{display:flex;gap:10px;align-items:flex-start}
-  .radio-msg.me{flex-direction:row-reverse}
-  .radio-avatar{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#031018;font-weight:800}
-  .radio-bubble{padding:10px;border-radius:10px;background:rgba(0,0,0,0.34)}
-  .radio-bubble.me{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#031018}
-  .radio-meta{font-size:11px;color:var(--muted);margin-top:6px}
+  /* LISTS */
+  .list{display:flex;flex-direction:column;gap:8px}
+  .item{padding:10px;border-radius:10px;background:rgba(0,0,0,0.04);display:flex;justify-content:space-between;align-items:center}
 
-  /* Modal */
-  .overlay{position:fixed;inset:0;background:linear-gradient(rgba(2,6,10,0.6),rgba(2,6,10,0.8));display:flex;align-items:center;justify-content:center;z-index:9999}
-  .modal{width:820px;max-width:96%;background:linear-gradient(180deg,#071729,#061421);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
+  /* SEARCH & FILTER */
+  .searchbar{display:flex;gap:8px;align-items:center}
+  .searchbar input{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)}
 
-  /* Animations small */
-  .fade-in{animation:fadeIn .28s ease both}
-  @keyframes fadeIn{ from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+  /* STATS / MINI CHART */
+  .stats{display:flex;gap:12px;align-items:center}
+  .stat{background:rgba(255,255,255,0.02);padding:10px;border-radius:10px;min-width:100px;text-align:center}
+  .stat .num{font-weight:900;font-size:18px}
+  .chart-wrap{width:160px;height:60px}
 
-  footer{margin-top:32px;text-align:center;color:var(--muted);font-size:13px;padding-bottom:26px}
+  /* FOOTER */
+  footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+
+  /* responsive */
+  @media (max-width:640px){
+    header{flex-direction:column;align-items:stretch}
+    #toasts{left:12px;right:12px;width:auto}
+  }
+
+  /* UX Helpers */
+  .refresh-pulse{animation: pulse .9s ease}
+  @keyframes pulse{0%{box-shadow:0 0 0 rgba(91,34,255,0.12)}70%{box-shadow:0 0 30px rgba(91,34,255,0.06)}100%{box-shadow:none}}
 </style>
 </head>
 <body>
-  <div class="bg" aria-hidden="true">
-    <div class="nebula"></div>
-    <div class="nebula r"></div>
-    <div class="gridOverlay"></div>
-    <div class="stripes"></div>
-  </div>
-
-  <div class="wrap" role="main">
+  <div class="wrap">
     <header>
       <div class="brand">
-        <div class="logo" aria-hidden="true"><img src="https://cdn.discordapp.com/attachments/1421898595271180360/1425878366116122654/LOGO_WIZARD_FONDO.png.png" alt="logo" style="width:100%;height:100%;object-fit:cover;border-radius:8px"></div>
+        <div class="logo" aria-hidden="true">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 8px 20px rgba(0,0,0,0.5))">
+            <rect x="0" y="0" width="24" height="24" rx="5" fill="white" fill-opacity="0.06"/>
+            <path d="M6 12h12M6 7h12M6 17h12" stroke="white" stroke-opacity="0.9" stroke-width="1.2" stroke-linecap="round"/>
+          </svg>
+        </div>
         <div>
           <h1>Daynight RP — PDA / CAD</h1>
-          <div class="subtitle">Interfaz mejorada y correcciones • Firestore</div>
+          <div class="subtitle">Completo • Firestore-ready • Notifs FiveM</div>
         </div>
       </div>
 
       <div class="top-right">
-        <div id="userDisplay" class="pill">No conectado</div>
+        <div id="userDisplay" class="pill">Visitante</div>
         <div id="dutyStatus" class="pill">En servicio: 0</div>
-        <div id="notifWrap" style="display:inline-flex;align-items:center">
-          <div id="notifPill" class="notif-pill" style="display:none">Alertas 0</div>
+        <div id="notifWrap">
+          <div id="notifPill" class="pill" style="display:none">Alertas 0</div>
         </div>
+        <button id="btnRefreshAll" class="btn-ghost">Refrescar todo</button>
         <button id="btnExport" class="btn">Exportar</button>
-        <button id="btnLogin" class="btn-ghost">Entrar</button>
-        <div id="adminModeWrap" style="display:none">
-          <span id="adminModePill" class="admin-mode-pill">Admin: OFF</span>
-        </div>
+        <button id="btnTheme" class="icon-btn" title="Cambiar tema">🎨</button>
       </div>
     </header>
 
-    <section class="grid" id="cardsRoot" aria-label="Paneles principales"></section>
-
-    <div id="expandedRoot" aria-live="polite"></div>
-
-    <footer>Hecho para Daynight RP • UI actualizada • Firestore-only</footer>
-  </div>
-
-  <!-- LOGIN / REGISTER modal -->
-  <div id="loginModal" class="overlay" style="display:none" aria-hidden="true">
-    <div class="modal fade-in" role="dialog" aria-modal="true">
-      <h3>Entrar / Registrarse</h3>
-      <div class="muted small">Demo con Firestore. En producción: Firebase Auth + reglas.</div>
-
-      <div style="margin-top:12px">
-        <label class="muted small" for="loginUser">Usuario</label>
-        <input id="loginUser" placeholder="usuario"/>
-        <label class="muted small" for="loginPass" style="margin-top:8px">Contraseña</label>
-        <input id="loginPass" type="password" placeholder="contraseña"/>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button id="loginBtnModal" class="btn">Entrar</button>
-          <button id="guestBtn" class="btn-ghost">Invitado</button>
-          <div style="margin-left:auto" class="small muted">¿Sin cuenta? <span id="showReg" style="cursor:pointer;color:var(--accent)">Crear</span></div>
-        </div>
-        <div id="loginError" class="muted small" style="margin-top:8px;color:var(--danger);display:none"></div>
-      </div>
-
-      <div id="registerBlock" style="display:none;margin-top:12px;border-top:1px dashed rgba(255,255,255,0.03);padding-top:12px">
-        <h4 style="margin:0 0 8px 0">Crear cuenta</h4>
-        <label class="muted small">Nombre visible</label>
-        <input id="regName" placeholder="Ej: Ofc. Pérez"/>
-        <label class="muted small">Usuario</label>
-        <input id="regUser" placeholder="usuario"/>
-        <label class="muted small">Contraseña</label>
-        <input id="regPass" type="password" placeholder="contraseña"/>
-        <div style="display:flex;gap:8px;margin-top:8px">
-          <select id="regRole">
-            <option value="officer">Officer</option>
-            <option value="sergeant">Sergeant</option>
-            <option value="dispatcher">Dispatcher</option>
-            <option value="admin">Admin</option>
-          </select>
-          <button id="regCreate" class="btn">Crear</button>
-          <button id="regCancel" class="btn-ghost">Cancelar</button>
-        </div>
-        <div id="regMsg" class="muted small" style="margin-top:8px"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Firebase (modular v9) & Main script -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import {
-      getFirestore, collection, getDocs, addDoc, setDoc, doc, deleteDoc, updateDoc,
-      onSnapshot, query, where, orderBy
-    } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
-
-    // CONFIG - reemplaza si hace falta
-    const firebaseConfig = {
-      apiKey: "AIzaSyCskczYgGtlPPBEIZiE5PuY7s_cfE_3Chg",
-      authDomain: "wizard-rp.firebaseapp.com",
-      projectId: "wizard-rp",
-      storageBucket: "wizard-rp.firebasestorage.app",
-      messagingSenderId: "479456044047",
-      appId: "1:479456044047:web:65c52e2430bcb6ca586f7a",
-      measurementId: "G-KX5Y56CG0R"
-    };
-
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const COL = name => collection(db, name);
-
-    // App state
-    const STATE = {
-      currentUser: null,
-      adminMode: false,
-      selectedCard: null,
-      unsub: {},
-      radioHeartbeatTimers: {}
-    };
-
-    // small helpers
-    const $ = (sel, root=document) => root.querySelector(sel);
-    const escapeHtml = s => (s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-
-    async function pushLog(msg){
-      try{ await addDoc(COL('logs'), { t: Date.now(), msg }); }catch(e){ console.warn('pushLog', e); }
-    }
-
-    // seed demo if empty (best-effort)
-    async function seedIfEmpty(){
-      try{
-        const usersSnap = await getDocs(COL('users'));
-        if(usersSnap.empty){
-          await addDoc(COL('users'), { username:'admin', display:'Admin', password:'admin123', role:'admin', badge:'ADM-001', onDuty:false });
-          await addDoc(COL('users'), { username:'dispatcher', display:'Dispatch', password:'dispatch', role:'dispatcher', badge:'DISP', onDuty:false });
-          await addDoc(COL('users'), { username:'perety04', display:'Perety 04', password:'peretypass', role:'officer', badge:'PD-314', onDuty:false });
-        }
-        const rolesSnap = await getDocs(COL('roles'));
-        if(rolesSnap.empty){
-          await setDoc(doc(db,'roles','officer'), { name:'Officer', color:'#7c3aed', permissions:['create_reports','create_pda','create_call'] });
-          await setDoc(doc(db,'roles','sergeant'), { name:'Sergeant', color:'#3b82f6', permissions:['create_reports','create_pda','create_call','delete_reports'] });
-          await setDoc(doc(db,'roles','dispatcher'), { name:'Dispatcher', color:'#f97316', permissions:['create_call','assign_call'] });
-          await setDoc(doc(db,'roles','admin'), { name:'Admin', color:'#10b981', permissions:['all'] });
-        }
-        const channelsSnap = await getDocs(COL('radio_channels'));
-        if(channelsSnap.empty){
-          await addDoc(COL('radio_channels'), { id:'general', name:'General', created_at: Date.now() });
-          await addDoc(COL('radio_channels'), { id:'police', name:'Police', created_at: Date.now() });
-          await addDoc(COL('radio_channels'), { id:'medical', name:'Medical', created_at: Date.now() });
-        }
-        const logsSnap = await getDocs(COL('logs'));
-        if(logsSnap.empty){
-          await addDoc(COL('logs'), { t: Date.now(), msg: 'Seed inicial (Firestore)' });
-        }
-      }catch(e){ console.warn('seedIfEmpty: may be blocked by rules', e); }
-    }
-
-    /* ---------- UI core ---------- */
-
-    const cardsRoot = $('#cardsRoot');
-    const expandedRoot = $('#expandedRoot');
-    const userDisplay = $('#userDisplay');
-    const dutyStatus = $('#dutyStatus');
-    const btnLogin = $('#btnLogin');
-    const btnExport = $('#btnExport');
-    const adminModeWrap = $('#adminModeWrap');
-    const adminModePill = $('#adminModePill');
-    const notifPill = $('#notifPill');
-
-    const CARDS = [
-      { id:'pda', title:'PDA / Fichas', desc:'Buscar y crear fichas', icon:'🚓' },
-      { id:'calls', title:'Dispatch / Llamadas', desc:'Crear/Asignar llamadas', icon:'📞' },
-      { id:'reports', title:'Informes', desc:'Crear / Editar informes', icon:'📑' },
-      { id:'wanted', title:'BOLO / Wanted', desc:'Fichas buscados', icon:'🚨' },
-      { id:'fines', title:'Multas', desc:'Generar sanciones', icon:'💸' },
-      { id:'service', title:'Servicio', desc:'Entrar / Salir de servicio', icon:'🟢' },
-      { id:'alerts', title:'Alertas', desc:'Crear y gestionar alertas', icon:'⚠️' },
-      { id:'radio', title:'Radios', desc:'Chat por canales', icon:'📡' },
-      { id:'admin', title:'Administración', desc:'Roles y usuarios (avanzado)', icon:'⚙️' },
-      { id:'logs', title:'Auditoría', desc:'Historial de acciones', icon:'📜' }
-    ];
-
-    function renderCards(){
-      cardsRoot.innerHTML = '';
-      const isAdmin = STATE.currentUser && STATE.currentUser.role === 'admin';
-      CARDS.forEach(c=>{
-        if((c.id === 'admin' || c.id === 'logs') && !isAdmin) return;
-        const el = document.createElement('div');
-        el.className = 'card';
-        el.dataset.id = c.id;
-        el.innerHTML = `<div class="card-head">
-          <div><div class="title">${c.title}</div><div class="desc">${c.desc}</div></div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end">
-            <div style="font-size:26px">${c.icon}</div>
-            <button class="btn-ghost open-btn" data-open="${c.id}" style="margin-top:8px">Abrir</button>
+    <div class="top-row">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+          <div class="searchbar" style="flex:1">
+            <input id="globalSearch" placeholder="Buscar BOLOs, multas, usuarios..." />
+            <button id="searchBtn" class="btn-ghost">Buscar</button>
+            <button id="clearSearch" class="btn-ghost">Limpiar</button>
           </div>
-        </div>`;
-        el.addEventListener('click', (e)=> {
-          // prevent double open when clicking inner button
-          if(e.target && e.target.matches('button')) return;
-          openCard(c.id, el);
-        });
-        el.querySelector('.open-btn').addEventListener('click', (e)=> { e.stopPropagation(); openCard(c.id, el); });
-        cardsRoot.appendChild(el);
-      });
-    }
+          <div style="display:flex;gap:8px;align-items:center;margin-left:12px">
+            <div class="stats">
+              <div class="stat"><div class="num" id="statWanted">0</div><div class="muted small">BOLOs</div></div>
+              <div class="stat"><div class="num" id="statFines">0</div><div class="muted small">Multas</div></div>
+              <div class="stat"><div class="num" id="statUsers">0</div><div class="muted small">Usuarios</div></div>
+            </div>
+          </div>
+        </div>
 
-    function setActiveCard(el){
-      document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
-      if(el) el.classList.add('active');
-    }
+        <section class="grid" id="cardsRoot" aria-label="Paneles principales"></section>
 
-    function clearExpanded(){
-      // clear unsubs for panels (if any)
-      if(STATE.unsub.currentPanel && typeof STATE.unsub.currentPanel === 'function') {
-        try{ STATE.unsub.currentPanel(); } catch(e){/* ignore */ }
-        STATE.unsub.currentPanel = null;
-      }
-      expandedRoot.innerHTML = '';
-      setActiveCard(null);
-    }
+        <div id="expandedRoot" aria-live="polite"></div>
+      </div>
 
-    async function openCard(id, cardEl=null){
-      clearExpanded();
-      setActiveCard(cardEl);
-      const panel = document.createElement('div');
-      panel.className = 'expanded';
-      expandedRoot.appendChild(panel);
-      switch(id){
-        case 'pda': await renderPDA(panel); break;
-        case 'calls': await renderCalls(panel); break;
-        case 'reports': await renderReports(panel); break;
-        case 'wanted': await renderWanted(panel); break;
-        case 'fines': await renderFines(panel); break;
-        case 'service': await renderService(panel); break;
-        case 'alerts': await renderAlerts(panel); break;
-        case 'radio': await renderRadio(panel); break;
-        case 'admin': await renderAdmin(panel); break;
-        case 'logs': await renderLogs(panel); break;
-        default: panel.textContent = 'Panel no implementado'; break;
-      }
-      panel.scrollIntoView({ behavior:'smooth', block:'start' });
-    }
+      <aside>
+        <div class="card">
+          <div class="card-head"><div><strong>Panel rápido</strong><div class="muted small">Accesos y acciones</div></div></div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
+            <button id="quickNewBolo" class="btn">Nuevo BOLO</button>
+            <button id="quickNewFine" class="btn btn-small">Nueva Multa</button>
+            <button id="openWanted" class="btn-ghost">Abrir Wanted</button>
+            <button id="openFines" class="btn-ghost">Abrir Multas</button>
+            <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03)">
+            <div style="display:flex;gap:8px;align-items:center">
+              <div style="flex:1">
+                <div class="muted small">Notificaciones</div>
+                <div id="lastNotif" class="muted small">—</div>
+              </div>
+              <button id="clearNotifs" class="btn-ghost">Limpiar</button>
+            </div>
+          </div>
+        </div>
 
-    /* ---------- Permission helper ---------- */
-    async function hasPerm(perm){
-      if(!STATE.currentUser) return perm === 'create_call' ? true : false;
+        <div class="card" style="margin-top:12px">
+          <div class="card-head"><div><strong>Estadísticas</strong><div class="muted small">Resumen</div></div></div>
+          <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;align-items:center">
+            <div class="chart-wrap" id="miniChart" aria-hidden="true"></div>
+            <div class="muted small">Últimas 24h: llamadas</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:12px">
+          <div class="card-head"><div><strong>Atajos</strong><div class="muted small">Teclado</div></div></div>
+          <div style="margin-top:8px" class="muted small">
+            <ul>
+              <li><b>W</b> — Abrir Wanted</li>
+              <li><b>M</b> — Abrir Multas</li>
+              <li><b>N</b> — Nuevo BOLO</li>
+              <li><b>Esc</b> — Cerrar panel</li>
+            </ul>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <footer>Made for Daynight RP • Full-featured PDA / CAD • Paste as index.html</footer>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toasts" aria-live="polite" aria-atomic="true"></div>
+
+<script>
+/* ============================================================
+   Big PDA / CAD Script
+   - Firestore modular / compat detection and adapter
+   - Panels: Wanted (BOLO), Fines (Multas), Alerts, Admin (basic)
+   - Notifs style FiveM, stats, search, filters, realtime listeners if available
+   ============================================================ */
+
+/* -------------------- Firestore Adapter (modular + compat) -------------------- */
+const FireDB = (function(){
+  const hasModular = (typeof getFirestore === 'function' && typeof collection === 'function');
+  const hasCompat = (typeof firebase !== 'undefined' && firebase.firestore);
+  let dbMod = null;
+  if(hasModular){
+    try { dbMod = getFirestore(); } catch(e){ dbMod = null; }
+  }
+  function _ok(){ return hasModular || hasCompat; }
+
+  // helpers (modular symbols may not be imported in the global scope; we won't import them here)
+  return {
+    available: _ok(),
+    hasModular, hasCompat, dbMod,
+    COL(name){
+      if(hasModular && dbMod) return collection(dbMod, name);
+      if(hasCompat) return firebase.firestore().collection(name);
+      return null;
+    },
+    async getAll(name){
       try{
-        const rSnap = await getDocs(query(COL('roles'), where('__name__','==', STATE.currentUser.role)));
-        let role = null; rSnap.forEach(d=> role = d.data());
-        if(!role) return false;
-        if(Array.isArray(role.permissions) && role.permissions.includes('all')){
-          const sensitive = ['delete_reports','delete_alerts','manage_users','manage_roles','delete_all_alerts','impersonate','view_logs','all'];
-          if(sensitive.includes(perm)) return STATE.adminMode === true;
+        if(hasModular && dbMod){
+          if(typeof getDocs !== 'function') throw new Error('getDocs no disponible (modular import faltante)');
+          const snap = await getDocs(collection(dbMod, name));
+          const out = []; snap.forEach(d=> out.push({ id:d.id, ...d.data() }));
+          return out;
+        } else if(hasCompat){
+          const snap = await firebase.firestore().collection(name).get();
+          const out = []; snap.forEach(d=> out.push({ id:d.id, ...d.data() }));
+          return out;
+        }
+      }catch(e){ console.warn('FireDB.getAll error', e); }
+      return null;
+    },
+    async add(name, data){
+      try{
+        if(hasModular && dbMod){
+          if(typeof addDoc !== 'function') throw new Error('addDoc no disponible (modular import faltante)');
+          const res = await addDoc(collection(dbMod, name), data);
+          return { id: res.id, ...data };
+        } else if(hasCompat){
+          const ref = await firebase.firestore().collection(name).add(data);
+          return { id: ref.id, ...data };
+        }
+      }catch(e){ console.warn('FireDB.add error', e); }
+      return null;
+    },
+    async del(name, id){
+      try{
+        if(hasModular && dbMod){
+          if(typeof deleteDoc !== 'function' || typeof doc !== 'function') throw new Error('deleteDoc/doc faltan (modular import)');
+          await deleteDoc(doc(dbMod, name, id));
+          return true;
+        } else if(hasCompat){
+          await firebase.firestore().collection(name).doc(id).delete();
           return true;
         }
-        return role.permissions && role.permissions.includes(perm);
-      }catch(e){ console.warn('hasPerm error', e); return false; }
+      }catch(e){ console.warn('FireDB.del error', e); }
+      return false;
+    },
+    async update(name, id, patch){
+      try{
+        if(hasModular && dbMod){
+          if(typeof updateDoc !== 'function' || typeof doc !== 'function') throw new Error('updateDoc/doc faltan (modular import)');
+          await updateDoc(doc(dbMod, name, id), patch);
+          return true;
+        } else if(hasCompat){
+          await firebase.firestore().collection(name).doc(id).update(patch);
+          return true;
+        }
+      }catch(e){ console.warn('FireDB.update error', e); }
+      return false;
+    },
+    // optional real-time listener if available
+    listen(name, onChange){
+      try{
+        if(hasModular && dbMod){
+          if(typeof onSnapshot !== 'function') { console.warn('onSnapshot faltante (modular import)'); return null; }
+          const q = collection(dbMod, name);
+          return onSnapshot(q, snap => { const out=[]; snap.forEach(d=> out.push({ id:d.id, ...d.data() })); onChange(out); });
+        } else if(hasCompat){
+          return firebase.firestore().collection(name).onSnapshot(snap => { const out=[]; snap.forEach(d=> out.push({ id:d.id, ...d.data() })); onChange(out); });
+        }
+      }catch(e){ console.warn('FireDB.listen error', e); }
+      return null;
     }
+  };
+})();
 
-    /* ---------- Panels Implementation (improved) ---------- */
+/* -------------------- STATE -------------------- */
+const STATE = {
+  currentUser: { display: 'Visitante', role: 'user' },
+  notifications: [],
+  onDutyCount: 0,
+  wanted: [], fines: [], alerts: [], users: []
+};
 
-    // --- PDA
-    async function renderPDA(container){
-      container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-        <div><strong>PDA / Fichas</strong><div class="muted small">Buscar y crear fichas</div></div>
-        <div><button class="btn btn-small close-panel">Cerrar</button></div>
+const COLLECTIONS = {
+  wanted: 'wanted', // change if needed
+  fines: 'fines',
+  users: 'users',
+  alerts: 'alerts'
+};
+
+/* -------------------- DOM refs -------------------- */
+const cardsRoot = document.getElementById('cardsRoot');
+const expandedRoot = document.getElementById('expandedRoot');
+const userDisplay = document.getElementById('userDisplay');
+const dutyStatus = document.getElementById('dutyStatus');
+const toastWrap = document.getElementById('toasts');
+
+/* -------------------- UI: Cards config -------------------- */
+const CARDS = [
+  { id:'dispatch', title:'Despacho', desc:'Ver llamadas activas', icon:'🚨' },
+  { id:'wanted', title:'BOLO / Wanted', desc:'Listados y prioridades', icon:'🔎' },
+  { id:'fines', title:'Multas', desc:'Gestionar multas y pagos', icon:'💸' },
+  { id:'reports', title:'Incidentes', desc:'Reportes públicos', icon:'📋' },
+  { id:'alerts', title:'Alertas', desc:'Alertas de ciudad', icon:'🔔' },
+  { id:'radio', title:'Radios', desc:'Canales y mensajes', icon:'📡' },
+  { id:'admin', title:'Administración', desc:'Roles y usuarios', icon:'⚙️' },
+];
+
+/* render cards */
+function renderCards(){
+  cardsRoot.innerHTML='';
+  CARDS.forEach(c=>{
+    const el = document.createElement('div'); el.className='card'; el.dataset.id=c.id;
+    el.innerHTML = `
+      <div class="ribbon"></div>
+      <div class="card-head">
+        <div><div class="title">${c.title}</div><div class="desc">${c.desc}</div></div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end">
+          <div style="font-size:26px">${c.icon}</div>
+          <div class="card-actions" style="margin-top:8px">
+            <button class="btn-ghost btn-small open-btn" data-open="${c.id}">Abrir</button>
+            <button class="btn-ghost btn-small refresh-btn" data-refresh="${c.id}">Refrescar</button>
+          </div>
+        </div>
       </div>
-      <div style="margin-top:12px;display:grid;grid-template-columns:1fr 380px;gap:12px">
-        <div>
-          <input id="pdaQ" placeholder="Buscar..." style="width:100%;margin-bottom:8px"/>
-          <div id="pdaResults" class="list"></div>
-        </div>
-        <div>
-          <div class="muted small">Nueva ficha</div>
-          <textarea id="pdaTxt"></textarea>
-          <div style="display:flex;gap:8px;margin-top:8px"><button id="createPDA" class="btn">Crear</button><button class="btn-ghost close-panel">Cancelar</button></div>
-        </div>
-      </div>`;
-      container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-      $('#pdaQ', container).addEventListener('input', ()=> loadPDAs($('#pdaQ', container).value, container));
-      $('#createPDA', container).addEventListener('click', async ()=>{
-        if(!await hasPerm('create_pda')) { alert('No tienes permiso'); return; }
-        const txt = $('#pdaTxt', container).value.trim(); if(!txt) return alert('Rellena la ficha');
-        try{ await addDoc(COL('pda'), { text: txt, author: STATE.currentUser ? STATE.currentUser.username : 'Invitado', created_at: Date.now() }); await pushLog('Ficha PDA creada'); $('#pdaTxt', container).value=''; }catch(e){ console.error(e); alert('Error creando ficha'); }
-      });
-      // realtime subscribe
-      if(STATE.unsub.pda) STATE.unsub.pda();
-      STATE.unsub.pda = onSnapshot(COL('pda'), ()=> loadPDAs($('#pdaQ', container).value, container));
-      await loadPDAs('', container);
-      STATE.unsub.currentPanel = STATE.unsub.pda;
-    }
-    async function loadPDAs(q='', container=document){
-      const results = $('#pdaResults', container); if(!results) return;
-      try{
-        const snap = await getDocs(COL('pda'));
-        const arr = []; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
-        const out = arr.filter(p => q.trim()==='' ? true : (p.text||'').toLowerCase().includes(q.toLowerCase()));
-        results.innerHTML = out.map(p=> `<div class="item"><div style="flex:1"><b>${escapeHtml((p.text||'').slice(0,40))}</b><div class="muted small">${escapeHtml((p.text||'').slice(0,140))}</div></div>
-          <div><button class="btn-ghost view-pda" data-id="${p.id}">Ver</button> <button class="btn-ghost del-pda" data-id="${p.id}">Borrar</button></div></div>`).join('') || '<div class="muted small">Sin fichas</div>';
-        results.querySelectorAll('.view-pda').forEach(btn=> btn.onclick = async ()=> {
-          const id = btn.dataset.id;
-          const doc = await fetchDoc('pda', id);
-          alert(`Ficha:\n\n${doc?.text||'No encontrada'}\n\nAutor: ${doc?.author||'—'}`);
-        });
-        results.querySelectorAll('.del-pda').forEach(btn=> btn.onclick = async ()=> {
-          const id = btn.dataset.id;
-          if(!confirm('Borrar ficha?')) return;
-          if(!await hasPerm('delete_reports')){ alert('Admin Mode necesario para borrar'); return; }
-          try{ await deleteDoc(doc(db,'pda',id)); await pushLog(`Ficha PDA ${id} borrada`); }catch(e){ console.error(e); alert('Error borrando'); }
-        });
-      }catch(e){ console.error('loadPDAs', e); results.innerHTML = '<div class="muted small">Error cargando</div>'; }
-    }
+    `;
+    el.querySelector('.open-btn').addEventListener('click', (e)=>{ e.stopPropagation(); openCard(c.id, el); });
+    el.querySelector('.refresh-btn').addEventListener('click', (e)=>{ e.stopPropagation(); refreshPanel(c.id, el); });
+    el.addEventListener('click', ()=> openCard(c.id, el));
+    cardsRoot.appendChild(el);
+  });
+}
 
-    // --- Calls
-    async function renderCalls(container){
-      container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-        <div><strong>Dispatch / Llamadas</strong><div class="muted small">Crear y asignar llamadas</div></div>
-        <div><button class="btn btn-small close-panel">Cerrar</button></div></div>
-        <div style="margin-top:12px;display:flex;gap:8px"><input id="callFrom" placeholder="Remitente (opcional)"/><input id="callMsg" placeholder="Mensaje"/><button id="callCreate" class="btn">Crear</button></div>
-        <div style="margin-top:12px"><strong>Llamadas</strong><div id="callsList" class="list" style="margin-top:8px"></div></div>`;
-      container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-      $('#callCreate', container).addEventListener('click', async ()=>{
-        const caller = $('#callFrom', container).value.trim() || 'Anonimo';
-        const message = $('#callMsg', container).value.trim(); if(!message) return alert('Introduce mensaje');
-        try{ await addDoc(COL('calls'), { caller, message, status:'pending', assigned_to:null, created_at: Date.now() }); await pushLog('Llamada creada'); $('#callMsg', container).value=''; }catch(e){ console.error(e); alert('Error creando llamada'); }
-      });
-      if(STATE.unsub.calls) STATE.unsub.calls();
-      STATE.unsub.calls = onSnapshot(COL('calls'), ()=> loadCalls());
-      await loadCalls();
-      STATE.unsub.currentPanel = STATE.unsub.calls;
-    }
-    async function loadCalls(){
-      const list = $('#callsList'); if(!list) return;
-      try{
-        const snap = await getDocs(COL('calls'));
-        const arr=[]; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
-        if(!arr.length){ list.innerHTML = '<div class="muted small">No hay llamadas</div>'; return; }
-        list.innerHTML = '';
-        const usersSnap = await getDocs(COL('users')); const users=[]; usersSnap.forEach(u=> users.push({ id:u.id, ...u.data() }));
-        for(const c of arr){
-          const assignee = c.assigned_to ? (users.find(u=>u.id===c.assigned_to)?.display || '—') : '—';
-          const el = document.createElement('div'); el.className='item';
-          el.innerHTML = `<div style="flex:1"><b>${escapeHtml(c.caller)}</b><div class="muted small">${escapeHtml(c.message)}</div></div>
-            <div style="text-align:right"><div class="muted tiny">${new Date(c.created_at||0).toLocaleString()}</div><div class="muted tiny">Asig: ${escapeHtml(assignee)}</div></div>`;
-          const btns = document.createElement('div'); btns.style.marginLeft='12px';
-          if(await hasPerm('assign_call') && STATE.currentUser){
-            const assign = document.createElement('button'); assign.className='btn-ghost'; assign.textContent='Asignar a mí';
-            assign.onclick = async ()=> { try{ await updateDoc(doc(db,'calls',c.id), { status:'assigned', assigned_to: STATE.currentUser.id }); await pushLog(`Llamada ${c.id} asignada a ${STATE.currentUser.username}`); }catch(e){ console.error(e); } };
-            btns.appendChild(assign);
-          }
-          if(STATE.currentUser && (STATE.currentUser.role === 'admin' || (c.assigned_to && STATE.currentUser.id === c.assigned_to))){
-            const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
-            del.onclick = async ()=> { if(confirm('Borrar llamada?')){ try{ await deleteDoc(doc(db,'calls',c.id)); await pushLog(`Llamada ${c.id} borrada`); }catch(e){ console.error(e); } } };
-            btns.appendChild(del);
-          }
-          el.appendChild(btns); list.appendChild(el);
-        }
-      }catch(e){ console.error('loadCalls', e); list.innerHTML = '<div class="muted small">Error cargando</div>'; }
-    }
+/* -------------------- Expanded panel logic -------------------- */
+function clearExpanded(){
+  if(!expandedRoot.firstElementChild) return;
+  const node = expandedRoot.firstElementChild;
+  node.style.animation = 'panelOut .18s ease forwards';
+  setTimeout(()=> expandedRoot.innerHTML='', 190);
+}
 
-    // --- Reports
-    async function renderReports(container){
-      container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-        <div><strong>Informes</strong><div class="muted small">Crear y consultar informes</div></div>
-        <div><button class="btn btn-small close-panel">Cerrar</button></div></div>
-        <div style="margin-top:12px"><div class="muted small">Plantilla</div><textarea id="tplReport" style="min-height:80px"></textarea></div>
-        <div style="margin-top:8px" class="form-row"><input id="repTitle" placeholder="Título"/><input id="repAuthor" placeholder="Autor (auto)"/></div>
-        <div style="margin-top:8px"><textarea id="repDesc" placeholder="Descripción..."></textarea></div>
-        <div style="margin-top:8px;display:flex;gap:8px"><button id="saveRep" class="btn">Guardar</button><button class="btn-ghost close-panel">Cancelar</button></div>
-        <div style="margin-top:12px"><strong>Últimos informes</strong><div id="reportsList" class="list" style="margin-top:8px"></div></div>`;
-      container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-      $('#repAuthor', container).value = STATE.currentUser ? STATE.currentUser.display : 'Invitado';
-      $('#saveRep', container).addEventListener('click', async ()=>{
-        if(!await hasPerm('create_reports')){ alert('No tienes permiso'); return; }
-        const title = $('#repTitle', container).value.trim(), desc = $('#repDesc', container).value.trim();
-        if(!title || !desc) return alert('Título y descripción');
-        try{ await addDoc(COL('reports'), { title, description: desc, author: STATE.currentUser ? STATE.currentUser.display : 'Invitado', created_at: Date.now() }); await pushLog(`Informe creado: ${title}`); loadReports(); }catch(e){ console.error(e); alert('Error guardando informe'); }
-      });
-      if(STATE.unsub.reports) STATE.unsub.reports();
-      STATE.unsub.reports = onSnapshot(COL('reports'), ()=> loadReports());
-      await loadReports();
-      STATE.unsub.currentPanel = STATE.unsub.reports;
+function openCard(id, hostEl){
+  document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
+  if(hostEl) hostEl.classList.add('active');
+
+  expandedRoot.innerHTML = '';
+  const panel = document.createElement('div'); panel.className='expanded';
+  panel.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>${id.toUpperCase()}</strong><div class="muted small">Panel dinámico</div></div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-small refresh-panel" data-id="${id}">Refrescar</button>
+        <button class="btn-ghost close-panel">Cerrar</button>
+      </div>
+    </div>
+    <div id="panelBody_${id}" style="margin-top:12px"></div>
+  `;
+  expandedRoot.appendChild(panel);
+
+  panel.querySelector('.close-panel').addEventListener('click', ()=> clearExpanded());
+  panel.querySelector('.refresh-panel').addEventListener('click', ()=> refreshPanel(id, hostEl));
+
+  // route
+  switch(id){
+    case 'wanted': renderWantedPanel(panel.querySelector(`#panelBody_${id}`)); break;
+    case 'fines': renderFinesPanel(panel.querySelector(`#panelBody_${id}`)); break;
+    case 'alerts': renderAlertsPanel(panel.querySelector(`#panelBody_${id}`)); break;
+    case 'admin': renderAdminPanel(panel.querySelector(`#panelBody_${id}`)); break;
+    default:
+      panel.querySelector(`#panelBody_${id}`).innerHTML = `<div class="muted small">Contenido demo / no implementado</div>`;
+  }
+}
+
+/* -------------------- Refresh handlers -------------------- */
+async function refreshPanel(id, hostEl){
+  if(hostEl){ hostEl.classList.add('refresh-pulse'); setTimeout(()=> hostEl.classList.remove('refresh-pulse'), 900); }
+  switch(id){
+    case 'wanted': await loadWanted(); break;
+    case 'fines': await loadFines(); break;
+    case 'alerts': await loadAlerts(); break;
+    case 'admin': await loadUsers(); break;
+    default: break;
+  }
+  updateHeader();
+  notify('info','Refrescado', `Panel ${id} actualizado`, 1600);
+}
+
+document.getElementById('btnRefreshAll').addEventListener('click', async ()=>{
+  document.querySelectorAll('.card').forEach(c=>c.classList.add('refresh-pulse'));
+  setTimeout(()=> document.querySelectorAll('.card').forEach(c=>c.classList.remove('refresh-pulse')), 900);
+  await Promise.all([loadWanted(), loadFines(), loadAlerts(), loadUsers()]);
+  updateHeader();
+  notify('info','Refrescado','Todos los paneles actualizados', 1800);
+});
+
+/* -------------------- Notifications (FiveM-like toasts) -------------------- */
+let TOAST_ID = 0;
+function notify(type='info', title='', text='', ttl=4000){
+  const id = ++TOAST_ID;
+  const el = document.createElement('div'); el.className='toast'; el.dataset.id=id;
+  const emoji = type==='danger'?'⚠️': type==='success'?'✅': type==='warn'?'🚨':'ℹ️';
+  el.innerHTML = `<div style="font-weight:900">${emoji} ${escapeHtml(title)}</div>
+                  <div class="t-body" style="margin-left:8px">${escapeHtml(text)}</div>
+                  <button class="t-close" aria-label="cerrar">×</button>`;
+  toastWrap.prepend(el);
+  updateNotifCount(1);
+  el.querySelector('.t-close').addEventListener('click', ()=> removeToast(id));
+  if(ttl && ttl>0) setTimeout(()=> removeToast(id), ttl);
+  // update last notif
+  const last = document.getElementById('lastNotif'); if(last) last.textContent = `${title} — ${text}`;
+  return id;
+}
+function removeToast(id){
+  const t = toastWrap.querySelector(`.toast[data-id="${id}"]`); if(!t) return;
+  t.style.opacity = '0'; t.style.transform = 'translateY(-8px)';
+  setTimeout(()=> { t.remove(); updateNotifCount(-1); }, 200);
+}
+function updateNotifCount(delta=0){
+  if(delta>0) STATE.notifications.push(1);
+  else if(delta<0) STATE.notifications.pop();
+  const n = STATE.notifications.length;
+  const pill = document.getElementById('notifPill');
+  if(n>0){ pill.style.display='inline-block'; pill.textContent = `Alertas ${n}`; }
+  else pill.style.display='none';
+}
+
+/* -------------------- Wanted (BOLO) -------------------- */
+async function loadWantedFromDB(){
+  if(!FireDB.available) return null;
+  return await FireDB.getAll(COLLECTIONS.wanted);
+}
+async function loadWanted(){
+  const dbdata = await loadWantedFromDB();
+  if(dbdata) STATE.wanted = dbdata;
+  else {
+    if(STATE.wanted.length===0){
+      STATE.wanted = [
+        { id:'bolo1', name:'Juan Pérez', reason:'Robo agravado', priority:'Alta', notes:'Armado', createdAt: new Date().toISOString() },
+        { id:'bolo2', name:'María Ruiz', reason:'Estafa', priority:'Media', notes:'Moverse en aeropuerto', createdAt: new Date().toISOString() },
+      ];
     }
-    async function loadReports(){
-      const list = $('#reportsList'); if(!list) return;
-      try{
-        const snap = await getDocs(query(COL('reports'), orderBy('created_at','desc')));
-        const arr = []; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
-        if(!arr.length){ list.innerHTML = '<div class="muted small">No hay informes</div>'; return; }
-        list.innerHTML = '';
-        for(const r of arr){
-          const it = document.createElement('div'); it.className='item';
-          it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(r.title)}</div><div class="muted small">${escapeHtml((r.description||'').slice(0,160))}</div></div>
-            <div style="text-align:right"><div class="muted tiny">${r.created_at? new Date(r.created_at).toLocaleString() : ''}</div><div class="muted tiny">${escapeHtml(r.author||'')}</div></div>`;
-          const btns = document.createElement('div'); btns.style.marginLeft='12px';
-          const view = document.createElement('button'); view.className='btn-ghost'; view.textContent='Ver';
-          view.onclick = ()=> alert(`Informe — ${r.title}\n\n${r.description}\n\nAutor: ${r.author}\nFecha: ${new Date(r.created_at||0).toLocaleString()}`);
-          btns.appendChild(view);
-          if(STATE.currentUser && (STATE.currentUser.role === 'admin' || STATE.currentUser.role === 'sergeant')){
-            const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
-            del.onclick = async ()=> {
-              if(!await hasPerm('delete_reports')){ alert('Admin Mode necesario'); return; }
-              if(!confirm('Borrar informe?')) return;
-              try{ await deleteDoc(doc(db,'reports',r.id)); await pushLog(`Informe ${r.id} borrado`); }catch(e){ console.error(e); alert('Error borrando'); }
-            };
-            btns.appendChild(del);
-          }
-          it.appendChild(btns); list.appendChild(it);
-        }
-      }catch(e){ console.error('loadReports', e); list.innerHTML = '<div class="muted small">Error cargando</div>'; }
+  }
+  renderWantedCards();
+  // update stat
+  document.getElementById('statWanted').textContent = STATE.wanted.length;
+}
+function renderWantedCards(){
+  // update footer summary on main card
+  const host = document.querySelector('.card[data-id="wanted"]');
+  if(host){
+    if(!host.querySelector('.card-footer')){
+      const ft = document.createElement('div'); ft.className='card-footer muted small'; ft.style.marginTop='8px';
+      ft.textContent = `${STATE.wanted.length} BOLO(s) activos`; host.appendChild(ft);
+    } else {
+      host.querySelector('.card-footer').textContent = `${STATE.wanted.length} BOLO(s) activos`;
     }
+  }
+}
 
-    // --- Alerts
-    async function renderAlerts(container){
-      container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-        <div><strong>Alertas</strong><div class="muted small">Crear alertas de la ciudad</div></div>
-        <div><button class="btn btn-small close-panel">Cerrar</button></div></div>
-        <div style="margin-top:12px" class="form-row"><select id="alertLevel"><option value="verde">Verde</option><option value="amarilla">Amarilla</option><option value="roja">Roja</option></select><input id="alertTitle" placeholder="Título"/></div>
-        <div style="margin-top:8px"><textarea id="alertMsg" placeholder="Mensaje..."></textarea></div>
-        <div style="margin-top:8px;display:flex;gap:8px"><button id="createAlertBtn" class="btn">Crear</button><button class="btn-ghost close-panel">Cancelar</button></div>
-        <div style="margin-top:12px"><strong>Alertas actuales</strong><div id="alertsList" class="list" style="margin-top:8px"></div></div>`;
-      container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-      $('#createAlertBtn', container).addEventListener('click', async ()=>{
-        if(!STATE.currentUser) return alert('Inicia sesión');
-        const lvl = $('#alertLevel', container).value, title = $('#alertTitle', container).value.trim(), msg = $('#alertMsg', container).value.trim();
-        if(!title || !msg) return alert('Título y mensaje');
-        try{ await addDoc(COL('alerts'), { title, message: msg, level: lvl, author: STATE.currentUser.username, created_at: Date.now() }); await pushLog(`Alerta creada: ${title}`); $('#alertTitle', container).value=''; $('#alertMsg', container).value=''; loadAlerts(); updateNotifCount(); }catch(e){ console.error(e); alert('Error creando alerta'); }
-      });
-      if(STATE.unsub.alerts) STATE.unsub.alerts();
-      STATE.unsub.alerts = onSnapshot(COL('alerts'), ()=> { loadAlerts(); updateNotifCount(); });
-      await loadAlerts();
-      STATE.unsub.currentPanel = STATE.unsub.alerts;
-    }
-    async function loadAlerts(){
-      const list = $('#alertsList'); if(!list) return;
-      try{
-        const snap = await getDocs(query(COL('alerts'), orderBy('created_at','desc')));
-        const arr = []; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
-        if(!arr.length){ list.innerHTML = '<div class="muted small">No hay alertas</div>'; return; }
-        list.innerHTML = '';
-        for(const a of arr){
-          const it = document.createElement('div'); it.className='item';
-          it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(a.title)} <span class="muted tiny">[${escapeHtml(a.level||'—')}]</span></div><div class="muted small">${escapeHtml((a.message||'').slice(0,200))}</div></div>
-            <div style="text-align:right"><div class="muted tiny">${a.created_at? new Date(a.created_at).toLocaleString() : ''}</div></div>`;
-          const btns = document.createElement('div'); btns.style.marginLeft='12px';
-          if(STATE.currentUser && (STATE.currentUser.role === 'admin' && STATE.adminMode || a.author === (STATE.currentUser && STATE.currentUser.username))){
-            const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
-            del.onclick = async ()=> { if(confirm('Borrar alerta?')){ try{ await deleteDoc(doc(db,'alerts',a.id)); await pushLog(`Alerta ${a.id} borrada`); loadAlerts(); updateNotifCount(); }catch(e){ console.error(e); } } };
-            btns.appendChild(del);
-          }
-          it.appendChild(btns); list.appendChild(it);
-        }
-      }catch(e){ console.error('loadAlerts', e); list.innerHTML = '<div class="muted small">Error cargando</div>'; }
-    }
-    async function updateNotifCount(){
-      try{
-        const snap = await getDocs(COL('alerts'));
-        const count = snap.size;
-        if(count>0){ notifPill.style.display='inline-block'; notifPill.textContent=`Alertas ${count}`; notifPill.onclick = ()=> openCard('alerts'); }
-        else notifPill.style.display='none';
-      }catch(e){ console.warn(e); }
-    }
+function renderWantedPanel(container){
+  const area = container || document.getElementById('panelBody_wanted');
+  if(!area) return;
+  area.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>BOLO / Wanted</strong><div class="muted small">Gestiona BOLOs</div></div>
+      <div style="display:flex;gap:8px">
+        <select id="filterPriority" class="btn-ghost btn-small">
+          <option value="">Todas prioridades</option>
+          <option value="Alta">Alta</option>
+          <option value="Media">Media</option>
+          <option value="Baja">Baja</option>
+        </select>
+        <button id="addBoloBtn" class="btn btn-small">Nuevo BOLO</button>
+        <button id="refreshWantedBtn" class="btn-ghost btn-small">Refrescar</button>
+      </div>
+    </div>
+    <div style="margin-top:12px" id="wantedList" class="list"></div>
+  `;
 
-    // --- Admin (users and roles)
-    async function renderAdmin(container){
-      container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-        <div><strong>Administración</strong><div class="muted small">Gestiona roles y usuarios</div></div>
-        <div><button class="btn btn-small close-panel">Cerrar</button></div></div>
-        <div style="margin-top:12px" id="adminNotice"></div>
-        <div style="margin-top:12px;display:flex;gap:12px">
-          <div style="flex:1"><h4>Usuarios</h4><div id="usersAdminList" class="list"></div></div>
-          <div style="width:360px"><h4>Crear usuario</h4><input id="adm_newUser" placeholder="username"><input id="adm_newDisplay" placeholder="display"><input id="adm_newPass" placeholder="password">
-            <select id="adm_newRole"></select>
-            <div style="display:flex;gap:8px;margin-top:8px"><button id="adm_createUser" class="btn">Crear</button><button id="adm_refresh" class="btn-ghost">Refrescar</button></div>
-            <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
-            <h4>Roles</h4>
-            <div style="display:flex;gap:8px"><input id="adm_newRoleName" placeholder="nuevo rol"><button id="adm_createRole" class="btn">Crear rol</button></div>
-            <div id="rolesAdminList" style="margin-top:12px"></div>
-          </div>
-        </div>`;
-      container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-
-      if(!STATE.currentUser || STATE.currentUser.role !== 'admin'){
-        $('#adminNotice', container).innerHTML = '<div class="item"><div style="flex:1"><b>Acceso denegado</b><div class="muted small">Necesitas ser admin.</div></div></div>';
-        return;
-      }
-      const notice = $('#adminNotice', container);
-      if(!STATE.adminMode){
-        notice.innerHTML = `<div class="item"><div style="flex:1"><b>Admin Mode OFF</b><div class="muted small">Activa Admin Mode para acciones sensibles</div></div><div><button id="enableAdminMode" class="btn">Activar</button></div></div>`;
-        $('#enableAdminMode', notice).addEventListener('click', async ()=>{
-          const pass = prompt('Reingresa la contraseña del admin:'); if(!pass) return;
-          try{
-            const s = await getDocs(query(COL('users'), where('username','==', STATE.currentUser.username), where('password','==', pass)));
-            if(s.empty) return alert('Contraseña incorrecta');
-            STATE.adminMode = true; updateHeader(); await pushLog(`Admin Mode activado por ${STATE.currentUser.username}`); renderAdmin(container);
-          }catch(e){ console.error(e); alert('Error validando contraseña'); }
-        });
-      } else {
-        notice.innerHTML = `<div class="item"><div style="flex:1"><b>Admin Mode ON</b><div class="muted small">Puedes realizar acciones administrativas</div></div><div><button id="disableAdminMode" class="btn-ghost">Desactivar</button></div></div>`;
-        $('#disableAdminMode', notice).addEventListener('click', ()=> { if(confirm('Desactivar Admin Mode?')){ STATE.adminMode=false; updateHeader(); renderAdmin(container); } });
-      }
-
-      // roles dropdown
-      const rolesSnap = await getDocs(COL('roles')); const roleSelect = $('#adm_newRole', container); roleSelect.innerHTML = '';
-      rolesSnap.forEach(r=> roleSelect.appendChild(Object.assign(document.createElement('option'), { value: r.id, textContent: r.id })));
-
-      // handlers
-      $('#adm_createUser', container).addEventListener('click', async ()=>{
-        if(!STATE.adminMode) return alert('Activa Admin Mode');
-        const username = $('#adm_newUser', container).value.trim(); if(!username) return alert('username requerido');
-        const display = $('#adm_newDisplay', container).value.trim() || username;
-        const pass = $('#adm_newPass', container).value.trim() || '1234';
-        const role = $('#adm_newRole', container).value;
-        try{ await addDoc(COL('users'), { username, display, password: pass, role, badge:'', onDuty:false }); await pushLog(`Usuario creado: ${username}`); renderAdmin(container); }catch(e){ console.error(e); alert('Error creando usuario'); }
-      });
-      $('#adm_refresh', container).addEventListener('click', ()=> renderAdmin(container));
-      $('#adm_createRole', container).addEventListener('click', async ()=>{
-        if(!STATE.adminMode) return alert('Activa Admin Mode');
-        const name = $('#adm_newRoleName', container).value.trim(); if(!name) return alert('Nombre rol requerido');
-        try{ await setDoc(doc(db,'roles',name), { name, color:'#999999', permissions:[] }); await pushLog(`Rol creado: ${name}`); renderAdmin(container); }catch(e){ console.error(e); alert('Error creando rol'); }
-      });
-
-      await loadUsersAdmin(container);
-      await loadRolesAdmin(container);
-    }
-
-    async function loadUsersAdmin(container){
-      const list = $('#usersAdminList', container); list.innerHTML = '<div class="muted small">Cargando...</div>';
-      try{
-        const snap = await getDocs(COL('users')); const users=[]; snap.forEach(s=> users.push({ id:s.id, ...s.data() }));
-        list.innerHTML = '';
-        for(const u of users){
-          const div = document.createElement('div'); div.className='item';
-          const canPerform = STATE.adminMode && STATE.currentUser && STATE.currentUser.role === 'admin';
-          div.innerHTML = `<div><b>${escapeHtml(u.display)} (${escapeHtml(u.username)})</b><div class="muted small">Rol: <span>${escapeHtml(u.role||'—')}</span> • Badge: ${escapeHtml(u.badge||'—')}</div></div>
-            <div style="text-align:right"><select data-uid="${u.id}" ${canPerform?'' : 'disabled'} class="adm-role-sel"></select>
-            <div style="margin-top:6px"><button data-uid="${u.id}" ${canPerform?'' : 'disabled'} class="btn-ghost btn-small" data-act="del">Borrar</button> <button data-uid="${u.id}" ${canPerform?'' : 'disabled'} class="btn btn-small" data-act="imp">Impersonar</button></div></div>`;
-          list.appendChild(div);
-        }
-        // fill role selects and attach events
-        const rolesSnap = await getDocs(COL('roles')); const roleKeys=[]; rolesSnap.forEach(r=> roleKeys.push(r.id));
-        list.querySelectorAll('.adm-role-sel').forEach(sel=>{
-          sel.innerHTML = roleKeys.map(k=> `<option value="${k}">${k}</option>` ).join('');
-          (async ()=>{
-            const uid = sel.dataset.uid;
-            const s = await getDocs(query(COL('users'), where('__name__','==', uid)));
-            let userObj = null; s.forEach(d=> userObj = d.data());
-            if(userObj) sel.value = userObj.role || '';
-          })();
-          sel.onchange = async e=> {
-            if(!STATE.adminMode) return alert('Activa Admin Mode');
-            const uid = e.target.dataset.uid; const newRole = e.target.value;
-            try{ await updateDoc(doc(db,'users',uid), { role: newRole }); await pushLog(`Rol cambiado: ${uid} -> ${newRole}`); loadUsersAdmin(container); }catch(e){ console.error(e); alert('Error cambiando rol'); }
-          };
-        });
-        list.querySelectorAll('button[data-act="del"]').forEach(b=>{
-          b.onclick = async ()=> {
-            if(!STATE.adminMode) return alert('Activa Admin Mode');
-            const uid = b.dataset.uid; if(!confirm('Borrar usuario?')) return;
-            try{
-              const s = await getDocs(query(COL('users'), where('__name__','==', uid)));
-              let userObj = null; s.forEach(d=> userObj = d.data());
-              if(userObj && userObj.username === 'admin'){ return alert('No puedes borrar admin seed'); }
-              await deleteDoc(doc(db,'users',uid)); await pushLog(`Usuario borrado: ${uid}`); loadUsersAdmin(container);
-            }catch(e){ console.error(e); alert('Error borrando usuario'); }
-          };
-        });
-        list.querySelectorAll('button[data-act="imp"]').forEach(b=>{
-          b.onclick = async ()=> {
-            if(!STATE.adminMode) return alert('Activa Admin Mode');
-            const uid = b.dataset.uid;
-            try{
-              const s = await getDocs(query(COL('users'), where('__name__','==', uid)));
-              let userObj = null; s.forEach(d=> userObj = { id:d.id, ...d.data() });
-              if(!userObj) return alert('Usuario no encontrado');
-              STATE.currentUser = userObj; updateHeader(); await pushLog(`Impersonación: ${userObj.username}`); renderCards(); alert('Impersonando: ' + userObj.display);
-            }catch(e){ console.error(e); alert('Error impersonando'); }
-          };
-        });
-      }catch(e){ console.error('loadUsersAdmin', e); list.innerHTML = '<div class="muted small">Error cargando usuarios</div>'; }
-    }
-
-    async function loadRolesAdmin(container){
-      const out = $('#rolesAdminList', container); out.innerHTML = '';
-      try{
-        const snap = await getDocs(COL('roles'));
-        snap.forEach(s=>{
-          const r = s.data();
-          const div = document.createElement('div'); div.className='item';
-          div.innerHTML = `<div style="flex:1"><b>${s.id}</b><div class="muted small">Permisos: ${(r.permissions||[]).join(', ') || 'Sin permisos'}</div></div>
-            <div style="text-align:right"><button data-role="${s.id}" class="btn-ghost" data-act="edit">Editar</button> <button data-role="${s.id}" class="btn" data-act="del">Borrar</button></div>`;
-          out.appendChild(div);
-        });
-        out.querySelectorAll('button[data-act="edit"]').forEach(b=>{
-          b.onclick = async ()=> {
-            if(!STATE.adminMode) return alert('Activa Admin Mode');
-            const roleKey = b.dataset.role;
-            const modal = document.createElement('div'); modal.className='overlay';
-            modal.innerHTML = `<div class="modal"><h3>Editar rol: ${roleKey}</h3><div class="muted small">Permisos (separados por comas)</div><textarea id="permArea" style="width:100%;height:100px;margin-top:8px"></textarea><div style="display:flex;gap:8px;margin-top:12px"><button id="saveRole" class="btn">Guardar</button><button id="cancelRole" class="btn-ghost">Cancelar</button></div></div>`;
-            document.body.appendChild(modal);
-            const rSnap = await getDocs(query(COL('roles'), where('__name__','==', roleKey)));
-            let roleObj = null; rSnap.forEach(d=> roleObj = d.data());
-            $('#permArea', modal).value = (roleObj && roleObj.permissions) ? roleObj.permissions.join(',') : '';
-            $('#cancelRole', modal).onclick = ()=> modal.remove();
-            $('#saveRole', modal).onclick = async ()=> {
-              const perms = $('#permArea', modal).value.split(',').map(x=>x.trim()).filter(Boolean);
-              await setDoc(doc(db,'roles',roleKey), { name: roleKey, color: roleObj?.color || '#999999', permissions: perms });
-              await pushLog(`Rol editado: ${roleKey}`); modal.remove(); loadRolesAdmin(container); loadUsersAdmin(container);
-            };
-          };
-        });
-        out.querySelectorAll('button[data-act="del"]').forEach(b=>{
-          b.onclick = async ()=> {
-            if(!STATE.adminMode) return alert('Activa Admin Mode');
-            const roleKey = b.dataset.role;
-            if(!confirm('Borrar rol? Los usuarios con este rol quedarán con rol vacío')) return;
-            try{ await deleteDoc(doc(db,'roles',roleKey));
-              const usersSnap = await getDocs(COL('users'));
-              usersSnap.forEach(async u=>{ const d = u.data(); if(d.role === roleKey) await updateDoc(doc(db,'users',u.id), { role: '' }); });
-              await pushLog(`Rol borrado: ${roleKey}`); loadRolesAdmin(container); loadUsersAdmin(container);
-            }catch(e){ console.error(e); alert('Error borrando rol'); }
-          };
-        });
-      }catch(e){ console.error('loadRolesAdmin', e); out.innerHTML = '<div class="muted small">Error cargando roles</div>'; }
-    }
-
-    // --- Logs
-    async function renderLogs(container){
-      container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-        <div><strong>Auditoría</strong><div class="muted small">Últimas acciones</div></div>
-        <div><button class="btn btn-small close-panel">Cerrar</button></div></div>
-        <div style="margin-top:12px" id="logsList" class="list"></div>`;
-      container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-      const list = $('#logsList', container);
-      if(STATE.unsub.logs) STATE.unsub.logs();
-      STATE.unsub.logs = onSnapshot(query(COL('logs'), orderBy('t','desc')), snap=>{
-        list.innerHTML = '';
-        snap.forEach(s=> {
-          const d = s.data();
-          const it = document.createElement('div'); it.className='item'; it.innerHTML = `<div><div style="font-weight:700">${escapeHtml(d.msg)}</div><div class="muted small">${new Date(d.t).toLocaleString()}</div></div>`;
-          list.appendChild(it);
-        });
-      });
-      STATE.unsub.currentPanel = STATE.unsub.logs;
-    }
-
-    // --- Radio with presence (heartbeat)
-    async function renderRadio(container){
-      container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-        <div><strong>Radios</strong><div class="muted small">Chat por canales • presencia incluida</div></div>
-        <div><button class="btn btn-small close-panel">Cerrar</button></div></div>
-        <div style="margin-top:12px;display:flex;gap:12px">
-          <div style="flex:1">
-            <div style="display:flex;gap:8px;align-items:center">
-              <select id="radioChannelSelect"></select>
-              <div style="margin-left:auto;display:flex;gap:8px"><input id="radioNewChannel" placeholder="Nuevo canal"/><button id="radioCreateChannel" class="btn-ghost">Crear</button><button id="radioRefresh" class="btn-ghost">Refrescar</button></div>
-            </div>
-            <div id="radioStatus" style="margin-top:8px" class="muted small"></div>
-            <div id="radioMessages" class="radio-messages" style="margin-top:12px"></div>
-            <div style="display:flex;gap:8px;margin-top:8px"><input id="radioMsgInput" placeholder="Escribe mensaje..." /><button id="radioSend" class="btn">Enviar</button></div>
-          </div>
-          <div style="width:320px">
-            <h4 style="margin:0 0 8px 0">Canales</h4>
-            <input id="radioSearchChannels" placeholder="Buscar..." style="width:100%;padding:8px;border-radius:8px"/>
-            <div id="radioChannelsList" class="list" style="margin-top:8px"></div>
-            <div style="margin-top:12px"><strong>Oyentes</strong><div id="radioListeners" class="list" style="margin-top:8px"></div></div>
-          </div>
-        </div>`;
-      container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> { stopRadioHeartbeat(); clearExpanded(); }));
-      $('#radioCreateChannel', container).addEventListener('click', async ()=>{
-        const val = $('#radioNewChannel', container).value.trim(); if(!val) return;
-        try{ await addDoc(COL('radio_channels'), { id: val, name: val, created_at: Date.now() }); await pushLog(`Canal radio creado: ${val}`); loadRadioChannels(container); $('#radioNewChannel', container).value=''; }catch(e){ console.error(e); alert('Error creando canal'); }
-      });
-      $('#radioRefresh', container).addEventListener('click', ()=> loadRadioChannels(container));
-      $('#radioSend', container).addEventListener('click', sendRadioMessage);
-      $('#radioMsgInput', container).addEventListener('keydown', (e)=> { if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendRadioMessage(); }});
-      $('#radioSearchChannels', container).addEventListener('input', (e)=>{ const q=(e.target.value||'').toLowerCase(); document.querySelectorAll('#radioChannelsList .item').forEach(it=> it.style.display = (it.dataset.name||'').toLowerCase().includes(q) ? '' : 'none'); });
-
-      // subscribe channels realtime
-      if(STATE.unsub.radio_channels) STATE.unsub.radio_channels();
-      STATE.unsub.radio_channels = onSnapshot(COL('radio_channels'), snap => { renderChannelList(snap.docs.map(d=>({ id:d.id, ...d.data() })), container); });
-      await loadRadioChannels(container);
-      STATE.unsub.currentPanel = STATE.unsub.radio_channels;
-    }
-
-    async function loadRadioChannels(container=document){
-      const list = $('#radioChannelsList', container); const select = $('#radioChannelSelect', container);
-      if(!list || !select) return;
-      try{
-        const snap = await getDocs(COL('radio_channels'));
-        const arr = []; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
-        renderChannelList(arr, container);
-      }catch(e){ console.error('loadRadioChannels', e); list.innerHTML = '<div class="muted small">Error cargando</div>'; }
-    }
-    function renderChannelList(arr, container=document){
-      const list = $('#radioChannelsList', container); const select = $('#radioChannelSelect', container);
-      if(!list || !select) return;
-      list.innerHTML = ''; select.innerHTML = '';
-      arr.forEach(ch=>{
-        const id = ch.id || ch.name; const name = ch.name || id;
-        const it = document.createElement('div'); it.className='item'; it.dataset.name = name;
-        it.innerHTML = `<div style="flex:1"><b>${escapeHtml(name)}</b><div class="muted small">${escapeHtml(id)}</div></div><div><button class="btn-ghost" data-id="${escapeHtml(id)}">Unirse</button></div>`;
-        it.querySelector('button').onclick = ()=> switchRadioChannel(id, container);
+  const list = area.querySelector('#wantedList');
+  const renderList = (items) => {
+    if(items.length===0) list.innerHTML = '<div class="muted small">Sin BOLOs activos</div>';
+    else {
+      list.innerHTML = '';
+      items.forEach(w=>{
+        const it = document.createElement('div'); it.className='item';
+        it.innerHTML = `<div style="max-width:70%"><b>${escapeHtml(w.name||'N/A')}</b><div class="muted small">${escapeHtml(w.reason||'')} • ${escapeHtml(w.priority||'')}</div></div>
+                        <div style="display:flex;gap:8px">
+                          <button class="btn-ghost btn-small view-bolo" data-id="${w.id}">Ver</button>
+                          <button class="btn btn-small del-bolo" data-id="${w.id}">Borrar</button>
+                        </div>`;
         list.appendChild(it);
-        const opt = document.createElement('option'); opt.value = id; opt.textContent = name; select.appendChild(opt);
       });
     }
-
-    async function switchRadioChannel(channelId, container=document){
-      if(!channelId) return;
-      const select = $('#radioChannelSelect', container); if(select) select.value = channelId;
-      const messagesEl = $('#radioMessages', container); if(!messagesEl) return;
-      messagesEl.innerHTML = '<div class="muted small">Cargando mensajes...</div>';
-      // unsubscribe previous
-      if(STATE.unsub.radio_messages) STATE.unsub.radio_messages();
-      // subscribe to messages and filter client-side
-      STATE.unsub.radio_messages = onSnapshot(COL('radio_messages'), snap=>{
-        const msgs = [];
-        snap.forEach(s=> { const d = s.data(); if((d.channel||'') === channelId) msgs.push({ id:s.id, ...d }); });
-        msgs.sort((a,b)=> (a.created_at||0) - (b.created_at||0));
-        renderRadioMessages(msgs, container);
+    // add listeners
+    list.querySelectorAll('.del-bolo').forEach(b=>{
+      b.addEventListener('click', async ()=>{
+        const id = b.dataset.id;
+        if(FireDB.available){
+          const ok = await FireDB.del(COLLECTIONS.wanted, id);
+          if(!ok){ notify('danger','Error','No se pudo eliminar en Firestore',2000); return; }
+        }
+        STATE.wanted = STATE.wanted.filter(x=> x.id !== id);
+        renderList(STATE.wanted);
+        notify('success','BOLO eliminado', `Se eliminó ${id}`, 1600);
+        document.getElementById('statWanted').textContent = STATE.wanted.length;
       });
-      // start presence heartbeat
-      startRadioHeartbeat(channelId);
-      // load listeners
-      loadRadioListeners(channelId, container);
-      // set status
-      $('#radioStatus', container).textContent = `Conectado al canal: ${channelId}`;
-      STATE.unsub.currentPanel = STATE.unsub.radio_messages;
-    }
-
-    function renderRadioMessages(msgs, container=document){
-      const messagesEl = $('#radioMessages', container); if(!messagesEl) return;
-      messagesEl.innerHTML = '';
-      if(!msgs.length){ messagesEl.innerHTML = '<div class="muted small">Sin mensajes</div>'; return; }
-      msgs.forEach(m=>{
-        const me = STATE.currentUser && (STATE.currentUser.display === m.author || STATE.currentUser.username === m.author_username);
-        const it = document.createElement('div'); it.className = 'radio-msg ' + (me ? 'me' : '');
-        const avatar = document.createElement('div'); avatar.className='radio-avatar';
-        avatar.textContent = (m.author||'G').split(' ').map(s=>s[0]||'').slice(0,2).join('').toUpperCase();
-        // color by role if possible: we'll show gradient if author role known (best-effort)
-        it.appendChild(avatar);
-        const bubble = document.createElement('div'); bubble.className='radio-bubble ' + (me ? 'me' : '');
-        bubble.innerHTML = `<div style="font-weight:700">${escapeHtml(m.author||'Anon')}</div><div>${escapeHtml(m.text||'')}</div><div class="radio-meta">${new Date(m.created_at||0).toLocaleString()}</div>`;
-        it.appendChild(bubble);
-        messagesEl.appendChild(it);
+    });
+    list.querySelectorAll('.view-bolo').forEach(b=>{
+      b.addEventListener('click', ()=>{
+        const id = b.dataset.id; const w = STATE.wanted.find(x=>x.id===id);
+        if(!w) return;
+        const modal = createModal(`<h3>${escapeHtml(w.name)}</h3>
+          <p><b>Motivo:</b> ${escapeHtml(w.reason)}</p>
+          <p><b>Prioridad:</b> ${escapeHtml(w.priority)}</p>
+          <p class="muted small">${escapeHtml(w.notes||'')}</p>
+          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+            <button class="btn-ghost" id="closeModal">Cerrar</button>
+          </div>`);
+        modal.querySelector('#closeModal').addEventListener('click', ()=> modal.remove());
       });
-      messagesEl.scrollTop = messagesEl.scrollHeight;
-    }
+    });
+  };
 
-    async function sendRadioMessage(){
-      const input = $('#radioMsgInput'); if(!input) return;
-      const text = input.value.trim(); if(!text) return;
-      const channel = STATE.selectedChannel || $('#radioChannelSelect')?.value;
-      if(!channel) return alert('Selecciona un canal');
-      try{ await addDoc(COL('radio_messages'), { channel, text, author: STATE.currentUser ? STATE.currentUser.display : 'Invitado', author_username: STATE.currentUser ? STATE.currentUser.username : 'guest', created_at: Date.now() }); await pushLog(`Mensaje radio (${channel})`); input.value=''; }catch(e){ console.error(e); alert('Error enviando mensaje'); }
-    }
+  renderList(STATE.wanted);
 
-    // Presence (best-effort): write doc radio_presence/{channel}_{username} with lastSeen timestamp; keep heartbeat interval; remove on unload
-    async function startRadioHeartbeat(channel){
-      try{
-        if(!STATE.currentUser) return;
-        stopRadioHeartbeat();
-        STATE.selectedChannel = channel;
-        const docId = `presence_${channel}_${STATE.currentUser.username}`;
-        const docRef = doc(db,'radio_presence', docId);
-        // initial write
-        await setDoc(docRef, { channel, username: STATE.currentUser.username, display: STATE.currentUser.display, role: STATE.currentUser.role, lastSeen: Date.now() });
-        // heartbeat every 20s
-        const timer = setInterval(async ()=>{
-          try{ await updateDoc(docRef, { lastSeen: Date.now() }); }catch(e){ /* ignore */ }
-        }, 20000);
-        STATE.radioHeartbeatTimers[channel] = { timer, docId };
-        // remove on unload (best-effort)
-        window.addEventListener('beforeunload', async ()=> {
-          try{ await deleteDoc(doc(db,'radio_presence', docId)); }catch(e){ /* ignore */ }
-        });
-      }catch(e){ console.warn('startRadioHeartbeat', e); }
+  area.querySelector('#addBoloBtn').addEventListener('click', async ()=>{
+    const name = prompt('Nombre del sujeto:') || 'Sujeto anónimo';
+    const reason = prompt('Motivo:') || 'No especificado';
+    const priority = prompt('Prioridad (Alta/Media/Baja):') || 'Media';
+    const notes = prompt('Notas:') || '';
+    const data = { name, reason, priority, notes, createdAt: new Date().toISOString() };
+    if(FireDB.available){
+      const created = await FireDB.add(COLLECTIONS.wanted, data);
+      if(created) { STATE.wanted.unshift(created); notify('success','BOLO creado','Guardado en Firestore',1600); }
+      else { data.id = `bolo${Date.now().toString().slice(-5)}`; STATE.wanted.unshift(data); notify('warn','BOLO creado','Guardado localmente',1600); }
+    } else {
+      data.id = `bolo${Date.now().toString().slice(-5)}`; STATE.wanted.unshift(data); notify('success','BOLO creado','Guardado localmente',1600);
     }
-    async function stopRadioHeartbeat(){
-      for(const ch in STATE.radioHeartbeatTimers){
-        const obj = STATE.radioHeartbeatTimers[ch];
-        clearInterval(obj.timer);
-        try{ await deleteDoc(doc(db,'radio_presence', obj.docId)); }catch(e){ /* ignore */ }
-      }
-      STATE.radioHeartbeatTimers = {};
-    }
-    async function loadRadioListeners(channel, container=document){
-      // show listeners from radio_presence where channel==channel and lastSeen within last 45s
-      const list = $('#radioListeners', container); if(!list) return;
-      try{
-        const snap = await getDocs(COL('radio_presence'));
-        const arr = [];
-        snap.forEach(s=> { const d=s.data(); if(d.channel===channel) arr.push(d); });
-        list.innerHTML = '';
-        if(!arr.length){ list.innerHTML = '<div class="muted small">Nadie escuchando</div>'; return; }
-        arr.forEach(p=> {
-          const el = document.createElement('div'); el.className='item';
-          el.innerHTML = `<div style="display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#031018">${escapeHtml((p.display||'').split(' ').map(s=>s[0]||'').slice(0,2).join(''))}</div><div><b>${escapeHtml(p.display||p.username)}</b><div class="muted small">${escapeHtml(p.role||'')}</div></div></div>`;
-          list.appendChild(el);
-        });
-      }catch(e){ console.error('loadRadioListeners', e); list.innerHTML = '<div class="muted small">Error</div>'; }
-    }
+    renderList(STATE.wanted);
+    document.getElementById('statWanted').textContent = STATE.wanted.length;
+  });
 
-    /* ---------- Service (duty) ---------- */
-    async function renderService(container){
-      container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-        <div><strong>Servicio</strong><div class="muted small">Ponte en servicio o sal</div></div>
-        <div><button class="btn btn-small close-panel">Cerrar</button></div></div>
-        <div style="margin-top:12px;display:flex;gap:8px;align-items:center"><div class="muted small">Tu estado:</div><div id="serviceBox" class="pill">Desconocido</div><div style="margin-left:auto"><button id="toggleDuty" class="btn">Cambiar</button></div></div>
-        <div style="margin-top:12px"><strong>Policías en servicio</strong><div id="dutyList" class="list" style="margin-top:8px"></div></div>`;
-      container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-      if(!STATE.currentUser){ $('#serviceBox', container).textContent = 'Inicia sesión'; $('#toggleDuty', container).onclick = ()=> alert('Inicia sesión'); return; }
-      const s = await getDocs(query(COL('users'), where('__name__','==', STATE.currentUser.id)));
-      let userObj = null; s.forEach(d=> userObj = d.data());
-      const on = userObj?.onDuty || false; $('#serviceBox', container).textContent = on ? 'En servicio' : 'Fuera de servicio';
-      $('#toggleDuty', container).onclick = async ()=> {
-        try{ await updateDoc(doc(db,'users',STATE.currentUser.id), { onDuty: !on }); await pushLog(`${STATE.currentUser.username} toggled duty`); renderService(container); updateHeader(); }catch(e){ console.error(e); alert('Error'); }
-      };
-      await loadDutyList();
-    }
-    async function loadDutyList(){
-      const list = $('#dutyList'); if(!list) return;
-      try{
-        const snap = await getDocs(COL('users'));
-        const active = []; snap.forEach(s=> { const d = s.data(); if(d.onDuty) active.push(d.display || d.username); });
-        list.innerHTML = active.map(a=> `<div class="item">${escapeHtml(a)}</div>`).join('') || '<div class="muted small">Nadie en servicio</div>';
-      }catch(e){ console.error('loadDutyList', e); list.innerHTML = '<div class="muted small">Error</div>'; }
-    }
+  area.querySelector('#refreshWantedBtn').addEventListener('click', ()=> { loadWanted(); notify('info','Wanted','Lista recargada',1200); });
+  area.querySelector('#filterPriority').addEventListener('change', (e)=> {
+    const v = e.target.value;
+    if(!v) renderList(STATE.wanted);
+    else renderList(STATE.wanted.filter(x=> (x.priority||'').toLowerCase() === v.toLowerCase()));
+  });
+}
 
-    /* ---------- Auth UI wiring ---------- */
-    $('#btnLogin').addEventListener('click', ()=> { $('#loginModal').style.display = 'flex'; });
-    $('#guestBtn').addEventListener('click', ()=> { STATE.currentUser = null; STATE.adminMode = false; updateHeader(); $('#loginModal').style.display='none'; });
-    $('#showReg').addEventListener('click', ()=> { const r = $('#registerBlock'); r.style.display = r.style.display==='none' ? 'block' : 'none'; });
-    $('#regCancel').addEventListener('click', ()=> $('#registerBlock').style.display='none');
+/* -------------------- Fines (Multas) -------------------- */
+async function loadFinesFromDB(){
+  if(!FireDB.available) return null;
+  return await FireDB.getAll(COLLECTIONS.fines);
+}
+async function loadFines(){
+  const dbdata = await loadFinesFromDB();
+  if(dbdata) STATE.fines = dbdata;
+  else {
+    if(STATE.fines.length===0){
+      STATE.fines = [ { id:'fine1', owner:'Carlos Díaz', amount:250, reason:'Exceso de velocidad', paid:false, createdAt: new Date().toISOString() } ];
+    }
+  }
+  document.getElementById('statFines').textContent = STATE.fines.length;
+}
 
-    $('#loginBtnModal').addEventListener('click', async ()=>{
-      const u = $('#loginUser').value.trim(), p = $('#loginPass').value.trim();
-      if(!u || !p){ $('#loginError').style.display='block'; $('#loginError').textContent='Usuario y contraseña requeridos'; return; }
-      try{
-        const s = await getDocs(query(COL('users'), where('username','==', u), where('password','==', p)));
-        if(s.empty){ $('#loginError').style.display='block'; $('#loginError').textContent='Usuario o contraseña incorrectos'; return; }
-        let found=null; s.forEach(d=> found={ id:d.id, ...d.data() });
-        STATE.currentUser = found; STATE.adminMode = false; updateHeader(); $('#loginModal').style.display='none'; await pushLog(`Sesión iniciada: ${found.username}`); renderCards();
-      }catch(e){ console.error('login', e); $('#loginError').style.display='block'; $('#loginError').textContent='Error en login'; }
+function renderFinesPanel(container){
+  let area = container || document.getElementById('panelBody_fines');
+  if(!area){
+    const modal = document.createElement('div'); modal.style.position='fixed'; modal.style.right='20px'; modal.style.bottom='20px'; modal.style.width='420px'; modal.style.zIndex=99999;
+    modal.innerHTML = `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>Multas</strong><div class="muted small">Resumen</div></div>
+      <div><button class="btn-ghost close-small">Cerrar</button></div>
+    </div><div id="finesMiniList" style="margin-top:12px"></div></div>`;
+    document.body.appendChild(modal);
+    modal.querySelector('.close-small').addEventListener('click', ()=> modal.remove());
+    area = modal.querySelector('#finesMiniList');
+  }
+
+  area.innerHTML = `<div style="display:flex;justify-content:space-between">
+    <div><strong>Multas</strong></div>
+    <div style="display:flex;gap:8px">
+      <button id="newFineBtn" class="btn btn-small">Nueva multa</button>
+      <button id="refreshFinesBtn" class="btn-ghost btn-small">Refrescar</button>
+    </div>
+  </div>
+  <div style="margin-top:12px" id="fineList" class="list"></div>`;
+
+  const list = area.querySelector('#fineList');
+  if(STATE.fines.length===0) list.innerHTML = '<div class="muted small">Sin multas</div>';
+  else {
+    list.innerHTML = '';
+    STATE.fines.forEach(f=>{
+      const it = document.createElement('div'); it.className='item';
+      it.innerHTML = `<div style="max-width:65%"><b>${escapeHtml(f.owner || 'N/A')}</b><div class="muted small">${escapeHtml(f.reason || '')} • ${escapeHtml(String(f.amount || 0))}€ ${f.paid? '• Pagada':''}</div></div>
+                      <div style="display:flex;gap:8px">
+                        <button class="btn-ghost btn-small pay-fine" data-id="${f.id}">${f.paid?'Reembolsar':'Pagar'}</button>
+                        <button class="btn btn-small del-fine" data-id="${f.id}">Eliminar</button>
+                      </div>`;
+      list.appendChild(it);
     });
 
-    $('#regCreate').addEventListener('click', async ()=>{
-      const username = $('#regUser').value.trim();
-      const display = $('#regName').value.trim() || username;
-      const pass = $('#regPass').value.trim() || '1234';
-      const role = $('#regRole').value || 'officer';
-      if(!username){ $('#regMsg').textContent='Usuario requerido'; return; }
-      try{
-        const exists = await getDocs(query(COL('users'), where('username','==', username)));
-        if(!exists.empty){ $('#regMsg').textContent='Usuario ya existe'; return; }
-        await addDoc(COL('users'), { username, display, password: pass, role, badge:'', onDuty:false });
-        $('#regMsg').textContent='Cuenta creada. Inicia sesión.';
-        await pushLog(`Cuenta creada: ${username}`);
-        $('#regUser').value=''; $('#regName').value=''; $('#regPass').value='';
-      }catch(e){ console.error('regCreate', e); $('#regMsg').textContent='Error creando cuenta'; }
+    list.querySelectorAll('.pay-fine').forEach(b=>{
+      b.addEventListener('click', async ()=>{
+        const id = b.dataset.id; const f = STATE.fines.find(x=>x.id===id);
+        if(!f) return;
+        f.paid = !f.paid;
+        if(FireDB.available){
+          const ok = await FireDB.update(COLLECTIONS.fines, id, { paid: f.paid });
+          if(!ok) notify('danger','Error','No se pudo actualizar en Firestore',1800);
+        }
+        renderFinesPanel(area);
+        notify('success','Multa actualizada', `${f.owner} • ${f.paid? 'Pagada':'Pendiente'}`, 1500);
+      });
     });
 
-    // export
-    $('#btnExport').addEventListener('click', async ()=>{
-      try{
-        const collections = ['users','roles','reports','wanted','calls','pda','fines','alerts','radio_channels','radio_messages','logs'];
-        const data = {};
-        for(const c of collections){ const s=await getDocs(COL(c)); data[c]=[]; s.forEach(d=> data[c].push({ id:d.id, ...d.data() })); }
-        const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
-        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href=url; a.download='firestore_export_'+Date.now()+'.json'; document.body.appendChild(a); a.click(); a.remove();
-      }catch(e){ console.error('export', e); alert('Error exportando'); }
+    list.querySelectorAll('.del-fine').forEach(b=>{
+      b.addEventListener('click', async ()=>{
+        const id = b.dataset.id;
+        if(FireDB.available){
+          const ok = await FireDB.del(COLLECTIONS.fines, id);
+          if(!ok){ notify('danger','Error','No se pudo eliminar en Firestore',1800); return; }
+        }
+        STATE.fines = STATE.fines.filter(x=>x.id!==id);
+        renderFinesPanel(area);
+        notify('info','Multa eliminada', `ID ${id}`, 1200);
+        document.getElementById('statFines').textContent = STATE.fines.length;
+      });
     });
+  }
 
-    /* ---------- Header helpers ---------- */
-    async function updateHeader(){
-      userDisplay.textContent = STATE.currentUser ? `${STATE.currentUser.display} (${STATE.currentUser.role})` : 'No conectado';
-      // onDuty
-      try{
-        const snap = await getDocs(COL('users')); let cnt=0; snap.forEach(s=> { if(s.data().onDuty) cnt++; }); dutyStatus.textContent = `En servicio: ${cnt}`;
-      }catch(e){ dutyStatus.textContent = 'En servicio: —'; }
-      adminModeWrap.style.display = STATE.currentUser && STATE.currentUser.role === 'admin' ? 'inline-block' : 'none';
-      adminModePill.textContent = `Admin: ${STATE.adminMode ? 'ON' : 'OFF'}`;
-      updateNotifCount();
+  area.querySelector('#newFineBtn').addEventListener('click', async ()=>{
+    const owner = prompt('Titular de la multa:') || 'Desconocido';
+    const amount = parseFloat(prompt('Importe (€):') || '0') || 0;
+    const reason = prompt('Motivo:') || '—';
+    const data = { owner, amount, reason, paid:false, createdAt: new Date().toISOString() };
+    if(FireDB.available){
+      const created = await FireDB.add(COLLECTIONS.fines, data);
+      if(created){ STATE.fines.unshift(created); notify('success','Multa creada','Guardada en Firestore',1500); }
+      else { data.id = `fine${Date.now().toString().slice(-5)}`; STATE.fines.unshift(data); notify('warn','Multa creada','Guardada localmente',1600); }
+    } else { data.id = `fine${Date.now().toString().slice(-5)}`; STATE.fines.unshift(data); notify('success','Multa creada','Guardada localmente',1500); }
+    renderFinesPanel(area);
+    document.getElementById('statFines').textContent = STATE.fines.length;
+  });
+
+  area.querySelector('#refreshFinesBtn').addEventListener('click', ()=> { loadFines(); notify('info','Multas','Lista recargada',1200); });
+}
+
+/* -------------------- Alerts -------------------- */
+async function loadAlerts(){
+  if(FireDB.available){
+    const db = await FireDB.getAll(COLLECTIONS.alerts);
+    if(db) STATE.alerts = db;
+  }
+}
+function renderAlertsPanel(container){
+  const area = container || document.getElementById('panelBody_alerts');
+  if(!area) return;
+  area.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>Alertas</strong><div class="muted small">Enviar una alerta</div></div>
+      <div style="display:flex;gap:8px">
+        <button id="sendAlertBtn" class="btn btn-small">Enviar</button>
+        <button id="refreshAlertsBtn" class="btn-ghost btn-small">Refrescar</button>
+      </div>
+    </div>
+    <div style="margin-top:12px">
+      <input id="alertTitle" placeholder="Título" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04)"/>
+      <textarea id="alertMsg" placeholder="Mensaje..." style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);margin-top:8px"></textarea>
+    </div>
+    <div style="margin-top:8px" id="alertsList" class="list"></div>
+  `;
+  const list = area.querySelector('#alertsList');
+  if((STATE.alerts || []).length===0) list.innerHTML = '<div class="muted small">Sin alertas enviadas</div>';
+  else {
+    list.innerHTML = '';
+    STATE.alerts.forEach((a)=>{
+      const it = document.createElement('div'); it.className='item';
+      it.innerHTML = `<div><b>${escapeHtml(a.title||'')}</b><div class="muted small">${escapeHtml(a.msg||'')}</div></div><div>${escapeHtml(a.ts||'')}</div>`;
+      list.appendChild(it);
+    });
+  }
+  area.querySelector('#sendAlertBtn').addEventListener('click', async ()=>{
+    const t = area.querySelector('#alertTitle').value || 'Alerta';
+    const m = area.querySelector('#alertMsg').value || '';
+    const a = { title:t, msg:m, ts: new Date().toLocaleString() };
+    if(FireDB.available){
+      const created = await FireDB.add(COLLECTIONS.alerts, a);
+      if(created) { STATE.alerts.unshift(created); notify('warn', t, m, 4000); }
+      else { STATE.alerts.unshift(a); notify('warn', t, m, 4000); }
+    } else {
+      STATE.alerts.unshift(a); notify('warn', t, m, 4000);
     }
+    renderAlertsPanel(area);
+  });
+  area.querySelector('#refreshAlertsBtn').addEventListener('click', ()=> { loadAlerts(); notify('info','Alertas recargadas','',1200); });
+}
 
-    /* ---------- small util: fetchDoc by id ---------- */
-    async function fetchDoc(collectionName, id){
-      try{
-        const s = await getDocs(query(COL(collectionName), where('__name__','==', id)));
-        let data=null; s.forEach(d=> data=d.data()); return data;
-      }catch(e){ console.warn('fetchDoc', e); return null; }
+/* -------------------- Admin / Users -------------------- */
+async function loadUsers(){
+  if(FireDB.available){
+    const db = await FireDB.getAll(COLLECTIONS.users);
+    if(db) STATE.users = db;
+  } else {
+    if(STATE.users.length===0){
+      STATE.users = [
+        { id:'u1', displayName:'Oficial1', onDuty:true, role:'police' },
+        { id:'u2', displayName:'Dispatch', onDuty:false, role:'dispatch' },
+      ];
     }
+  }
+  document.getElementById('statUsers').textContent = STATE.users.length;
+}
+function renderAdminPanel(container){
+  const area = container || document.getElementById('panelBody_admin');
+  if(!area) return;
+  area.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+      <div><strong>Administración</strong><div class="muted small">Usuarios y roles</div></div>
+      <div style="display:flex;gap:8px">
+        <button id="refreshUsers" class="btn-ghost btn-small">Refrescar</button>
+      </div>
+    </div>
+    <div style="margin-top:12px" id="usersList" class="list"></div>`;
+  const list = area.querySelector('#usersList');
+  if((STATE.users || []).length===0) list.innerHTML = '<div class="muted small">Sin usuarios</div>';
+  else {
+    list.innerHTML = '';
+    STATE.users.forEach(u=>{
+      const it = document.createElement('div'); it.className='item';
+      it.innerHTML = `<div><b>${escapeHtml(u.displayName||u.name||'Usu.')}</b><div class="muted small">${escapeHtml(u.role||'')}</div></div>
+                      <div style="display:flex;gap:8px">
+                        <button class="btn-ghost btn-small toggle-duty" data-id="${u.id}">${u.onDuty? 'Off duty':'On duty'}</button>
+                      </div>`;
+      list.appendChild(it);
+    });
+    list.querySelectorAll('.toggle-duty').forEach(b=>{
+      b.addEventListener('click', async ()=>{
+        const id = b.dataset.id; const u = STATE.users.find(x=>x.id===id);
+        if(!u) return;
+        u.onDuty = !u.onDuty;
+        if(FireDB.available) { await FireDB.update(COLLECTIONS.users, id, { onDuty: u.onDuty }).catch(()=> notify('danger','Error','No se pudo actualizar usuario',1600)); }
+        renderAdminPanel(area);
+        updateHeader();
+      });
+    });
+  }
+  area.querySelector('#refreshUsers').addEventListener('click', ()=> { loadUsers(); notify('info','Usuarios recargados','',1200); });
+}
 
-    // subscribe alerts count realtime
-    if(STATE.unsub.alertCount) STATE.unsub.alertCount();
-    STATE.unsub.alertCount = onSnapshot(COL('alerts'), ()=> updateNotifCount());
+/* -------------------- Header helpers -------------------- */
+async function updateHeader(){
+  userDisplay.textContent = STATE.currentUser ? `${STATE.currentUser.display} (${STATE.currentUser.role})` : 'No conectado';
+  try{
+    if(FireDB.available){
+      const users = await FireDB.getAll(COLLECTIONS.users);
+      STATE.onDutyCount = (users || []).filter(u=>u.onDuty).length;
+    }
+  }catch(e){ console.warn(e); }
+  dutyStatus.textContent = `En servicio: ${STATE.onDutyCount || 0}`;
+}
 
-    // Init
-    (async ()=>{
-      await seedIfEmpty();
-      renderCards();
-      updateHeader();
-    })();
+/* -------------------- Search & Quick actions -------------------- */
+document.getElementById('searchBtn').addEventListener('click', ()=> {
+  const q = document.getElementById('globalSearch').value.trim().toLowerCase();
+  if(!q) { notify('info','Buscar','Introduce texto',1200); return; }
+  // search BOLO and fines
+  const bolos = STATE.wanted.filter(w => (w.name||'').toLowerCase().includes(q) || (w.reason||'').toLowerCase().includes(q));
+  const fines = STATE.fines.filter(f => (f.owner||'').toLowerCase().includes(q) || (f.reason||'').toLowerCase().includes(q));
+  // show results modal
+  let html = `<div style="max-height:60vh;overflow:auto"><h3>Resultados para "${escapeHtml(q)}"</h3>`;
+  html += `<h4>BOLOs (${bolos.length})</h4>`;
+  bolos.forEach(b=> html += `<div style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.02)"><b>${escapeHtml(b.name)}</b> — ${escapeHtml(b.reason)}</div>`);
+  html += `<h4 style="margin-top:8px">Multas (${fines.length})</h4>`;
+  fines.forEach(f=> html += `<div style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.02)"><b>${escapeHtml(f.owner)}</b> — ${escapeHtml(f.reason)} — ${escapeHtml(String(f.amount))}€</div>`);
+  html += `</div><div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn-ghost" id="closeModal">Cerrar</button></div>`;
+  const m = createModal(html);
+  m.querySelector('#closeModal').addEventListener('click', ()=> m.remove());
+});
+document.getElementById('clearSearch').addEventListener('click', ()=> { document.getElementById('globalSearch').value=''; notify('info','Buscar','Campo limpiado',900); });
 
-    // expose for debug
-    window.__APP = { STATE, db, openCard };
+/* quick buttons */
+document.getElementById('quickNewBolo').addEventListener('click', ()=> { openCard('wanted'); setTimeout(()=> document.querySelector('#addBoloBtn')?.click?.(), 320); });
+document.getElementById('quickNewFine').addEventListener('click', ()=> { openCard('fines'); setTimeout(()=> document.querySelector('#newFineBtn')?.click?.(), 320); });
+document.getElementById('openWanted').addEventListener('click', ()=> openCard('wanted'));
+document.getElementById('openFines').addEventListener('click', ()=> openCard('fines'));
 
-  </script>
+/* export/import */
+document.getElementById('btnExport').addEventListener('click', ()=>{
+  const data = { wanted: STATE.wanted, fines: STATE.fines, alerts: STATE.alerts, users: STATE.users };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
+  const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'pda_export_' + Date.now() + '.json'; document.body.appendChild(a); a.click(); a.remove();
+  notify('success','Exportado','JSON descargado',1500);
+});
+
+/* clear toasts */
+document.getElementById('clearNotifs').addEventListener('click', ()=> { document.getElementById('toasts').innerHTML=''; STATE.notifications=[]; updateNotifCount(0); notify('info','Notificaciones','Limpiadas',900); });
+
+/* theme toggle (simple aesthetic swap) */
+document.getElementById('btnTheme').addEventListener('click', ()=>{
+  const root = document.documentElement;
+  const cur = root.style.getPropertyValue('--accent1') || getComputedStyle(root).getPropertyValue('--accent1');
+  if(cur.includes('5b22ff')){ // switch to blue police
+    root.style.setProperty('--accent1', '#0ea5e9'); root.style.setProperty('--accent2', '#1e40af');
+    notify('success','Tema','Modo Policía activado',1200);
+  } else {
+    root.style.setProperty('--accent1', '#5b22ff'); root.style.setProperty('--accent2', '#00d4b4');
+    notify('success','Tema','Tema por defecto activado',1200);
+  }
+});
+
+/* -------------------- Mini chart (SVG sparkline) -------------------- */
+function renderMiniChart(){
+  // random demo data or derived from fines/wanted counts
+  const vals = [
+    Math.max(0, (STATE.wanted.length || 0) + Math.floor(Math.random()*3-1)),
+    Math.max(0, (STATE.fines.length || 0) + Math.floor(Math.random()*3-1)),
+    Math.max(0, ((STATE.users.length)||0) + Math.floor(Math.random()*3-1)),
+    Math.max(0, (STATE.wanted.length || 0) + Math.floor(Math.random()*3-1)),
+    Math.max(0, (STATE.fines.length || 0) + Math.floor(Math.random()*3-1)),
+  ];
+  const w = 160, h=60, pad=6; const max = Math.max(...vals,1);
+  const step = (w - pad*2) / (vals.length-1);
+  let path = '';
+  vals.forEach((v,i)=> { const x = pad + step*i; const y = pad + (1 - (v/max))*(h-pad*2); path += (i===0?`M ${x} ${y}`:` L ${x} ${y}`); });
+  document.getElementById('miniChart').innerHTML = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
+    <defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#00d4b4" stop-opacity="0.9"/><stop offset="1" stop-color="#5b22ff" stop-opacity="0.9"/></linearGradient></defs>
+    <path d="${path}" fill="none" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
+  </svg>`;
+}
+
+/* -------------------- Realtime listeners (optional) -------------------- */
+function tryRealtime(){
+  if(!FireDB.available) return;
+  try{
+    // wanted listener
+    const unsubWanted = FireDB.listen(COLLECTIONS.wanted, (arr)=>{
+      STATE.wanted = arr; renderWantedCards(); renderMiniChart(); document.getElementById('statWanted').textContent = STATE.wanted.length;
+    });
+    const unsubFines = FireDB.listen(COLLECTIONS.fines, (arr)=>{
+      STATE.fines = arr; document.getElementById('statFines').textContent = STATE.fines.length;
+    });
+    const unsubUsers = FireDB.listen(COLLECTIONS.users, (arr)=>{
+      STATE.users = arr; document.getElementById('statUsers').textContent = STATE.users.length;
+      STATE.onDutyCount = (arr || []).filter(u=>u.onDuty).length; dutyStatus.textContent = `En servicio: ${STATE.onDutyCount || 0}`;
+    });
+    // return unsubs if needed
+    return [unsubWanted, unsubFines, unsubUsers].filter(x=>x);
+  }catch(e){ console.warn('Realtime not available', e); return null; }
+}
+
+/* -------------------- UTIL: modal, escape -------------------- */
+function createModal(innerHTML){
+  const modal = document.createElement('div'); modal.style.position='fixed'; modal.style.inset=0; modal.style.display='grid'; modal.style.placeItems='center'; modal.style.zIndex=999999;
+  modal.innerHTML = `<div style="background:var(--card);padding:18px;border-radius:12px;min-width:320px;max-width:760px;max-height:80vh;overflow:auto">${innerHTML}</div>`;
+  document.body.appendChild(modal); return modal;
+}
+function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]; }); }
+
+/* -------------------- Shortcuts -------------------- */
+document.addEventListener('keydown', (e)=>{
+  if(e.key === 'Escape'){ clearExpanded(); }
+  if(e.key.toLowerCase() === 'w'){ openCard('wanted'); }
+  if(e.key.toLowerCase() === 'm'){ openCard('fines'); }
+  if(e.key.toLowerCase() === 'n'){ openCard('wanted'); setTimeout(()=> document.querySelector('#addBoloBtn')?.click?.(), 300); }
+});
+
+/* -------------------- Init: load data, render UI -------------------- */
+(async function init(){
+  renderCards();
+  renderMiniChart();
+
+  // load data (prefer Firestore if available)
+  await loadWanted();
+  await loadFines();
+  await loadAlerts();
+  await loadUsers();
+  updateHeader();
+
+  // try realtime listeners if possible (best-effort)
+  if(FireDB.available){
+    tryRealtime();
+    notify('success','Firestore detectado','Conexión con Firestore activa (siempre que la SDK esté inicializada y los imports modulares existan)',2200);
+  } else {
+    notify('warn','Sin Firestore','Modo demo/local activo',2200);
+  }
+
+  // wire quick open buttons on cards
+  document.querySelectorAll('.card').forEach(c=> {
+    const id = c.dataset.id;
+    if(id === 'wanted' && !c.querySelector('.card-footer')){
+      const ft = document.createElement('div'); ft.className='card-footer muted small'; ft.style.marginTop='8px'; ft.textContent = `${STATE.wanted.length} BOLO(s) activos`; c.appendChild(ft);
+    }
+  });
+
+  // expose debug
+  window.__PDA = { STATE, FireDB, loadWanted, loadFines, loadAlerts, loadUsers, notify };
+
+  // sample notifications
+  setTimeout(()=> notify('info','Bienvenido','Interfaz lista'), 600);
+  setTimeout(()=> renderMiniChart(), 600);
+})();
+
+</script>
 </body>
 </html>
