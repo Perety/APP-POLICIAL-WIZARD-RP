@@ -1,944 +1,361 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Daynight RP — PDA / CAD · Full</title>
-<meta name="description" content="PDA / CAD completo: BOLO, Multas, Alertas, Notifs FiveM, Firestore-ready">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDA | Daynight RP</title>
+  <style>
+    :root {
+      --bg: #0a0a14;
+      --panel: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.07);
+      --text: #f3f3f3;
+      --muted: #a0a0b0;
+      --accent: #8f5cff;
+      --accent2: #00d1ff;
+      --success: #3ef6a0;
+      --danger: #ff4e6d;
+      --radius: 12px;
+      --shadow: 0 10px 30px rgba(0,0,0,0.4);
+    }
 
-<!-- ====== FONTS (system fallback) ====== -->
-<style>
-  /* ---------- VARIABLES & THEME ---------- */
-  :root{
-    --bg-1:#030617; --bg-2:#071523;
-    --glass: rgba(255,255,255,0.03);
-    --card: linear-gradient(180deg, rgba(255,255,255,0.018), rgba(255,255,255,0.006));
-    --muted: #a9c0c8;
-    --text: #e9f7fb;
-    --accent1: #5b22ff;
-    --accent2: #00d4b4;
-    --danger: #ff6b6b;
-    --radius:16px;
-    --shadow-1: 0 20px 50px rgba(3,6,14,0.7);
-  }
+    body {
+      font-family: "Inter", sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(143,92,255,0.1), transparent 50%), var(--bg);
+      color: var(--text);
+      margin: 0;
+      padding: 0;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
 
-  html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial}
-  body{
-    background:
-      radial-gradient(1000px 400px at 12% 8%, rgba(91,34,255,0.06), transparent),
-      linear-gradient(180deg,var(--bg-1),var(--bg-2));
-    color:var(--text); padding:26px; -webkit-font-smoothing:antialiased;
-  }
+    header {
+      padding: 20px 40px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(0,0,0,0.3);
+      backdrop-filter: blur(10px);
+    }
 
-  /* grain */
-  body::before{
-    content:""; position:fixed; inset:0; pointer-events:none;
-    background-image: linear-gradient(130deg, rgba(255,255,255,0.01) 1px, transparent 1px);
-    background-size: 6px 6px; opacity:0.6; mix-blend-mode: overlay;
-  }
+    header h1 {
+      font-size: 1.2rem;
+      letter-spacing: 0.05em;
+      color: var(--accent2);
+    }
 
-  .wrap{max-width:1280px;margin:0 auto}
-  header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:18px}
-  .brand{display:flex;gap:14px;align-items:center}
-  .logo{width:72px;height:72px;border-radius:14px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:grid;place-items:center;overflow:hidden;border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 48px rgba(2,6,24,0.6)}
-  .brand h1{margin:0;font-size:20px}
-  .subtitle{color:var(--muted);font-size:13px}
+    main {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+      padding: 30px 40px;
+    }
 
-  .top-right{display:flex;gap:10px;align-items:center}
-  .pill{background:var(--glass);padding:8px 12px;border-radius:999px;color:var(--muted);font-weight:700}
-  .btn{background:linear-gradient(90deg,var(--accent1),var(--accent2));border:none;padding:8px 12px;border-radius:12px;color:#041018;cursor:pointer;font-weight:800;box-shadow:0 10px 28px rgba(30,8,80,0.14)}
-  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);padding:7px 10px;border-radius:10px;color:var(--muted);cursor:pointer}
-  .icon-btn{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:10px;background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.03);cursor:pointer}
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
 
-  /* LAYOUT */
-  .top-row{display:grid;grid-template-columns:1fr 360px;gap:14px;margin-bottom:14px}
-  @media (max-width:1100px){ .top-row{grid-template-columns:1fr} }
+    .panel:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 60px rgba(143,92,255,0.25);
+    }
 
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-  @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} }
-  @media (max-width:640px){ .grid{grid-template-columns:1fr} }
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
 
-  /* CARD */
-  .card{
-    background:var(--card); border-radius:var(--radius); padding:16px; border:1px solid rgba(255,255,255,0.04);
-    box-shadow:var(--shadow-1); display:flex;flex-direction:column; gap:10px; position:relative; overflow:hidden; transition: transform .28s cubic-bezier(.2,.9,.2,.99), box-shadow .28s, border-color .28s;
-  }
-  .card:hover{transform:translateY(-6px); box-shadow:0 40px 100px rgba(2,6,18,0.75); border-color:rgba(120,50,255,0.14)}
-  .ribbon{
-    position:absolute; left:-40px; top:-38px; transform:rotate(-18deg);
-    background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(120,50,255,0.06));
-    width:220px;height:80px; filter: blur(8px); opacity:0.6; pointer-events:none;
-  }
-  .card-head{display:flex;align-items:center;justify-content:space-between}
-  .title{font-weight:900;font-size:15px}
-  .desc{color:var(--muted);font-size:13px}
+    .panel-header h2 {
+      font-size: 1rem;
+      color: var(--accent);
+      margin: 0;
+    }
 
-  .card-actions{display:flex;gap:8px;align-items:center}
-  .btn-small{padding:6px 8px;border-radius:8px;font-size:13px}
+    .panel-body {
+      font-size: 0.9rem;
+      color: var(--muted);
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: thin;
+      padding-right: 4px;
+    }
 
-  /* EXPANDED */
-  #expandedRoot .expanded{
-    margin-top:12px;border-radius:12px;padding:16px;background:linear-gradient(180deg, rgba(255,255,255,0.016), rgba(0,0,0,0.03));
-    border:1px solid rgba(255,255,255,0.03); box-shadow:0 30px 44px rgba(0,0,0,0.55); animation: panelIn .28s both;
-  }
-  @keyframes panelIn{from{opacity:0;transform:translateY(12px) scale(.995}}to{opacity:1;transform:none}}@keyframes panelOut{from{opacity:1}to{opacity:0;transform:translateY(8px)}}
+    .btn {
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      padding: 6px 12px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: background 0.2s ease;
+    }
 
-  /* TOASTS */
-  #toasts{position:fixed; right:20px; top:84px; z-index:99999; display:flex;flex-direction:column; gap:10px; width:360px; pointer-events:none}
-  .toast{pointer-events:auto;display:flex;gap:10px;align-items:flex-start;padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));border:1px solid rgba(255,255,255,0.04);box-shadow:0 12px 30px rgba(2,6,10,0.6);color:var(--text);animation: toastIn .22s ease both}
-  @keyframes toastIn{from{opacity:0;transform:translateY(-8px) scale(.98)}to{opacity:1;transform:none}}
-  .t-left{font-weight:900;font-size:13px}
-  .t-body{font-size:13px;color:var(--muted)}
-  .t-close{margin-left:auto;background:transparent;border:none;color:var(--muted);cursor:pointer;font-weight:900}
+    .btn:hover {
+      filter: brightness(1.1);
+    }
 
-  /* LISTS */
-  .list{display:flex;flex-direction:column;gap:8px}
-  .item{padding:10px;border-radius:10px;background:rgba(0,0,0,0.04);display:flex;justify-content:space-between;align-items:center}
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
+      transition: color 0.2s ease, border-color 0.2s ease;
+    }
 
-  /* SEARCH & FILTER */
-  .searchbar{display:flex;gap:8px;align-items:center}
-  .searchbar input{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:var(--text)}
+    .btn-ghost:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
 
-  /* STATS / MINI CHART */
-  .stats{display:flex;gap:12px;align-items:center}
-  .stat{background:rgba(255,255,255,0.02);padding:10px;border-radius:10px;min-width:100px;text-align:center}
-  .stat .num{font-weight:900;font-size:18px}
-  .chart-wrap{width:160px;height:60px}
+    .item {
+      background: rgba(255,255,255,0.02);
+      border-radius: 8px;
+      padding: 10px;
+      margin-bottom: 8px;
+      border: 1px solid rgba(255,255,255,0.04);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-  /* FOOTER */
-  footer{margin-top:18px;color:var(--muted);font-size:13px;text-align:center}
+    .item strong {
+      color: var(--accent2);
+    }
 
-  /* responsive */
-  @media (max-width:640px){
-    header{flex-direction:column;align-items:stretch}
-    #toasts{left:12px;right:12px;width:auto}
-  }
+    footer {
+      text-align: center;
+      padding: 20px;
+      color: var(--muted);
+      font-size: 0.8rem;
+      border-top: 1px solid var(--border);
+      background: rgba(0,0,0,0.4);
+      backdrop-filter: blur(10px);
+    }
 
-  /* UX Helpers */
-  .refresh-pulse{animation: pulse .9s ease}
-  @keyframes pulse{0%{box-shadow:0 0 0 rgba(91,34,255,0.12)}70%{box-shadow:0 0 30px rgba(91,34,255,0.06)}100%{box-shadow:none}}
-</style>
+    /* FiveM-like notifications */
+    #notifications {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 9999;
+    }
+
+    .notif {
+      background: linear-gradient(120deg, rgba(143,92,255,0.9), rgba(0,209,255,0.9));
+      color: white;
+      padding: 10px 16px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      font-weight: 600;
+      animation: notifIn 0.4s ease, notifOut 0.4s ease 3.5s forwards;
+    }
+
+    @keyframes notifIn {
+      from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes notifOut {
+      to { opacity: 0; transform: translateY(-10px); }
+    }
+
+  </style>
 </head>
 <body>
-  <div class="wrap">
-    <header>
-      <div class="brand">
-        <div class="logo" aria-hidden="true">
-          <svg width="44" height="44" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter:drop-shadow(0 8px 20px rgba(0,0,0,0.5))">
-            <rect x="0" y="0" width="24" height="24" rx="5" fill="white" fill-opacity="0.06"/>
-            <path d="M6 12h12M6 7h12M6 17h12" stroke="white" stroke-opacity="0.9" stroke-width="1.2" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div>
-          <h1>Daynight RP — PDA / CAD</h1>
-          <div class="subtitle">Completo • Firestore-ready • Notifs FiveM</div>
-        </div>
+  <header>
+    <h1>📋 Daynight RP - PDA</h1>
+    <button id="refreshAll" class="btn-ghost">Refrescar Todo</button>
+  </header>
+
+  <main>
+    <div class="panel" id="panelWanted">
+      <div class="panel-header">
+        <h2>BOLO / Wanted</h2>
+        <button class="btn-ghost" onclick="refreshWanted()">⟳</button>
       </div>
-
-      <div class="top-right">
-        <div id="userDisplay" class="pill">Visitante</div>
-        <div id="dutyStatus" class="pill">En servicio: 0</div>
-        <div id="notifWrap">
-          <div id="notifPill" class="pill" style="display:none">Alertas 0</div>
-        </div>
-        <button id="btnRefreshAll" class="btn-ghost">Refrescar todo</button>
-        <button id="btnExport" class="btn">Exportar</button>
-        <button id="btnTheme" class="icon-btn" title="Cambiar tema">🎨</button>
-      </div>
-    </header>
-
-    <div class="top-row">
-      <div>
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-          <div class="searchbar" style="flex:1">
-            <input id="globalSearch" placeholder="Buscar BOLOs, multas, usuarios..." />
-            <button id="searchBtn" class="btn-ghost">Buscar</button>
-            <button id="clearSearch" class="btn-ghost">Limpiar</button>
-          </div>
-          <div style="display:flex;gap:8px;align-items:center;margin-left:12px">
-            <div class="stats">
-              <div class="stat"><div class="num" id="statWanted">0</div><div class="muted small">BOLOs</div></div>
-              <div class="stat"><div class="num" id="statFines">0</div><div class="muted small">Multas</div></div>
-              <div class="stat"><div class="num" id="statUsers">0</div><div class="muted small">Usuarios</div></div>
-            </div>
-          </div>
-        </div>
-
-        <section class="grid" id="cardsRoot" aria-label="Paneles principales"></section>
-
-        <div id="expandedRoot" aria-live="polite"></div>
-      </div>
-
-      <aside>
-        <div class="card">
-          <div class="card-head"><div><strong>Panel rápido</strong><div class="muted small">Accesos y acciones</div></div></div>
-          <div style="display:flex;flex-direction:column;gap:8px;margin-top:8px">
-            <button id="quickNewBolo" class="btn">Nuevo BOLO</button>
-            <button id="quickNewFine" class="btn btn-small">Nueva Multa</button>
-            <button id="openWanted" class="btn-ghost">Abrir Wanted</button>
-            <button id="openFines" class="btn-ghost">Abrir Multas</button>
-            <hr style="border:none;border-top:1px solid rgba(255,255,255,0.03)">
-            <div style="display:flex;gap:8px;align-items:center">
-              <div style="flex:1">
-                <div class="muted small">Notificaciones</div>
-                <div id="lastNotif" class="muted small">—</div>
-              </div>
-              <button id="clearNotifs" class="btn-ghost">Limpiar</button>
-            </div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:12px">
-          <div class="card-head"><div><strong>Estadísticas</strong><div class="muted small">Resumen</div></div></div>
-          <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;align-items:center">
-            <div class="chart-wrap" id="miniChart" aria-hidden="true"></div>
-            <div class="muted small">Últimas 24h: llamadas</div>
-          </div>
-        </div>
-
-        <div class="card" style="margin-top:12px">
-          <div class="card-head"><div><strong>Atajos</strong><div class="muted small">Teclado</div></div></div>
-          <div style="margin-top:8px" class="muted small">
-            <ul>
-              <li><b>W</b> — Abrir Wanted</li>
-              <li><b>M</b> — Abrir Multas</li>
-              <li><b>N</b> — Nuevo BOLO</li>
-              <li><b>Esc</b> — Cerrar panel</li>
-            </ul>
-          </div>
-        </div>
-      </aside>
+      <div class="panel-body" id="wantedList"></div>
+      <button class="btn" onclick="newWanted()">Nuevo BOLO</button>
     </div>
 
-    <footer>Made for Daynight RP • Full-featured PDA / CAD • Paste as index.html</footer>
-  </div>
-
-  <!-- Toast container -->
-  <div id="toasts" aria-live="polite" aria-atomic="true"></div>
-
-<script>
-/* ============================================================
-   Big PDA / CAD Script
-   - Firestore modular / compat detection and adapter
-   - Panels: Wanted (BOLO), Fines (Multas), Alerts, Admin (basic)
-   - Notifs style FiveM, stats, search, filters, realtime listeners if available
-   ============================================================ */
-
-/* -------------------- Firestore Adapter (modular + compat) -------------------- */
-const FireDB = (function(){
-  const hasModular = (typeof getFirestore === 'function' && typeof collection === 'function');
-  const hasCompat = (typeof firebase !== 'undefined' && firebase.firestore);
-  let dbMod = null;
-  if(hasModular){
-    try { dbMod = getFirestore(); } catch(e){ dbMod = null; }
-  }
-  function _ok(){ return hasModular || hasCompat; }
-
-  // helpers (modular symbols may not be imported in the global scope; we won't import them here)
-  return {
-    available: _ok(),
-    hasModular, hasCompat, dbMod,
-    COL(name){
-      if(hasModular && dbMod) return collection(dbMod, name);
-      if(hasCompat) return firebase.firestore().collection(name);
-      return null;
-    },
-    async getAll(name){
-      try{
-        if(hasModular && dbMod){
-          if(typeof getDocs !== 'function') throw new Error('getDocs no disponible (modular import faltante)');
-          const snap = await getDocs(collection(dbMod, name));
-          const out = []; snap.forEach(d=> out.push({ id:d.id, ...d.data() }));
-          return out;
-        } else if(hasCompat){
-          const snap = await firebase.firestore().collection(name).get();
-          const out = []; snap.forEach(d=> out.push({ id:d.id, ...d.data() }));
-          return out;
-        }
-      }catch(e){ console.warn('FireDB.getAll error', e); }
-      return null;
-    },
-    async add(name, data){
-      try{
-        if(hasModular && dbMod){
-          if(typeof addDoc !== 'function') throw new Error('addDoc no disponible (modular import faltante)');
-          const res = await addDoc(collection(dbMod, name), data);
-          return { id: res.id, ...data };
-        } else if(hasCompat){
-          const ref = await firebase.firestore().collection(name).add(data);
-          return { id: ref.id, ...data };
-        }
-      }catch(e){ console.warn('FireDB.add error', e); }
-      return null;
-    },
-    async del(name, id){
-      try{
-        if(hasModular && dbMod){
-          if(typeof deleteDoc !== 'function' || typeof doc !== 'function') throw new Error('deleteDoc/doc faltan (modular import)');
-          await deleteDoc(doc(dbMod, name, id));
-          return true;
-        } else if(hasCompat){
-          await firebase.firestore().collection(name).doc(id).delete();
-          return true;
-        }
-      }catch(e){ console.warn('FireDB.del error', e); }
-      return false;
-    },
-    async update(name, id, patch){
-      try{
-        if(hasModular && dbMod){
-          if(typeof updateDoc !== 'function' || typeof doc !== 'function') throw new Error('updateDoc/doc faltan (modular import)');
-          await updateDoc(doc(dbMod, name, id), patch);
-          return true;
-        } else if(hasCompat){
-          await firebase.firestore().collection(name).doc(id).update(patch);
-          return true;
-        }
-      }catch(e){ console.warn('FireDB.update error', e); }
-      return false;
-    },
-    // optional real-time listener if available
-    listen(name, onChange){
-      try{
-        if(hasModular && dbMod){
-          if(typeof onSnapshot !== 'function') { console.warn('onSnapshot faltante (modular import)'); return null; }
-          const q = collection(dbMod, name);
-          return onSnapshot(q, snap => { const out=[]; snap.forEach(d=> out.push({ id:d.id, ...d.data() })); onChange(out); });
-        } else if(hasCompat){
-          return firebase.firestore().collection(name).onSnapshot(snap => { const out=[]; snap.forEach(d=> out.push({ id:d.id, ...d.data() })); onChange(out); });
-        }
-      }catch(e){ console.warn('FireDB.listen error', e); }
-      return null;
-    }
-  };
-})();
-
-/* -------------------- STATE -------------------- */
-const STATE = {
-  currentUser: { display: 'Visitante', role: 'user' },
-  notifications: [],
-  onDutyCount: 0,
-  wanted: [], fines: [], alerts: [], users: []
-};
-
-const COLLECTIONS = {
-  wanted: 'wanted', // change if needed
-  fines: 'fines',
-  users: 'users',
-  alerts: 'alerts'
-};
-
-/* -------------------- DOM refs -------------------- */
-const cardsRoot = document.getElementById('cardsRoot');
-const expandedRoot = document.getElementById('expandedRoot');
-const userDisplay = document.getElementById('userDisplay');
-const dutyStatus = document.getElementById('dutyStatus');
-const toastWrap = document.getElementById('toasts');
-
-/* -------------------- UI: Cards config -------------------- */
-const CARDS = [
-  { id:'dispatch', title:'Despacho', desc:'Ver llamadas activas', icon:'🚨' },
-  { id:'wanted', title:'BOLO / Wanted', desc:'Listados y prioridades', icon:'🔎' },
-  { id:'fines', title:'Multas', desc:'Gestionar multas y pagos', icon:'💸' },
-  { id:'reports', title:'Incidentes', desc:'Reportes públicos', icon:'📋' },
-  { id:'alerts', title:'Alertas', desc:'Alertas de ciudad', icon:'🔔' },
-  { id:'radio', title:'Radios', desc:'Canales y mensajes', icon:'📡' },
-  { id:'admin', title:'Administración', desc:'Roles y usuarios', icon:'⚙️' },
-];
-
-/* render cards */
-function renderCards(){
-  cardsRoot.innerHTML='';
-  CARDS.forEach(c=>{
-    const el = document.createElement('div'); el.className='card'; el.dataset.id=c.id;
-    el.innerHTML = `
-      <div class="ribbon"></div>
-      <div class="card-head">
-        <div><div class="title">${c.title}</div><div class="desc">${c.desc}</div></div>
-        <div style="display:flex;flex-direction:column;align-items:flex-end">
-          <div style="font-size:26px">${c.icon}</div>
-          <div class="card-actions" style="margin-top:8px">
-            <button class="btn-ghost btn-small open-btn" data-open="${c.id}">Abrir</button>
-            <button class="btn-ghost btn-small refresh-btn" data-refresh="${c.id}">Refrescar</button>
-          </div>
-        </div>
+    <div class="panel" id="panelFines">
+      <div class="panel-header">
+        <h2>Multas</h2>
+        <button class="btn-ghost" onclick="refreshFines()">⟳</button>
       </div>
-    `;
-    el.querySelector('.open-btn').addEventListener('click', (e)=>{ e.stopPropagation(); openCard(c.id, el); });
-    el.querySelector('.refresh-btn').addEventListener('click', (e)=>{ e.stopPropagation(); refreshPanel(c.id, el); });
-    el.addEventListener('click', ()=> openCard(c.id, el));
-    cardsRoot.appendChild(el);
-  });
-}
-
-/* -------------------- Expanded panel logic -------------------- */
-function clearExpanded(){
-  if(!expandedRoot.firstElementChild) return;
-  const node = expandedRoot.firstElementChild;
-  node.style.animation = 'panelOut .18s ease forwards';
-  setTimeout(()=> expandedRoot.innerHTML='', 190);
-}
-
-function openCard(id, hostEl){
-  document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
-  if(hostEl) hostEl.classList.add('active');
-
-  expandedRoot.innerHTML = '';
-  const panel = document.createElement('div'); panel.className='expanded';
-  panel.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong>${id.toUpperCase()}</strong><div class="muted small">Panel dinámico</div></div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button class="btn btn-small refresh-panel" data-id="${id}">Refrescar</button>
-        <button class="btn-ghost close-panel">Cerrar</button>
-      </div>
+      <div class="panel-body" id="finesList"></div>
+      <button class="btn" onclick="newFine()">Nueva Multa</button>
     </div>
-    <div id="panelBody_${id}" style="margin-top:12px"></div>
-  `;
-  expandedRoot.appendChild(panel);
 
-  panel.querySelector('.close-panel').addEventListener('click', ()=> clearExpanded());
-  panel.querySelector('.refresh-panel').addEventListener('click', ()=> refreshPanel(id, hostEl));
-
-  // route
-  switch(id){
-    case 'wanted': renderWantedPanel(panel.querySelector(`#panelBody_${id}`)); break;
-    case 'fines': renderFinesPanel(panel.querySelector(`#panelBody_${id}`)); break;
-    case 'alerts': renderAlertsPanel(panel.querySelector(`#panelBody_${id}`)); break;
-    case 'admin': renderAdminPanel(panel.querySelector(`#panelBody_${id}`)); break;
-    default:
-      panel.querySelector(`#panelBody_${id}`).innerHTML = `<div class="muted small">Contenido demo / no implementado</div>`;
-  }
-}
-
-/* -------------------- Refresh handlers -------------------- */
-async function refreshPanel(id, hostEl){
-  if(hostEl){ hostEl.classList.add('refresh-pulse'); setTimeout(()=> hostEl.classList.remove('refresh-pulse'), 900); }
-  switch(id){
-    case 'wanted': await loadWanted(); break;
-    case 'fines': await loadFines(); break;
-    case 'alerts': await loadAlerts(); break;
-    case 'admin': await loadUsers(); break;
-    default: break;
-  }
-  updateHeader();
-  notify('info','Refrescado', `Panel ${id} actualizado`, 1600);
-}
-
-document.getElementById('btnRefreshAll').addEventListener('click', async ()=>{
-  document.querySelectorAll('.card').forEach(c=>c.classList.add('refresh-pulse'));
-  setTimeout(()=> document.querySelectorAll('.card').forEach(c=>c.classList.remove('refresh-pulse')), 900);
-  await Promise.all([loadWanted(), loadFines(), loadAlerts(), loadUsers()]);
-  updateHeader();
-  notify('info','Refrescado','Todos los paneles actualizados', 1800);
-});
-
-/* -------------------- Notifications (FiveM-like toasts) -------------------- */
-let TOAST_ID = 0;
-function notify(type='info', title='', text='', ttl=4000){
-  const id = ++TOAST_ID;
-  const el = document.createElement('div'); el.className='toast'; el.dataset.id=id;
-  const emoji = type==='danger'?'⚠️': type==='success'?'✅': type==='warn'?'🚨':'ℹ️';
-  el.innerHTML = `<div style="font-weight:900">${emoji} ${escapeHtml(title)}</div>
-                  <div class="t-body" style="margin-left:8px">${escapeHtml(text)}</div>
-                  <button class="t-close" aria-label="cerrar">×</button>`;
-  toastWrap.prepend(el);
-  updateNotifCount(1);
-  el.querySelector('.t-close').addEventListener('click', ()=> removeToast(id));
-  if(ttl && ttl>0) setTimeout(()=> removeToast(id), ttl);
-  // update last notif
-  const last = document.getElementById('lastNotif'); if(last) last.textContent = `${title} — ${text}`;
-  return id;
-}
-function removeToast(id){
-  const t = toastWrap.querySelector(`.toast[data-id="${id}"]`); if(!t) return;
-  t.style.opacity = '0'; t.style.transform = 'translateY(-8px)';
-  setTimeout(()=> { t.remove(); updateNotifCount(-1); }, 200);
-}
-function updateNotifCount(delta=0){
-  if(delta>0) STATE.notifications.push(1);
-  else if(delta<0) STATE.notifications.pop();
-  const n = STATE.notifications.length;
-  const pill = document.getElementById('notifPill');
-  if(n>0){ pill.style.display='inline-block'; pill.textContent = `Alertas ${n}`; }
-  else pill.style.display='none';
-}
-
-/* -------------------- Wanted (BOLO) -------------------- */
-async function loadWantedFromDB(){
-  if(!FireDB.available) return null;
-  return await FireDB.getAll(COLLECTIONS.wanted);
-}
-async function loadWanted(){
-  const dbdata = await loadWantedFromDB();
-  if(dbdata) STATE.wanted = dbdata;
-  else {
-    if(STATE.wanted.length===0){
-      STATE.wanted = [
-        { id:'bolo1', name:'Juan Pérez', reason:'Robo agravado', priority:'Alta', notes:'Armado', createdAt: new Date().toISOString() },
-        { id:'bolo2', name:'María Ruiz', reason:'Estafa', priority:'Media', notes:'Moverse en aeropuerto', createdAt: new Date().toISOString() },
-      ];
-    }
-  }
-  renderWantedCards();
-  // update stat
-  document.getElementById('statWanted').textContent = STATE.wanted.length;
-}
-function renderWantedCards(){
-  // update footer summary on main card
-  const host = document.querySelector('.card[data-id="wanted"]');
-  if(host){
-    if(!host.querySelector('.card-footer')){
-      const ft = document.createElement('div'); ft.className='card-footer muted small'; ft.style.marginTop='8px';
-      ft.textContent = `${STATE.wanted.length} BOLO(s) activos`; host.appendChild(ft);
-    } else {
-      host.querySelector('.card-footer').textContent = `${STATE.wanted.length} BOLO(s) activos`;
-    }
-  }
-}
-
-function renderWantedPanel(container){
-  const area = container || document.getElementById('panelBody_wanted');
-  if(!area) return;
-  area.innerHTML = `
-    <div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong>BOLO / Wanted</strong><div class="muted small">Gestiona BOLOs</div></div>
-      <div style="display:flex;gap:8px">
-        <select id="filterPriority" class="btn-ghost btn-small">
-          <option value="">Todas prioridades</option>
-          <option value="Alta">Alta</option>
-          <option value="Media">Media</option>
-          <option value="Baja">Baja</option>
-        </select>
-        <button id="addBoloBtn" class="btn btn-small">Nuevo BOLO</button>
-        <button id="refreshWantedBtn" class="btn-ghost btn-small">Refrescar</button>
+    <div class="panel" id="panelAlerts">
+      <div class="panel-header">
+        <h2>Alertas</h2>
+        <button class="btn-ghost" onclick="refreshAlerts()">⟳</button>
       </div>
+      <div class="panel-body" id="alertsList"></div>
+      <button class="btn" onclick="newAlert()">Enviar Alerta</button>
     </div>
-    <div style="margin-top:12px" id="wantedList" class="list"></div>
-  `;
+  </main>
 
-  const list = area.querySelector('#wantedList');
-  const renderList = (items) => {
-    if(items.length===0) list.innerHTML = '<div class="muted small">Sin BOLOs activos</div>';
-    else {
-      list.innerHTML = '';
-      items.forEach(w=>{
-        const it = document.createElement('div'); it.className='item';
-        it.innerHTML = `<div style="max-width:70%"><b>${escapeHtml(w.name||'N/A')}</b><div class="muted small">${escapeHtml(w.reason||'')} • ${escapeHtml(w.priority||'')}</div></div>
-                        <div style="display:flex;gap:8px">
-                          <button class="btn-ghost btn-small view-bolo" data-id="${w.id}">Ver</button>
-                          <button class="btn btn-small del-bolo" data-id="${w.id}">Borrar</button>
-                        </div>`;
-        list.appendChild(it);
+  <footer>Interfaz CAD Profesional - Estilo Neon Accent | Daynight RP</footer>
+
+  <div id="notifications"></div>
+
+  <script>
+    const wantedList = document.getElementById('wantedList');
+    const finesList = document.getElementById('finesList');
+    const alertsList = document.getElementById('alertsList');
+    const notifs = document.getElementById('notifications');
+
+    const state = {
+      wanted: [],
+      fines: [],
+      alerts: []
+    };
+
+    /* ========== UTILIDADES ========== */
+    function notify(msg) {
+      const div = document.createElement('div');
+      div.className = 'notif';
+      div.textContent = msg;
+      notifs.appendChild(div);
+      setTimeout(() => div.remove(), 4000);
+    }
+
+    /* ========== BOLO / Wanted ========== */
+    async function refreshWanted() {
+      wantedList.innerHTML = '';
+      if (typeof getFirestore === 'function') {
+        const snap = await getDocs(collection(getFirestore(), 'wanted'));
+        state.wanted = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      }
+      if (!state.wanted.length) state.wanted = [{ name: "John Doe", reason: "Sospechoso de robo", priority: "Alta" }];
+      state.wanted.forEach(w => {
+        const el = document.createElement('div');
+        el.className = 'item';
+        el.innerHTML = `<div><strong>${w.name}</strong><div>${w.reason}</div></div>
+                        <button class="btn-ghost" onclick="delWanted('${w.id}')">Eliminar</button>`;
+        wantedList.appendChild(el);
       });
+      notify("BOLOs actualizados");
     }
-    // add listeners
-    list.querySelectorAll('.del-bolo').forEach(b=>{
-      b.addEventListener('click', async ()=>{
-        const id = b.dataset.id;
-        if(FireDB.available){
-          const ok = await FireDB.del(COLLECTIONS.wanted, id);
-          if(!ok){ notify('danger','Error','No se pudo eliminar en Firestore',2000); return; }
-        }
-        STATE.wanted = STATE.wanted.filter(x=> x.id !== id);
-        renderList(STATE.wanted);
-        notify('success','BOLO eliminado', `Se eliminó ${id}`, 1600);
-        document.getElementById('statWanted').textContent = STATE.wanted.length;
+
+    async function newWanted() {
+      const name = prompt("Nombre del sospechoso:");
+      const reason = prompt("Motivo:");
+      const data = { name, reason, createdAt: new Date().toISOString() };
+      if (typeof getFirestore === 'function') {
+        await addDoc(collection(getFirestore(), 'wanted'), data);
+      }
+      state.wanted.push(data);
+      refreshWanted();
+      notify("Nuevo BOLO añadido");
+    }
+
+    async function delWanted(id) {
+      if (typeof getFirestore === 'function' && id) await deleteDoc(doc(getFirestore(), 'wanted', id));
+      state.wanted = state.wanted.filter(w => w.id !== id);
+      refreshWanted();
+      notify("BOLO eliminado");
+    }
+
+    /* ========== MULTAS ========== */
+    async function refreshFines() {
+      finesList.innerHTML = '';
+      if (typeof getFirestore === 'function') {
+        const snap = await getDocs(collection(getFirestore(), 'fines'));
+        state.fines = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      }
+      if (!state.fines.length) state.fines = [{ owner: "Carlos Díaz", reason: "Exceso de velocidad", amount: 250 }];
+      state.fines.forEach(f => {
+        const el = document.createElement('div');
+        el.className = 'item';
+        el.innerHTML = `<div><strong>${f.owner}</strong><div>${f.reason} • ${f.amount || 0}€</div></div>
+                        <button class="btn-ghost" onclick="delFine('${f.id}')">Eliminar</button>`;
+        finesList.appendChild(el);
       });
-    });
-    list.querySelectorAll('.view-bolo').forEach(b=>{
-      b.addEventListener('click', ()=>{
-        const id = b.dataset.id; const w = STATE.wanted.find(x=>x.id===id);
-        if(!w) return;
-        const modal = createModal(`<h3>${escapeHtml(w.name)}</h3>
-          <p><b>Motivo:</b> ${escapeHtml(w.reason)}</p>
-          <p><b>Prioridad:</b> ${escapeHtml(w.priority)}</p>
-          <p class="muted small">${escapeHtml(w.notes||'')}</p>
-          <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-            <button class="btn-ghost" id="closeModal">Cerrar</button>
-          </div>`);
-        modal.querySelector('#closeModal').addEventListener('click', ()=> modal.remove());
+      notify("Multas actualizadas");
+    }
+
+    async function newFine() {
+      const owner = prompt("Titular de la multa:");
+      const reason = prompt("Motivo:");
+      const amount = prompt("Importe (€):");
+      const data = { owner, reason, amount, createdAt: new Date().toISOString() };
+      if (typeof getFirestore === 'function') {
+        await addDoc(collection(getFirestore(), 'fines'), data);
+      }
+      state.fines.push(data);
+      refreshFines();
+      notify("Nueva multa añadida");
+    }
+
+    async function delFine(id) {
+      if (typeof getFirestore === 'function' && id) await deleteDoc(doc(getFirestore(), 'fines', id));
+      state.fines = state.fines.filter(f => f.id !== id);
+      refreshFines();
+      notify("Multa eliminada");
+    }
+
+    /* ========== ALERTAS ========== */
+    async function refreshAlerts() {
+      alertsList.innerHTML = '';
+      if (typeof getFirestore === 'function') {
+        const snap = await getDocs(collection(getFirestore(), 'alerts'));
+        state.alerts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      }
+      if (!state.alerts.length) state.alerts = [{ title: "Patrulla requerida", msg: "Central solicita apoyo en sector norte" }];
+      state.alerts.forEach(a => {
+        const el = document.createElement('div');
+        el.className = 'item';
+        el.innerHTML = `<div><strong>${a.title || 'Alerta'}</strong><div>${a.msg || ''}</div></div>`;
+        alertsList.appendChild(el);
       });
-    });
-  };
-
-  renderList(STATE.wanted);
-
-  area.querySelector('#addBoloBtn').addEventListener('click', async ()=>{
-    const name = prompt('Nombre del sujeto:') || 'Sujeto anónimo';
-    const reason = prompt('Motivo:') || 'No especificado';
-    const priority = prompt('Prioridad (Alta/Media/Baja):') || 'Media';
-    const notes = prompt('Notas:') || '';
-    const data = { name, reason, priority, notes, createdAt: new Date().toISOString() };
-    if(FireDB.available){
-      const created = await FireDB.add(COLLECTIONS.wanted, data);
-      if(created) { STATE.wanted.unshift(created); notify('success','BOLO creado','Guardado en Firestore',1600); }
-      else { data.id = `bolo${Date.now().toString().slice(-5)}`; STATE.wanted.unshift(data); notify('warn','BOLO creado','Guardado localmente',1600); }
-    } else {
-      data.id = `bolo${Date.now().toString().slice(-5)}`; STATE.wanted.unshift(data); notify('success','BOLO creado','Guardado localmente',1600);
+      notify("Alertas actualizadas");
     }
-    renderList(STATE.wanted);
-    document.getElementById('statWanted').textContent = STATE.wanted.length;
-  });
 
-  area.querySelector('#refreshWantedBtn').addEventListener('click', ()=> { loadWanted(); notify('info','Wanted','Lista recargada',1200); });
-  area.querySelector('#filterPriority').addEventListener('change', (e)=> {
-    const v = e.target.value;
-    if(!v) renderList(STATE.wanted);
-    else renderList(STATE.wanted.filter(x=> (x.priority||'').toLowerCase() === v.toLowerCase()));
-  });
-}
-
-/* -------------------- Fines (Multas) -------------------- */
-async function loadFinesFromDB(){
-  if(!FireDB.available) return null;
-  return await FireDB.getAll(COLLECTIONS.fines);
-}
-async function loadFines(){
-  const dbdata = await loadFinesFromDB();
-  if(dbdata) STATE.fines = dbdata;
-  else {
-    if(STATE.fines.length===0){
-      STATE.fines = [ { id:'fine1', owner:'Carlos Díaz', amount:250, reason:'Exceso de velocidad', paid:false, createdAt: new Date().toISOString() } ];
+    async function newAlert() {
+      const title = prompt("Título de la alerta:");
+      const msg = prompt("Mensaje:");
+      const data = { title, msg, createdAt: new Date().toISOString() };
+      if (typeof getFirestore === 'function') {
+        await addDoc(collection(getFirestore(), 'alerts'), data);
+      }
+      state.alerts.push(data);
+      refreshAlerts();
+      notify("Nueva alerta enviada");
     }
-  }
-  document.getElementById('statFines').textContent = STATE.fines.length;
-}
 
-function renderFinesPanel(container){
-  let area = container || document.getElementById('panelBody_fines');
-  if(!area){
-    const modal = document.createElement('div'); modal.style.position='fixed'; modal.style.right='20px'; modal.style.bottom='20px'; modal.style.width='420px'; modal.style.zIndex=99999;
-    modal.innerHTML = `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong>Multas</strong><div class="muted small">Resumen</div></div>
-      <div><button class="btn-ghost close-small">Cerrar</button></div>
-    </div><div id="finesMiniList" style="margin-top:12px"></div></div>`;
-    document.body.appendChild(modal);
-    modal.querySelector('.close-small').addEventListener('click', ()=> modal.remove());
-    area = modal.querySelector('#finesMiniList');
-  }
-
-  area.innerHTML = `<div style="display:flex;justify-content:space-between">
-    <div><strong>Multas</strong></div>
-    <div style="display:flex;gap:8px">
-      <button id="newFineBtn" class="btn btn-small">Nueva multa</button>
-      <button id="refreshFinesBtn" class="btn-ghost btn-small">Refrescar</button>
-    </div>
-  </div>
-  <div style="margin-top:12px" id="fineList" class="list"></div>`;
-
-  const list = area.querySelector('#fineList');
-  if(STATE.fines.length===0) list.innerHTML = '<div class="muted small">Sin multas</div>';
-  else {
-    list.innerHTML = '';
-    STATE.fines.forEach(f=>{
-      const it = document.createElement('div'); it.className='item';
-      it.innerHTML = `<div style="max-width:65%"><b>${escapeHtml(f.owner || 'N/A')}</b><div class="muted small">${escapeHtml(f.reason || '')} • ${escapeHtml(String(f.amount || 0))}€ ${f.paid? '• Pagada':''}</div></div>
-                      <div style="display:flex;gap:8px">
-                        <button class="btn-ghost btn-small pay-fine" data-id="${f.id}">${f.paid?'Reembolsar':'Pagar'}</button>
-                        <button class="btn btn-small del-fine" data-id="${f.id}">Eliminar</button>
-                      </div>`;
-      list.appendChild(it);
+    /* ========== GENERAL ========== */
+    document.getElementById('refreshAll').addEventListener('click', () => {
+      refreshWanted();
+      refreshFines();
+      refreshAlerts();
+      notify("Todo actualizado");
     });
 
-    list.querySelectorAll('.pay-fine').forEach(b=>{
-      b.addEventListener('click', async ()=>{
-        const id = b.dataset.id; const f = STATE.fines.find(x=>x.id===id);
-        if(!f) return;
-        f.paid = !f.paid;
-        if(FireDB.available){
-          const ok = await FireDB.update(COLLECTIONS.fines, id, { paid: f.paid });
-          if(!ok) notify('danger','Error','No se pudo actualizar en Firestore',1800);
-        }
-        renderFinesPanel(area);
-        notify('success','Multa actualizada', `${f.owner} • ${f.paid? 'Pagada':'Pendiente'}`, 1500);
-      });
-    });
-
-    list.querySelectorAll('.del-fine').forEach(b=>{
-      b.addEventListener('click', async ()=>{
-        const id = b.dataset.id;
-        if(FireDB.available){
-          const ok = await FireDB.del(COLLECTIONS.fines, id);
-          if(!ok){ notify('danger','Error','No se pudo eliminar en Firestore',1800); return; }
-        }
-        STATE.fines = STATE.fines.filter(x=>x.id!==id);
-        renderFinesPanel(area);
-        notify('info','Multa eliminada', `ID ${id}`, 1200);
-        document.getElementById('statFines').textContent = STATE.fines.length;
-      });
-    });
-  }
-
-  area.querySelector('#newFineBtn').addEventListener('click', async ()=>{
-    const owner = prompt('Titular de la multa:') || 'Desconocido';
-    const amount = parseFloat(prompt('Importe (€):') || '0') || 0;
-    const reason = prompt('Motivo:') || '—';
-    const data = { owner, amount, reason, paid:false, createdAt: new Date().toISOString() };
-    if(FireDB.available){
-      const created = await FireDB.add(COLLECTIONS.fines, data);
-      if(created){ STATE.fines.unshift(created); notify('success','Multa creada','Guardada en Firestore',1500); }
-      else { data.id = `fine${Date.now().toString().slice(-5)}`; STATE.fines.unshift(data); notify('warn','Multa creada','Guardada localmente',1600); }
-    } else { data.id = `fine${Date.now().toString().slice(-5)}`; STATE.fines.unshift(data); notify('success','Multa creada','Guardada localmente',1500); }
-    renderFinesPanel(area);
-    document.getElementById('statFines').textContent = STATE.fines.length;
-  });
-
-  area.querySelector('#refreshFinesBtn').addEventListener('click', ()=> { loadFines(); notify('info','Multas','Lista recargada',1200); });
-}
-
-/* -------------------- Alerts -------------------- */
-async function loadAlerts(){
-  if(FireDB.available){
-    const db = await FireDB.getAll(COLLECTIONS.alerts);
-    if(db) STATE.alerts = db;
-  }
-}
-function renderAlertsPanel(container){
-  const area = container || document.getElementById('panelBody_alerts');
-  if(!area) return;
-  area.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong>Alertas</strong><div class="muted small">Enviar una alerta</div></div>
-      <div style="display:flex;gap:8px">
-        <button id="sendAlertBtn" class="btn btn-small">Enviar</button>
-        <button id="refreshAlertsBtn" class="btn-ghost btn-small">Refrescar</button>
-      </div>
-    </div>
-    <div style="margin-top:12px">
-      <input id="alertTitle" placeholder="Título" style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04)"/>
-      <textarea id="alertMsg" placeholder="Mensaje..." style="width:100%;padding:8px;border-radius:8px;border:1px solid rgba(255,255,255,0.04);margin-top:8px"></textarea>
-    </div>
-    <div style="margin-top:8px" id="alertsList" class="list"></div>
-  `;
-  const list = area.querySelector('#alertsList');
-  if((STATE.alerts || []).length===0) list.innerHTML = '<div class="muted small">Sin alertas enviadas</div>';
-  else {
-    list.innerHTML = '';
-    STATE.alerts.forEach((a)=>{
-      const it = document.createElement('div'); it.className='item';
-      it.innerHTML = `<div><b>${escapeHtml(a.title||'')}</b><div class="muted small">${escapeHtml(a.msg||'')}</div></div><div>${escapeHtml(a.ts||'')}</div>`;
-      list.appendChild(it);
-    });
-  }
-  area.querySelector('#sendAlertBtn').addEventListener('click', async ()=>{
-    const t = area.querySelector('#alertTitle').value || 'Alerta';
-    const m = area.querySelector('#alertMsg').value || '';
-    const a = { title:t, msg:m, ts: new Date().toLocaleString() };
-    if(FireDB.available){
-      const created = await FireDB.add(COLLECTIONS.alerts, a);
-      if(created) { STATE.alerts.unshift(created); notify('warn', t, m, 4000); }
-      else { STATE.alerts.unshift(a); notify('warn', t, m, 4000); }
-    } else {
-      STATE.alerts.unshift(a); notify('warn', t, m, 4000);
-    }
-    renderAlertsPanel(area);
-  });
-  area.querySelector('#refreshAlertsBtn').addEventListener('click', ()=> { loadAlerts(); notify('info','Alertas recargadas','',1200); });
-}
-
-/* -------------------- Admin / Users -------------------- */
-async function loadUsers(){
-  if(FireDB.available){
-    const db = await FireDB.getAll(COLLECTIONS.users);
-    if(db) STATE.users = db;
-  } else {
-    if(STATE.users.length===0){
-      STATE.users = [
-        { id:'u1', displayName:'Oficial1', onDuty:true, role:'police' },
-        { id:'u2', displayName:'Dispatch', onDuty:false, role:'dispatch' },
-      ];
-    }
-  }
-  document.getElementById('statUsers').textContent = STATE.users.length;
-}
-function renderAdminPanel(container){
-  const area = container || document.getElementById('panelBody_admin');
-  if(!area) return;
-  area.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
-      <div><strong>Administración</strong><div class="muted small">Usuarios y roles</div></div>
-      <div style="display:flex;gap:8px">
-        <button id="refreshUsers" class="btn-ghost btn-small">Refrescar</button>
-      </div>
-    </div>
-    <div style="margin-top:12px" id="usersList" class="list"></div>`;
-  const list = area.querySelector('#usersList');
-  if((STATE.users || []).length===0) list.innerHTML = '<div class="muted small">Sin usuarios</div>';
-  else {
-    list.innerHTML = '';
-    STATE.users.forEach(u=>{
-      const it = document.createElement('div'); it.className='item';
-      it.innerHTML = `<div><b>${escapeHtml(u.displayName||u.name||'Usu.')}</b><div class="muted small">${escapeHtml(u.role||'')}</div></div>
-                      <div style="display:flex;gap:8px">
-                        <button class="btn-ghost btn-small toggle-duty" data-id="${u.id}">${u.onDuty? 'Off duty':'On duty'}</button>
-                      </div>`;
-      list.appendChild(it);
-    });
-    list.querySelectorAll('.toggle-duty').forEach(b=>{
-      b.addEventListener('click', async ()=>{
-        const id = b.dataset.id; const u = STATE.users.find(x=>x.id===id);
-        if(!u) return;
-        u.onDuty = !u.onDuty;
-        if(FireDB.available) { await FireDB.update(COLLECTIONS.users, id, { onDuty: u.onDuty }).catch(()=> notify('danger','Error','No se pudo actualizar usuario',1600)); }
-        renderAdminPanel(area);
-        updateHeader();
-      });
-    });
-  }
-  area.querySelector('#refreshUsers').addEventListener('click', ()=> { loadUsers(); notify('info','Usuarios recargados','',1200); });
-}
-
-/* -------------------- Header helpers -------------------- */
-async function updateHeader(){
-  userDisplay.textContent = STATE.currentUser ? `${STATE.currentUser.display} (${STATE.currentUser.role})` : 'No conectado';
-  try{
-    if(FireDB.available){
-      const users = await FireDB.getAll(COLLECTIONS.users);
-      STATE.onDutyCount = (users || []).filter(u=>u.onDuty).length;
-    }
-  }catch(e){ console.warn(e); }
-  dutyStatus.textContent = `En servicio: ${STATE.onDutyCount || 0}`;
-}
-
-/* -------------------- Search & Quick actions -------------------- */
-document.getElementById('searchBtn').addEventListener('click', ()=> {
-  const q = document.getElementById('globalSearch').value.trim().toLowerCase();
-  if(!q) { notify('info','Buscar','Introduce texto',1200); return; }
-  // search BOLO and fines
-  const bolos = STATE.wanted.filter(w => (w.name||'').toLowerCase().includes(q) || (w.reason||'').toLowerCase().includes(q));
-  const fines = STATE.fines.filter(f => (f.owner||'').toLowerCase().includes(q) || (f.reason||'').toLowerCase().includes(q));
-  // show results modal
-  let html = `<div style="max-height:60vh;overflow:auto"><h3>Resultados para "${escapeHtml(q)}"</h3>`;
-  html += `<h4>BOLOs (${bolos.length})</h4>`;
-  bolos.forEach(b=> html += `<div style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.02)"><b>${escapeHtml(b.name)}</b> — ${escapeHtml(b.reason)}</div>`);
-  html += `<h4 style="margin-top:8px">Multas (${fines.length})</h4>`;
-  fines.forEach(f=> html += `<div style="padding:8px;border-bottom:1px solid rgba(255,255,255,0.02)"><b>${escapeHtml(f.owner)}</b> — ${escapeHtml(f.reason)} — ${escapeHtml(String(f.amount))}€</div>`);
-  html += `</div><div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn-ghost" id="closeModal">Cerrar</button></div>`;
-  const m = createModal(html);
-  m.querySelector('#closeModal').addEventListener('click', ()=> m.remove());
-});
-document.getElementById('clearSearch').addEventListener('click', ()=> { document.getElementById('globalSearch').value=''; notify('info','Buscar','Campo limpiado',900); });
-
-/* quick buttons */
-document.getElementById('quickNewBolo').addEventListener('click', ()=> { openCard('wanted'); setTimeout(()=> document.querySelector('#addBoloBtn')?.click?.(), 320); });
-document.getElementById('quickNewFine').addEventListener('click', ()=> { openCard('fines'); setTimeout(()=> document.querySelector('#newFineBtn')?.click?.(), 320); });
-document.getElementById('openWanted').addEventListener('click', ()=> openCard('wanted'));
-document.getElementById('openFines').addEventListener('click', ()=> openCard('fines'));
-
-/* export/import */
-document.getElementById('btnExport').addEventListener('click', ()=>{
-  const data = { wanted: STATE.wanted, fines: STATE.fines, alerts: STATE.alerts, users: STATE.users };
-  const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
-  const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'pda_export_' + Date.now() + '.json'; document.body.appendChild(a); a.click(); a.remove();
-  notify('success','Exportado','JSON descargado',1500);
-});
-
-/* clear toasts */
-document.getElementById('clearNotifs').addEventListener('click', ()=> { document.getElementById('toasts').innerHTML=''; STATE.notifications=[]; updateNotifCount(0); notify('info','Notificaciones','Limpiadas',900); });
-
-/* theme toggle (simple aesthetic swap) */
-document.getElementById('btnTheme').addEventListener('click', ()=>{
-  const root = document.documentElement;
-  const cur = root.style.getPropertyValue('--accent1') || getComputedStyle(root).getPropertyValue('--accent1');
-  if(cur.includes('5b22ff')){ // switch to blue police
-    root.style.setProperty('--accent1', '#0ea5e9'); root.style.setProperty('--accent2', '#1e40af');
-    notify('success','Tema','Modo Policía activado',1200);
-  } else {
-    root.style.setProperty('--accent1', '#5b22ff'); root.style.setProperty('--accent2', '#00d4b4');
-    notify('success','Tema','Tema por defecto activado',1200);
-  }
-});
-
-/* -------------------- Mini chart (SVG sparkline) -------------------- */
-function renderMiniChart(){
-  // random demo data or derived from fines/wanted counts
-  const vals = [
-    Math.max(0, (STATE.wanted.length || 0) + Math.floor(Math.random()*3-1)),
-    Math.max(0, (STATE.fines.length || 0) + Math.floor(Math.random()*3-1)),
-    Math.max(0, ((STATE.users.length)||0) + Math.floor(Math.random()*3-1)),
-    Math.max(0, (STATE.wanted.length || 0) + Math.floor(Math.random()*3-1)),
-    Math.max(0, (STATE.fines.length || 0) + Math.floor(Math.random()*3-1)),
-  ];
-  const w = 160, h=60, pad=6; const max = Math.max(...vals,1);
-  const step = (w - pad*2) / (vals.length-1);
-  let path = '';
-  vals.forEach((v,i)=> { const x = pad + step*i; const y = pad + (1 - (v/max))*(h-pad*2); path += (i===0?`M ${x} ${y}`:` L ${x} ${y}`); });
-  document.getElementById('miniChart').innerHTML = `<svg width="${w}" height="${h}" viewBox="0 0 ${w} ${h}" xmlns="http://www.w3.org/2000/svg">
-    <defs><linearGradient id="g1" x1="0" x2="1"><stop offset="0" stop-color="#00d4b4" stop-opacity="0.9"/><stop offset="1" stop-color="#5b22ff" stop-opacity="0.9"/></linearGradient></defs>
-    <path d="${path}" fill="none" stroke="url(#g1)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" />
-  </svg>`;
-}
-
-/* -------------------- Realtime listeners (optional) -------------------- */
-function tryRealtime(){
-  if(!FireDB.available) return;
-  try{
-    // wanted listener
-    const unsubWanted = FireDB.listen(COLLECTIONS.wanted, (arr)=>{
-      STATE.wanted = arr; renderWantedCards(); renderMiniChart(); document.getElementById('statWanted').textContent = STATE.wanted.length;
-    });
-    const unsubFines = FireDB.listen(COLLECTIONS.fines, (arr)=>{
-      STATE.fines = arr; document.getElementById('statFines').textContent = STATE.fines.length;
-    });
-    const unsubUsers = FireDB.listen(COLLECTIONS.users, (arr)=>{
-      STATE.users = arr; document.getElementById('statUsers').textContent = STATE.users.length;
-      STATE.onDutyCount = (arr || []).filter(u=>u.onDuty).length; dutyStatus.textContent = `En servicio: ${STATE.onDutyCount || 0}`;
-    });
-    // return unsubs if needed
-    return [unsubWanted, unsubFines, unsubUsers].filter(x=>x);
-  }catch(e){ console.warn('Realtime not available', e); return null; }
-}
-
-/* -------------------- UTIL: modal, escape -------------------- */
-function createModal(innerHTML){
-  const modal = document.createElement('div'); modal.style.position='fixed'; modal.style.inset=0; modal.style.display='grid'; modal.style.placeItems='center'; modal.style.zIndex=999999;
-  modal.innerHTML = `<div style="background:var(--card);padding:18px;border-radius:12px;min-width:320px;max-width:760px;max-height:80vh;overflow:auto">${innerHTML}</div>`;
-  document.body.appendChild(modal); return modal;
-}
-function escapeHtml(s){ if(!s && s!==0) return ''; return String(s).replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]; }); }
-
-/* -------------------- Shortcuts -------------------- */
-document.addEventListener('keydown', (e)=>{
-  if(e.key === 'Escape'){ clearExpanded(); }
-  if(e.key.toLowerCase() === 'w'){ openCard('wanted'); }
-  if(e.key.toLowerCase() === 'm'){ openCard('fines'); }
-  if(e.key.toLowerCase() === 'n'){ openCard('wanted'); setTimeout(()=> document.querySelector('#addBoloBtn')?.click?.(), 300); }
-});
-
-/* -------------------- Init: load data, render UI -------------------- */
-(async function init(){
-  renderCards();
-  renderMiniChart();
-
-  // load data (prefer Firestore if available)
-  await loadWanted();
-  await loadFines();
-  await loadAlerts();
-  await loadUsers();
-  updateHeader();
-
-  // try realtime listeners if possible (best-effort)
-  if(FireDB.available){
-    tryRealtime();
-    notify('success','Firestore detectado','Conexión con Firestore activa (siempre que la SDK esté inicializada y los imports modulares existan)',2200);
-  } else {
-    notify('warn','Sin Firestore','Modo demo/local activo',2200);
-  }
-
-  // wire quick open buttons on cards
-  document.querySelectorAll('.card').forEach(c=> {
-    const id = c.dataset.id;
-    if(id === 'wanted' && !c.querySelector('.card-footer')){
-      const ft = document.createElement('div'); ft.className='card-footer muted small'; ft.style.marginTop='8px'; ft.textContent = `${STATE.wanted.length} BOLO(s) activos`; c.appendChild(ft);
-    }
-  });
-
-  // expose debug
-  window.__PDA = { STATE, FireDB, loadWanted, loadFines, loadAlerts, loadUsers, notify };
-
-  // sample notifications
-  setTimeout(()=> notify('info','Bienvenido','Interfaz lista'), 600);
-  setTimeout(()=> renderMiniChart(), 600);
-})();
-
-</script>
+    refreshWanted();
+    refreshFines();
+    refreshAlerts();
+  </script>
 </body>
 </html>
