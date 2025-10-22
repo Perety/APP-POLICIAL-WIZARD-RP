@@ -3,1067 +3,927 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Daynight RP — PDA / CAD (Completo, Auth + Firestore)</title>
+<title>Daynight RP — PDA / CAD (Firestore)</title>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
 <style>
-/* Theme & layout */
-:root{
-  --bg1:#06121a; --bg2:#071729;
-  --muted:#9fb3bd; --text:#e6f0f6;
-  --accent:#7c3aed; --accent2:#06b6a4;
-  --danger:#ff6b6b;
-  --glass:rgba(255,255,255,0.03);
-  --card:linear-gradient(180deg, rgba(255,255,255,0.014), rgba(255,255,255,0.006));
-  --radius:12px; --shadow:0 14px 40px rgba(2,6,10,0.6);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
-}
-*{box-sizing:border-box}
-html,body{height:100%;margin:0;background:
-  radial-gradient(800px 300px at 12% 8%, rgba(124,58,237,0.06), transparent),
-  linear-gradient(180deg,var(--bg2) 0%, var(--bg1) 60%); color:var(--text); -webkit-font-smoothing:antialiased}
-a{color:var(--accent)}
-/* Background effect */
-.bg{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-.nebula{position:absolute;width:70vmax;height:70vmax;left:-10vmin;top:-8vmin;background:
-  radial-gradient(circle at 30% 30%, rgba(124,58,237,0.22), transparent 30%),
-  radial-gradient(circle at 70% 70%, rgba(6,182,164,0.12), transparent 25%);
-  filter:blur(60px) saturate(120%); animation:float 12s ease-in-out infinite; opacity:0.95; mix-blend-mode:screen}
-.nebula.r{right:-10vmin;left:auto;top:6vmin;animation-duration:10s;animation-direction:reverse}
-.gridOverlay{position:absolute;inset:0;background-image:
-  linear-gradient(transparent 96%, rgba(255,255,255,0.01) 96%),
-  linear-gradient(90deg, transparent 96%, rgba(255,255,255,0.01) 96%); background-size:340px 340px; opacity:0.03}
-.stripes{position:absolute;inset:0;opacity:0.12;filter:blur(18px) saturate(120%);
-  background:linear-gradient(90deg, rgba(124,58,237,0.06) 0 20%, transparent 20% 50%),
-             linear-gradient(90deg, rgba(255,40,80,0.05) 50% 70%, transparent 70% 100%);
-  mix-blend-mode:overlay; animation:stripesShift 6.2s linear infinite}
-@keyframes float{0%{transform:translateY(-8px)}50%{transform:translateY(8px)}100%{transform:translateY(-8px)}}
-@keyframes stripesShift{0%{background-position:0 0,100% 0}50%{background-position:50% 0,50% 0}100%{background-position:0 0,100% 0}}
-
-/* Layout */
-.wrap{max-width:1200px;margin:22px auto;padding:22px;display:grid;grid-template-rows:auto 1fr;gap:18px;position:relative;z-index:2}
-header{display:flex;align-items:center;justify-content:space-between;gap:18px}
-.brand{display:flex;gap:12px;align-items:center}
-.logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent2),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:900;color:#031018}
-h1{margin:0;font-size:18px}
-.subtitle{color:var(--muted);font-size:13px}
-.top-right{display:flex;gap:10px;align-items:center}
-.pill{background:var(--glass);padding:8px 12px;border-radius:999px;font-weight:700;color:var(--muted)}
-.btn{background:linear-gradient(90deg,var(--accent),var(--accent2));color:#031018;padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:800}
-.btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:7px 10px;border-radius:10px;cursor:pointer}
-.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
-@media(max-width:1200px){ .grid{grid-template-columns:repeat(3,1fr)} }
-@media(max-width:900px){ .grid{grid-template-columns:repeat(2,1fr)} }
-@media(max-width:640px){ .grid{grid-template-columns:1fr} }
-
-/* Cards */
-.card{background:var(--card);border-radius:14px;padding:18px;border:1px solid rgba(255,255,255,0.04);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:12px;min-height:120px;transition:transform .2s,box-shadow .2s,border-color .2s}
-.card-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.card-logo{width:56px;height:56px;border-radius:10px;background:rgba(255,255,255,0.02);display:flex;align-items:center;justify-content:center}
-.title{font-weight:900;font-size:16px}
-.desc{color:var(--muted);font-size:13px}
-.card:hover{transform:translateY(-8px);box-shadow:0 28px 60px rgba(0,0,0,0.7);border-color:rgba(140,80,240,0.12)}
-.card.active{outline:3px solid rgba(124,58,237,0.12); transform:translateY(-6px) scale(1.01)}
-
-/* Expanded panel */
-#expandedRoot .expanded{margin-top:12px;border-radius:12px;padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0.006));border:1px solid rgba(255,255,255,0.04);box-shadow:0 18px 46px rgba(0,0,0,0.6);animation:panelIn .28s both}
-@keyframes panelIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
-
-/* Lists & forms */
-.list{display:flex;flex-direction:column;gap:10px}
-.item{padding:12px;border-radius:10px;background:rgba(255,255,255,0.012);border:1px solid rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:space-between;gap:12px}
-input,textarea,select{background:rgba(0,0,0,0.18);border:1px solid rgba(255,255,255,0.03);padding:10px;border-radius:8px;color:inherit}
-textarea{min-height:100px}
-.muted{color:var(--muted)}
-.tiny{font-size:12px}
-
-/* Modal & helpers */
-.overlay{position:fixed;inset:0;background:linear-gradient(rgba(2,6,10,0.6),rgba(2,6,10,0.8));display:flex;align-items:center;justify-content:center;z-index:9999}
-.modal{width:920px;max-width:96%;background:linear-gradient(180deg,#071729,#061421);padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,0.03)}
-.fade-in{animation:fadeIn .28s ease both}
-@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
-
-footer{margin-top:32px;text-align:center;color:var(--muted);font-size:13px;padding-bottom:26px}
-
-/* small responsive fixes */
-@media(max-width:740px){ .logo{width:52px;height:52px} .card-logo{width:48px;height:48px} }
-</style>
-
-<!--
-Firestore recommended rules (example). Copy to Firestore Rules and adapt to your needs.
-Rules must be adapted for production and thoroughly tested.
-
-rules_version = '2';
-service cloud.firestore {
-  match /databases/{database}/documents {
-    function isAuthenticated() { return request.auth != null; }
-    function userDoc() { return get(/databases/$(database)/documents/users/$(request.auth.uid)).data; }
-    function isAdmin() { return request.auth != null && userDoc().role == 'admin'; }
-    function isMando() { return request.auth != null && (userDoc().role == 'mando' || userDoc().role == 'admin'); }
-
-    match /radio_channels/{id} {
-      allow read: if true;
-      allow create, update, delete: if isMando();
-    }
-    match /radio_messages/{id} {
-      allow read: if true;
-      allow create: if isAuthenticated();
-      allow delete: if isAdmin();
-    }
-    match /radio_presence/{id} {
-      allow read: if true;
-      allow write: if request.auth != null && request.resource.data.uid == request.auth.uid;
-      allow delete: if request.auth != null && resource.data.uid == request.auth.uid;
-    }
-    match /pda/{id} {
-      allow read: if true;
-      allow create: if isAuthenticated();
-      allow delete: if isAdmin();
-    }
-    match /calls/{id} {
-      allow read: if true;
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated();
-      allow delete: if isAdmin();
-    }
-    match /reports/{id} {
-      allow read: if true;
-      allow create: if isAuthenticated();
-      allow delete: if isAdmin() || isMando();
-    }
-    match /wanted/{id} {
-      allow read: if true;
-      allow create: if isAuthenticated();
-      allow delete: if isMando();
-    }
-    match /assignments/{id} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow update: if isAuthenticated() && (isMando() || resource.data.authorUid == request.auth.uid);
-      allow delete: if isMando();
-    }
-    match /users/{id} {
-      allow read: if isAuthenticated();
-      allow write: if request.auth != null && request.auth.uid == id || isAdmin();
-    }
-    match /roles/{id} {
-      allow read: if isAuthenticated();
-      allow write: if isAdmin();
-    }
-    match /alerts/{id} {
-      allow read: if true;
-      allow create: if isAuthenticated();
-      allow delete: if isAdmin();
-    }
-    match /fines/{id} {
-      allow read: if isAuthenticated();
-      allow create: if isAuthenticated();
-      allow delete: if isAdmin();
-    }
-    match /logs/{id} {
-      allow read: if isAdmin();
-      allow write: if isAuthenticated();
-    }
+  :root{
+    --bg-1: #071018;
+    --bg-2: #02141b;
+    --muted: #9fb3bd;
+    --accent: #6e3df0;
+    --accent-2: #23d6a8;
+    --danger: #ff5b5b;
+    --glass: rgba(255,255,255,0.03);
+    --card: linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    --radius: 14px;
+    --shadow: 0 12px 30px rgba(2,6,10,0.65);
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    color-scheme: dark;
   }
-}
--->
 
+  /* Page baseline */
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;background:radial-gradient(800px 300px at 15% 10%, rgba(134,61,240,0.06), transparent), linear-gradient(180deg,var(--bg-2) 0%, var(--bg-1) 60%); -webkit-font-smoothing:antialiased;}
+  a{color:var(--accent)}
+
+  /* Animated full-screen decorative background */
+  .bg {
+    position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden;
+    mix-blend-mode:screen;
+  }
+  .bg .nebula {
+    position:absolute; width:60vmax; height:60vmax; left:-10vmin; top:-15vmin;
+    background: radial-gradient(circle at 20% 30%, rgba(110,61,240,0.22), transparent 18%),
+                radial-gradient(circle at 70% 70%, rgba(46,208,171,0.14), transparent 18%);
+    filter: blur(60px) saturate(120%); transform: translateZ(0);
+    animation: float 12s ease-in-out infinite;
+    opacity:0.9;
+  }
+  .bg .nebula.r {
+    right:-10vmin; left:auto; top:10vmin;
+    background: radial-gradient(circle at 70% 20%, rgba(255,52,99,0.22), transparent 18%),
+                radial-gradient(circle at 30% 80%, rgba(110,231,183,0.12), transparent 18%);
+    animation-duration:10s;
+    animation-direction:reverse;
+  }
+  .bg .grids {
+    position:absolute; inset:0; background-image:
+      linear-gradient(transparent 95%, rgba(255,255,255,0.01) 95%),
+      linear-gradient(90deg, transparent 95%, rgba(255,255,255,0.01) 95%);
+    background-size: 320px 320px;
+    opacity:0.03; filter: blur(0.8px);
+  }
+  .bg .police-stripes {
+    position:absolute; inset:0; pointer-events:none;
+    background:
+      linear-gradient(90deg, rgba(110,61,240,0.06) 0 20%, transparent 20% 50%),
+      linear-gradient(90deg, rgba(255,60,80,0.06) 50% 70%, transparent 70% 100%);
+    mix-blend-mode:overlay;
+    animation: stripesShift 6s linear infinite;
+    opacity:0.6;
+  }
+
+  @keyframes float { 0%{ transform:translateY(-6px) } 50%{ transform:translateY(6px) } 100%{ transform:translateY(-6px) } }
+  @keyframes stripesShift { 0%{ background-position:0 0, 100% 0 } 50%{ background-position:50% 0, 50% 0 } 100%{ background-position:0 0, 100% 0 } }
+
+  /* Layout */
+  .wrap{max-width:1150px;margin:22px auto;padding:20px;display:grid;grid-template-rows:auto 1fr;gap:18px;position:relative;z-index:2}
+  header{display:flex;align-items:center;justify-content:space-between;gap:18px}
+  .brand{display:flex;gap:12px;align-items:center}
+  .logo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,var(--accent-2),var(--accent));display:flex;align-items:center;justify-content:center;font-weight:900;color:#031018;box-shadow:0 8px 26px rgba(100,40,200,0.14)}
+  h1{margin:0;font-size:18px}
+  .subtitle{color:var(--muted);font-size:13px}
+
+  .top-right{display:flex;gap:10px;align-items:center}
+  .pill{background:var(--glass);padding:8px 12px;border-radius:999px;font-weight:700;color:var(--muted)}
+  .btn{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#041018;padding:8px 12px;border-radius:10px;border:none;cursor:pointer;font-weight:800;box-shadow:0 8px 22px rgba(50,10,80,0.18)}
+  .btn-ghost{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:8px 10px;border-radius:10px;cursor:pointer}
+  .notif-pill{background:linear-gradient(90deg,var(--accent-2),var(--accent));padding:6px 10px;border-radius:999px;font-weight:800;color:#031018;cursor:pointer}
+
+  /* grid */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} }
+  @media (max-width:640px){ .grid{grid-template-columns:1fr} }
+
+  /* card */
+  .card{
+    background:var(--card);border-radius:var(--radius);padding:18px;border:1px solid rgba(255,255,255,0.03);box-shadow:var(--shadow);
+    display:flex;flex-direction:column;gap:12px;min-height:120px;transition:transform .22s,box-shadow .22s,border-color .22s;
+    overflow:hidden;position:relative;
+  }
+  .card:hover{transform:translateY(-8px);box-shadow:0 30px 60px rgba(2,6,10,0.8);border-color:rgba(150,80,240,0.12)}
+  .title{font-weight:900;font-size:16px}
+  .desc{color:var(--muted);font-size:13px}
+
+  /* expanded area */
+  #expandedRoot .expanded{margin-top:8px;border-radius:12px;padding:18px;background:linear-gradient(180deg, rgba(255,255,255,0.015), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);box-shadow:0 10px 30px rgba(0,0,0,0.45)}
+
+  /* forms, lists */
+  input, textarea, select, button { font:inherit; color:inherit }
+  input, textarea, select { background: rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.04); padding:10px; border-radius:8px }
+  textarea{min-height:100px;resize:vertical}
+  .list{display:flex;flex-direction:column;gap:8px}
+  .item{padding:10px;border-radius:10px;background:rgba(255,255,255,0.02);display:flex;justify-content:space-between;align-items:center}
+
+  /* radio UI */
+  .radio-wrap{display:flex;gap:12px;align-items:flex-start}
+  .radio-left{flex:1;display:flex;flex-direction:column;gap:10px}
+  .radio-right{width:320px}
+  .radio-messages{max-height:380px;overflow:auto;padding:12px;border-radius:10px;background:rgba(0,0,0,0.18)}
+  .radio-msg{display:flex;gap:10px;align-items:flex-start;max-width:86%}
+  .radio-msg.me{flex-direction:row-reverse}
+  .radio-avatar{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-weight:800;background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#031018}
+  .radio-bubble{padding:10px;border-radius:10px;background:rgba(0,0,0,0.34)}
+  .radio-bubble.me{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#031018}
+  .radio-meta{font-size:11px;color:var(--muted);margin-top:6px}
+
+  /* small animations */
+  .fade-in{animation:fadeIn .32s ease both}
+  @keyframes fadeIn{ from{opacity:0;transform:translateY(6px)} to{opacity:1;transform:none} }
+
+  /* footer */
+  footer{margin-top:26px;text-align:center;color:var(--muted);font-size:13px;padding-bottom:26px}
+</style>
 </head>
 <body>
   <div class="bg" aria-hidden="true">
     <div class="nebula"></div>
     <div class="nebula r"></div>
-    <div class="gridOverlay"></div>
-    <div class="stripes"></div>
+    <div class="grids"></div>
+    <div class="police-stripes"></div>
   </div>
 
   <div class="wrap">
     <header>
       <div class="brand">
-        <div class="logo" aria-hidden="true"><img src="https://cdn.discordapp.com/attachments/1421898595271180360/1425878366116122654/LOGO_WIZARD_FONDO.png.png" alt="logo" style="width:100%;height:100%;object-fit:cover;border-radius:8px"></div>
+        <div class="logo"><img id="brandLogo" alt="Logo" src="https://cdn.discordapp.com/attachments/1421898595271180360/1425878366116122654/LOGO_WIZARD_FONDO.png.png" style="width:100%;height:100%;object-fit:cover;border-radius:10px"></div>
         <div>
           <h1>Daynight RP — PDA / CAD</h1>
-          <div class="subtitle">Completo — Firebase Auth + Firestore • Todo en 1 archivo</div>
+          <div class="subtitle">Realtime — Firestore as single source (no localStorage)</div>
         </div>
       </div>
 
       <div class="top-right">
         <div id="userDisplay" class="pill">No conectado</div>
         <div id="dutyStatus" class="pill">En servicio: 0</div>
-        <div id="notifWrap" style="display:inline-flex;align-items:center"><div id="notifPill" class="pill" style="display:none;background:linear-gradient(90deg,var(--accent2),var(--accent));color:#031018"></div></div>
+        <div id="notifWrap" style="display:inline-flex;align-items:center">
+          <div id="notifPill" class="notif-pill" style="display:none">Alertas 0</div>
+        </div>
         <button id="btnExport" class="btn">Exportar</button>
         <button id="btnLogin" class="btn-ghost">Entrar</button>
-        <div id="adminModeWrap" style="display:none"><span id="adminModePill" class="pill">Admin: OFF</span></div>
+        <div id="adminModeWrap" style="display:none">
+          <span id="adminModePill" class="admin-mode-pill">Admin: OFF</span>
+        </div>
       </div>
     </header>
 
-    <section class="grid" id="cardsRoot" aria-label="Paneles principales"></section>
+    <section class="grid" id="cardsRoot"></section>
 
-    <div id="expandedRoot" aria-live="polite"></div>
+    <div id="expandedRoot"></div>
 
-    <footer>Hecho para Daynight RP • Firestore + Firebase Auth • Generado: 2025-10-20</footer>
+    <footer>Hecho para Daynight RP • Diseño actualizado • Firestore-only</footer>
   </div>
 
-  <!-- Login modal -->
+  <!-- LOGIN / REGISTER modal -->
   <div id="loginModal" class="overlay" style="display:none">
-    <div class="modal fade-in" role="dialog" aria-modal="true">
-      <h3>Entrar / Registrar</h3>
-      <div class="muted small">Usa Email/Password o Google Sign-In. Crear cuenta guardará perfil en 'users' (doc id = uid).</div>
+    <div class="modal fade-in">
+      <h3>Entrar / Registrarse</h3>
+      <div class="muted small">Usa tu cuenta almacenada en Firestore. Para producción usa Firebase Auth y reglas seguras.</div>
 
       <div style="margin-top:12px">
-        <label class="muted small">Email</label>
-        <input id="authEmail" placeholder="email@example.com" />
+        <label class="muted small">Usuario</label>
+        <input id="loginUser" placeholder="usuario (ej: perety04)"/>
         <label class="muted small" style="margin-top:8px">Contraseña</label>
-        <input id="authPass" type="password" placeholder="contraseña" />
+        <input id="loginPass" type="password" placeholder="contraseña"/>
         <div style="display:flex;gap:8px;margin-top:12px">
-          <button id="btnSignIn" class="btn">Entrar</button>
-          <button id="btnSignUp" class="btn-ghost">Crear cuenta</button>
-          <button id="btnGoogle" class="btn-ghost">Google</button>
+          <button id="loginBtnModal" class="btn">Entrar</button>
+          <button id="guestBtn" class="btn-ghost">Invitado</button>
+          <div style="margin-left:auto" class="small muted">¿Sin cuenta? <span id="showReg" class="link-like" style="cursor:pointer">Crear</span></div>
         </div>
+        <div id="loginError" class="muted small" style="margin-top:8px;color:var(--danger);display:none"></div>
+      </div>
+
+      <div id="registerBlock" style="display:none;margin-top:12px;border-top:1px dashed rgba(255,255,255,0.03);padding-top:12px">
+        <h4 style="margin:0 0 8px 0">Crear cuenta</h4>
+        <label class="muted small">Nombre visible</label>
+        <input id="regName" placeholder="Ej: Ofc. Pérez"/>
+        <label class="muted small">Usuario</label>
+        <input id="regUser" placeholder="usuario"/>
+        <label class="muted small">Contraseña</label>
+        <input id="regPass" type="password" placeholder="contraseña"/>
         <div style="display:flex;gap:8px;margin-top:8px">
-          <button id="btnReset" class="btn-ghost">Recuperar contraseña</button>
-          <div style="margin-left:auto" class="muted small">Cierra para volver</div>
+          <select id="regRole">
+            <option value="officer">Officer</option>
+            <option value="sergeant">Sergeant</option>
+            <option value="dispatcher">Dispatcher</option>
+            <option value="admin">Admin</option>
+          </select>
+          <button id="regCreate" class="btn">Crear</button>
+          <button id="regCancel" class="btn-ghost">Cancelar</button>
         </div>
-        <div id="authMsg" class="muted small" style="margin-top:8px"></div>
+        <div id="regMsg" class="muted small" style="margin-top:8px"></div>
       </div>
     </div>
   </div>
 
-  <!-- Import JSON modal (for admin) -->
-  <div id="importModal" class="overlay" style="display:none">
-    <div class="modal fade-in">
-      <h3>Importar JSON</h3>
-      <div class="muted small">Carga un archivo exportado previamente y selecciona qué colecciones importar.</div>
-      <input id="importFile" type="file" accept=".json" style="margin-top:12px"/>
-      <div style="display:flex;gap:8px;margin-top:12px"><button id="importConfirm" class="btn">Importar</button><button id="importCancel" class="btn-ghost">Cancelar</button></div>
-      <div id="importMsg" class="muted small" style="margin-top:8px"></div>
-    </div>
-  </div>
+  <!-- Firebase (modular v9) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+    import {
+      getFirestore, collection, getDocs, addDoc, setDoc, doc, deleteDoc, updateDoc,
+      onSnapshot, query, where, orderBy
+    } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-<script type="module">
-/* ---------------- Firebase imports ---------------- */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-import {
-  getFirestore, collection, getDocs, addDoc, setDoc, doc, deleteDoc, updateDoc,
-  onSnapshot, query, where, orderBy, getDoc
-} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+    // Firebase configuration (your project)
+    const firebaseConfig = {
+      apiKey: "AIzaSyCskczYgGtlPPBEIZiE5PuY7s_cfE_3Chg",
+      authDomain: "wizard-rp.firebaseapp.com",
+      projectId: "wizard-rp",
+      storageBucket: "wizard-rp.firebasestorage.app",
+      messagingSenderId: "479456044047",
+      appId: "1:479456044047:web:65c52e2430bcb6ca586f7a",
+      measurementId: "G-KX5Y56CG0R"
+    };
 
-import {
-  getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut,
-  onAuthStateChanged, GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail,
-  reauthenticateWithCredential, EmailAuthProvider
-} from "https://www.gstatic.com/firebasejs/9.22.2/firebase-auth.js";
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    window.__FIRESTORE_DB = db; // expose for debugging
 
-/* ---------------- Config & init ---------------- */
-const firebaseConfig = {
-  apiKey: "AIzaSyCskczYgGtlPPBEIZiE5PuY7s_cfE_3Chg",
-  authDomain: "wizard-rp.firebaseapp.com",
-  projectId: "wizard-rp",
-  storageBucket: "wizard-rp.firebasestorage.app",
-  messagingSenderId: "479456044047",
-  appId: "1:479456044047:web:65c52e2430bcb6ca586f7a",
-  measurementId: "G-KX5Y56CG0R"
-};
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
-const auth = getAuth(app);
-const provider = new GoogleAuthProvider();
+    // Simple helper collection accessor
+    const COL = (name) => collection(db, name);
 
-/* ---------------- Helpers & state ---------------- */
-const $ = (sel, root=document) => root.querySelector(sel);
-const escapeHtml = s => (s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const COL = n => collection(db, n);
-const log = async msg => { try{ await addDoc(COL('logs'), { t: Date.now(), msg }); }catch(e){ console.warn('log', e); } };
+    // App state (in-memory)
+    const APP = {
+      currentUser: null,
+      adminMode: false,
+      unsub: {}
+    };
 
-const STATE = {
-  userProfile: null, // { uid, id, username, display, role, ... }
-  adminMode: false,
-  unsub: {},
-  selectedChannel: null,
-  heartbeatTimers: {}
-};
-
-/* ---------------- Icons ---------------- */
-function getIconSVG(name,size=34){
-  const common = `width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false"`;
-  switch(name){
-    case 'pda': return `<svg ${common}><rect x="3" y="2" width="18" height="20" rx="2" stroke="currentColor" stroke-width="1.4"></rect><rect x="7" y="6" width="10" height="2" rx="0.6" fill="currentColor"></rect></svg>`;
-    case 'calls': return `<svg ${common}><path d="M3 5c0-1.1.9-2 2-2h5l2 3h4c1.1 0 2 .9 2 2v3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path><path d="M21 16v2a2 2 0 0 1-2 2h-1" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
-    case 'reports': return `<svg ${common}><rect x="4" y="3" width="16" height="18" rx="2" stroke="currentColor" stroke-width="1.4"></rect><path d="M8 7h8M8 11h8M8 15h5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"></path></svg>`;
-    case 'wanted': return `<svg ${common}><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.4"></circle><path d="M12 7v5l3 3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>`;
-    case 'fines': return `<svg ${common}><path d="M6 3h10l3 3v13a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M11 7h2M10 12h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`;
-    case 'assignments': return `<svg ${common}><rect x="3" y="3" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M8 7h8M8 11h8M8 15h8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`;
-    case 'service': return `<svg ${common}><path d="M12 2v4M12 18v4M4.2 4.2l2.8 2.8M17 17l2.8 2.8M2 12h4M18 12h4M4.2 19.8l2.8-2.8M17 7l2.8-2.8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>`;
-    case 'alerts': return `<svg ${common}><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>`;
-    case 'radio': return `<svg ${common}><path d="M12 20c4.418 0 8-3.582 8-8a7.99 7.99 0 0 0-1.33-4.45M4.7 6.7A9 9 0 1 1 19.3 19.3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" fill="none"/></svg>`;
-    case 'admin': return `<svg ${common}><path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7z" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>`;
-    case 'logs': return `<svg ${common}><path d="M3 6h18M7 10h10M7 14h10M7 18h10" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>`;
-    default: return `<svg ${common}><rect x="3" y="3" width="18" height="18" rx="3" stroke="currentColor" stroke-width="1.2" fill="none"></rect></svg>`;
-  }
-}
-
-/* ---------------- Utilities ---------------- */
-function setHTML(el, html){ if(el) el.innerHTML = html; }
-function fetchDoc(collectionName, id){ return getDocs(query(COL(collectionName), where('__name__','==', id))).then(s=>{ let d=null; s.forEach(x=> d=x.data()); return d }).catch(()=>null); }
-
-/* ---------------- Cards rendering ---------------- */
-function renderCards(){
-  const root = document.getElementById('cardsRoot'); root.innerHTML = '';
-  const isAdmin = STATE.userProfile && STATE.userProfile.role === 'admin';
-  CARDS.forEach(c=>{
-    if((c.id==='admin' || c.id==='logs') && !isAdmin) return;
-    const el = document.createElement('div'); el.className='card'; el.tabIndex=0; el.dataset.id = c.id;
-    el.innerHTML = `<div class="card-head"><div style="display:flex;gap:12px;align-items:center"><div class="card-logo">${getIconSVG(c.icon)}</div><div><div class="title">${c.title}</div><div class="desc">${c.desc}</div></div></div><div style="display:flex;flex-direction:column;align-items:flex-end"><button class="btn-ghost open-btn" data-open="${c.id}">Abrir</button></div></div>`;
-    el.addEventListener('click', (e)=>{ if(e.target && e.target.matches('button')) return; openCard(c.id, el); });
-    el.querySelector('.open-btn').addEventListener('click', (e)=>{ e.stopPropagation(); openCard(c.id, el); });
-    el.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' ') { e.preventDefault(); openCard(c.id, el); } if(e.key==='ArrowRight') focusNext(el); if(e.key==='ArrowLeft') focusPrev(el); });
-    root.appendChild(el);
-  });
-}
-function focusNext(cur){ const cards = Array.from(document.querySelectorAll('.card')); const i = cards.indexOf(cur); if(i>=0 && i<cards.length-1) cards[i+1].focus(); }
-function focusPrev(cur){ const cards = Array.from(document.querySelectorAll('.card')); const i = cards.indexOf(cur); if(i>0) cards[i-1].focus(); }
-function setActiveCard(el){ document.querySelectorAll('.card').forEach(c=>c.classList.remove('active')); if(el) el.classList.add('active'); }
-
-/* ---------------- Panel management ---------------- */
-function clearExpanded(){
-  if(STATE.unsub.current && typeof STATE.unsub.current === 'function'){ try{ STATE.unsub.current(); }catch(e){} }
-  STATE.unsub.current = null;
-  document.getElementById('expandedRoot').innerHTML = '';
-  setActiveCard(null);
-  stopHeartbeats();
-}
-async function openCard(id, cardEl=null){
-  clearExpanded(); setActiveCard(cardEl);
-  const panel = document.createElement('div'); panel.className='expanded';
-  document.getElementById('expandedRoot').appendChild(panel);
-  switch(id){
-    case 'pda': await panelPDA(panel); break;
-    case 'calls': await panelCalls(panel); break;
-    case 'reports': await panelReports(panel); break;
-    case 'wanted': await panelWanted(panel); break;
-    case 'fines': await panelFines(panel); break;
-    case 'assignments': await panelAssignments(panel); break;
-    case 'service': await panelService(panel); break;
-    case 'alerts': await panelAlerts(panel); break;
-    case 'radio': await panelRadio(panel); break;
-    case 'admin': await panelAdmin(panel); break;
-    case 'logs': await panelLogs(panel); break;
-    default: panel.innerHTML = '<div>Panel no implementado</div>'; break;
-  }
-  panel.scrollIntoView({ behavior:'smooth', block:'start' });
-}
-
-/* ---------------- Common helpers ---------------- */
-async function hasPermission(perm){
-  if(!STATE.userProfile) return false;
-  try{
-    const rSnap = await getDocs(query(COL('roles'), where('__name__','==', STATE.userProfile.role)));
-    let role=null; rSnap.forEach(d=> role = d.data());
-    if(!role) return false;
-    if(Array.isArray(role.permissions) && role.permissions.includes('all')){
-      const sensitive = ['delete_reports','delete_alerts','manage_users','manage_roles','delete_all_alerts','impersonate','view_logs','all','assignments'];
-      if(sensitive.includes(perm)) return STATE.adminMode === true;
-      return true;
+    // Quick logging to Firestore
+    async function pushLog(msg){
+      try{ await addDoc(COL('logs'), { t: Date.now(), msg }); } catch(e){ console.warn('pushLog failed', e); }
     }
-    return role.permissions && role.permissions.includes(perm);
-  }catch(e){ console.warn('hasPermission', e); return false; }
-}
-function enableRefresh(container, handler){ const btn = container.querySelector('.refresh-panel'); if(btn) btn.onclick = handler; }
 
-/* ---------------- Seed demo data ---------------- */
-async function seedIfEmpty(){
-  try{
-    const u = await getDocs(COL('users'));
-    if(u.empty){
-      // Note: these are profile docs, Auth must be used for sign-in; these seeds are for demo only
-      await addDoc(COL('users'), { username:'admin', display:'Admin', role:'admin', badge:'ADM-001', onDuty:false });
-      await addDoc(COL('users'), { username:'dispatcher', display:'Dispatch', role:'dispatcher', badge:'DISP', onDuty:false });
-      await addDoc(COL('users'), { username:'perety04', display:'Perety 04', role:'officer', badge:'PD-314', onDuty:false });
-    }
-    const rolesSnap = await getDocs(COL('roles'));
-    if(rolesSnap.empty){
-      await setDoc(doc(db,'roles','officer'), { name:'Officer', color:'#7c3aed', permissions:['create_reports','create_pda','create_call'] });
-      await setDoc(doc(db,'roles','sergeant'), { name:'Sergeant', color:'#3b82f6', permissions:['create_reports','create_pda','create_call','delete_reports'] });
-      await setDoc(doc(db,'roles','mando'), { name:'Mando', color:'#ef4444', permissions:['assignments'] });
-      await setDoc(doc(db,'roles','dispatcher'), { name:'Dispatcher', color:'#f97316', permissions:['create_call','assign_call'] });
-      await setDoc(doc(db,'roles','admin'), { name:'Admin', color:'#10b981', permissions:['all'] });
-    }
-    const channels = await getDocs(COL('radio_channels'));
-    if(channels.empty){
-      await addDoc(COL('radio_channels'), { id:'general', name:'General', created_at: Date.now() });
-      await addDoc(COL('radio_channels'), { id:'police', name:'Police', created_at: Date.now() });
-      await addDoc(COL('radio_channels'), { id:'medical', name:'Medical', created_at: Date.now() });
-    }
-  }catch(e){ console.warn('seedIfEmpty', e); }
-}
-
-/* ---------------- Panel: PDA ---------------- */
-async function panelPDA(container){
-  setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>PDA / Fichas</strong><div class="muted small">Buscar y crear fichas</div></div>
-    <div style="display:flex;gap:8px;align-items:center"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
-  </div>
-  <div style="margin-top:12px;display:grid;grid-template-columns:1fr 380px;gap:12px">
-    <div><input id="pdaQ" placeholder="Buscar..." style="width:100%;margin-bottom:8px"/><div id="pdaResults" class="list"></div></div>
-    <div><div class="muted small">Nueva ficha</div><textarea id="pdaTxt"></textarea><div style="display:flex;gap:8px;margin-top:8px"><button id="createPDA" class="btn">Crear</button><button class="btn-ghost close-panel">Cancelar</button></div></div>
-  </div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-  enableRefresh(container, ()=> loadPDAs($('#pdaQ',container).value, container));
-  $('#pdaQ',container).addEventListener('input', ()=> loadPDAs($('#pdaQ',container).value, container));
-  $('#createPDA',container).addEventListener('click', async ()=>{
-    if(!STATE.userProfile) return alert('Inicia sesión');
-    if(!(await hasPermission('create_pda'))) return alert('No tienes permiso');
-    const txt = $('#pdaTxt',container).value.trim(); if(!txt) return alert('Rellena la ficha');
-    try{ await addDoc(COL('pda'), { text: txt, authorUid: auth.currentUser.uid, author: STATE.userProfile.display, created_at: Date.now() }); await log('Ficha PDA creada'); $('#pdaTxt',container).value=''; loadPDAs('',container); }catch(e){ console.error(e); alert('Error creando PDA'); }
-  });
-  if(STATE.unsub.pda) STATE.unsub.pda();
-  STATE.unsub.pda = onSnapshot(COL('pda'), ()=> loadPDAs($('#pdaQ',container).value, container));
-  STATE.unsub.current = STATE.unsub.pda;
-  await loadPDAs('',container);
-}
-async function loadPDAs(q='', container=document){
-  const results = $('#pdaResults', container); if(!results) return;
-  try{
-    const snap = await getDocs(query(COL('pda'), orderBy('created_at','desc')));
-    const arr=[]; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
-    const out = arr.filter(p => q.trim()==='' ? true : (p.text||'').toLowerCase().includes(q.toLowerCase()));
-    results.innerHTML = out.map(p=> `<div class="item"><div style="flex:1"><b>${escapeHtml((p.text||'').slice(0,40))}</b><div class="muted small">${escapeHtml((p.text||'').slice(0,140))}</div></div><div><button class="btn-ghost view-pda" data-id="${p.id}">Ver</button> <button class="btn-ghost del-pda" data-id="${p.id}">Borrar</button></div></div>`).join('') || '<div class="muted small">Sin fichas</div>';
-    results.querySelectorAll('.view-pda').forEach(b=> b.onclick = async ()=> { const d = await fetchDoc('pda', b.dataset.id); alert(`Ficha:\n\n${d?.text||'No encontrada'}\n\nAutor: ${d?.author||'—'}`); });
-    results.querySelectorAll('.del-pda').forEach(b=> b.onclick = async ()=> { if(!confirm('Borrar ficha?')) return; if(!(await hasPermission('delete_reports'))) return alert('Admin Mode necesario'); try{ await deleteDoc(doc(db,'pda',b.dataset.id)); await log(`Ficha ${b.dataset.id} borrada`); loadPDAs(q,container); }catch(e){ console.error(e); alert('Error'); }});
-  }catch(e){ console.error('loadPDAs', e); results.innerHTML = '<div class="muted small">Error cargando</div>'; }
-}
-
-/* ---------------- Panel: Calls ---------------- */
-async function panelCalls(container){
-  setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>Dispatch / Llamadas</strong><div class="muted small">Crear y asignar llamadas</div></div>
-    <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
-  </div>
-  <div style="margin-top:12px;display:flex;gap:8px"><input id="callFrom" placeholder="Remitente (opcional)"/><input id="callMsg" placeholder="Mensaje"/><button id="callCreate" class="btn">Crear</button></div>
-  <div style="margin-top:12px"><strong>Llamadas</strong><div id="callsList" class="list" style="margin-top:8px"></div></div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-  enableRefresh(container, ()=> loadCalls());
-  $('#callCreate',container).addEventListener('click', async ()=> {
-    if(!STATE.userProfile) return alert('Inicia sesión');
-    const caller = $('#callFrom',container).value.trim() || 'Anonimo';
-    const message = $('#callMsg',container).value.trim(); if(!message) return alert('Introduce mensaje');
-    try{ await addDoc(COL('calls'), { caller, message, status:'pending', assigned_to:null, created_at: Date.now(), author: STATE.userProfile.display, authorUid: auth.currentUser.uid }); await log('Llamada creada'); $('#callMsg',container).value=''; loadCalls(); }catch(e){ console.error(e); alert('Error'); }
-  });
-  if(STATE.unsub.calls) STATE.unsub.calls();
-  STATE.unsub.calls = onSnapshot(COL('calls'), ()=> loadCalls());
-  STATE.unsub.current = STATE.unsub.calls;
-  await loadCalls();
-}
-async function loadCalls(){
-  const list = $('#callsList'); if(!list) return;
-  try{
-    const snap = await getDocs(query(COL('calls'), orderBy('created_at','desc')));
-    const arr=[]; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
-    if(!arr.length){ list.innerHTML = '<div class="muted small">No hay llamadas</div>'; return; }
-    list.innerHTML = '';
-    const usersSnap = await getDocs(COL('users')); const users=[]; usersSnap.forEach(u=> users.push({ id:u.id, ...u.data() }));
-    for(const c of arr){
-      const assignee = c.assigned_to ? (users.find(u=>u.id===c.assigned_to)?.display || '—') : '—';
-      const el = document.createElement('div'); el.className='item';
-      el.innerHTML = `<div style="flex:1"><b>${escapeHtml(c.caller)}</b><div class="muted small">${escapeHtml(c.message)}</div></div><div style="text-align:right"><div class="muted tiny">${c.created_at?new Date(c.created_at).toLocaleString():''}</div><div class="muted tiny">Asig: ${escapeHtml(assignee)}</div></div>`;
-      const btns = document.createElement('div'); btns.style.marginLeft='12px';
-      if(await hasPermission('assign_call') && STATE.userProfile){
-        const assign = document.createElement('button'); assign.className='btn-ghost'; assign.textContent='Asignar a mí';
-        assign.onclick = async ()=> { try{ await updateDoc(doc(db,'calls',c.id), { status:'assigned', assigned_to: STATE.userProfile.id }); await log(`Llamada ${c.id} asignada a ${STATE.userProfile.username}`); loadCalls(); }catch(e){ console.error(e); } };
-        btns.appendChild(assign);
-      }
-      if(STATE.userProfile && (STATE.userProfile.role === 'admin' || (c.assigned_to && STATE.userProfile.id === c.assigned_to))){
-        const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
-        del.onclick = async ()=> { if(confirm('Borrar llamada?')){ try{ await deleteDoc(doc(db,'calls',c.id)); await log(`Llamada ${c.id} borrada`); loadCalls(); }catch(e){ console.error(e); } } };
-        btns.appendChild(del);
-      }
-      el.appendChild(btns); list.appendChild(el);
-    }
-  }catch(e){ console.error('loadCalls', e); list.innerHTML = '<div class="muted small">Error cargando</div>'; }
-}
-
-/* ---------------- Panel: Reports (see earlier full impl) ---------------- */
-/* Already implemented above; reuse function panelReports and loadReports (kept inline) */
-async function panelReports(container){ /* implemented previously - reuse above code block */ return panelReportsImpl(container); }
-async function panelReportsImpl(container){
-  // The implementation is identical to the earlier panelReports function; for brevity reuse pattern:
-  setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>Informes</strong><div class="muted small">Crear y consultar informes</div></div>
-    <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
-  </div>
-  <div style="margin-top:12px"><div class="muted small">Plantilla</div><textarea id="tplReport" style="min-height:80px"></textarea></div>
-  <div style="margin-top:8px" class="form-row"><input id="repTitle" placeholder="Título"/><input id="repAuthor" placeholder="Autor (auto)"/></div>
-  <div style="margin-top:8px"><textarea id="repDesc" placeholder="Descripción..."></textarea></div>
-  <div style="margin-top:8px;display:flex;gap:8px"><button id="saveRep" class="btn">Guardar</button><button class="btn-ghost close-panel">Cancelar</button></div>
-  <div style="margin-top:12px"><strong>Últimos informes</strong><div id="reportsList" class="list" style="margin-top:8px"></div></div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-  enableRefresh(container, ()=> loadReports());
-  $('#repAuthor', container).value = STATE.userProfile ? STATE.userProfile.display : 'Invitado';
-  $('#saveRep', container).addEventListener('click', async ()=>{
-    if(!STATE.userProfile) return alert('Inicia sesión');
-    if(!(await hasPermission('create_reports'))) return alert('No tienes permiso');
-    const title = $('#repTitle',container).value.trim(), desc = $('#repDesc',container).value.trim();
-    if(!title || !desc) return alert('Título y descripción obligatorios');
-    try{ await addDoc(COL('reports'), { title, description: desc, author: STATE.userProfile.display, authorUid: auth.currentUser.uid, created_at: Date.now() }); await log(`Informe creado: ${title}`); loadReports(); }catch(e){ console.error(e); alert('Error'); }
-  });
-  if(STATE.unsub.reports) STATE.unsub.reports();
-  STATE.unsub.reports = onSnapshot(COL('reports'), ()=> loadReports());
-  STATE.unsub.current = STATE.unsub.reports;
-  await loadReports();
-}
-async function loadReports(){
-  const list = $('#reportsList'); if(!list) return;
-  try{ const snap = await getDocs(query(COL('reports'), orderBy('created_at','desc'))); const arr=[]; snap.forEach(s=> arr.push({ id:s.id, ...s.data() })); if(!arr.length){ list.innerHTML = '<div class="muted small">No hay informes</div>'; return; } list.innerHTML=''; for(const r of arr){ const it=document.createElement('div'); it.className='item'; it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(r.title)}</div><div class="muted small">${escapeHtml((r.description||'').slice(0,160))}</div></div><div style="text-align:right"><div class="muted tiny">${r.created_at?new Date(r.created_at).toLocaleString():''}</div><div class="muted tiny">${escapeHtml(r.author||'')}</div></div>`; const btns=document.createElement('div'); btns.style.marginLeft='12px'; const view=document.createElement('button'); view.className='btn-ghost'; view.textContent='Ver'; view.onclick = ()=> alert(`Informe — ${r.title}\n\n${r.description}\n\nAutor: ${r.author}\nFecha: ${new Date(r.created_at||0).toLocaleString()}`); btns.appendChild(view); if(STATE.userProfile && (STATE.userProfile.role==='admin' || STATE.userProfile.role==='sergeant')){ const del=document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar'; del.onclick=async ()=>{ if(!(await hasPermission('delete_reports'))) return alert('Admin Mode requerido'); if(!confirm('Borrar informe?')) return; try{ await deleteDoc(doc(db,'reports',r.id)); await log(`Informe ${r.id} borrado`); loadReports(); }catch(e){ console.error(e); alert('Error'); } }; btns.appendChild(del); } it.appendChild(btns); list.appendChild(it); } }catch(e){ console.error('loadReports', e); list.innerHTML = '<div class="muted small">Error cargando</div>'; }
-}
-
-/* ---------------- Panel: Wanted (BOLO) ---------------- */
-async function panelWanted(container){
-  setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>BOLO / Wanted</strong><div class="muted small">Crear fichas buscadas</div></div>
-    <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
-  </div>
-  <div style="margin-top:12px;display:grid;grid-template-columns:1fr 320px;gap:12px">
-    <div><input id="wQ" placeholder="Buscar por nombre o descripción..." style="width:100%;margin-bottom:8px"/><div id="wantedList" class="list"></div></div>
-    <div><div class="muted small">Crear nueva ficha wanted</div><input id="wName" placeholder="Nombre / Alias"/><input id="wBounty" placeholder="Recompensa" style="margin-top:8px"/><textarea id="wDesc" placeholder="Descripción" style="margin-top:8px"></textarea><div style="display:flex;gap:8px;margin-top:8px"><button id="saveW" class="btn">Crear ficha</button><button class="btn-ghost close-panel">Cancelar</button></div></div>
-  </div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-  enableRefresh(container, ()=> loadWanted($('#wQ',container).value));
-  $('#wQ',container).addEventListener('input', ()=> loadWanted($('#wQ',container).value));
-  $('#saveW',container).addEventListener('click', async ()=>{
-    if(!STATE.userProfile) return alert('Inicia sesión');
-    if(!(await hasPermission('create_bolo'))) return alert('No tienes permiso para crear BOLO');
-    const name = $('#wName',container).value.trim(); const desc = $('#wDesc',container).value.trim(); const bounty = parseInt($('#wBounty',container).value||'0',10);
-    if(!name) return alert('Nombre requerido');
-    try{ await addDoc(COL('wanted'), { name, description: desc, bounty: bounty||0, created_at: Date.now(), author: STATE.userProfile.display, authorUid: auth.currentUser.uid }); await log(`Wanted creado: ${name}`); $('#wName',container).value=''; $('#wDesc',container).value=''; $('#wBounty',container).value=''; loadWanted(''); }catch(e){ console.error(e); alert('Error creando wanted'); }
-  });
-  if(STATE.unsub.wanted) STATE.unsub.wanted();
-  STATE.unsub.wanted = onSnapshot(COL('wanted'), ()=> loadWanted($('#wQ',container).value));
-  STATE.unsub.current = STATE.unsub.wanted;
-  await loadWanted('');
-}
-async function loadWanted(q=''){
-  const list = $('#wantedList'); if(!list) return;
-  try{
-    const snap = await getDocs(query(COL('wanted'), orderBy('created_at','desc')));
-    const arr=[]; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
-    const out = arr.filter(w => q.trim()==='' ? true : ((w.name||'').toLowerCase().includes(q.toLowerCase()) || (w.description||'').toLowerCase().includes(q.toLowerCase())));
-    if(!out.length){ list.innerHTML = '<div class="muted small">No hay fichas</div>'; return; }
-    list.innerHTML = '';
-    for(const w of out){
-      const it = document.createElement('div'); it.className='item';
-      it.innerHTML = `<div style="flex:1"><b>${escapeHtml(w.name)}</b><div class="muted small">${escapeHtml((w.description||'').slice(0,140))}</div></div><div class="muted tiny">${w.bounty||0}€</div>`;
-      const btns = document.createElement('div'); btns.style.marginLeft='12px';
-      const view = document.createElement('button'); view.className='btn-ghost'; view.textContent='Ver'; view.onclick = ()=> alert(`Wanted — ${w.name}\n\n${w.description}\nRecompensa: ${w.bounty||0}€`);
-      btns.appendChild(view);
-      if(STATE.userProfile && (STATE.userProfile.role === 'admin' || await hasPermission('manage_wanted'))){
-        const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
-        del.onclick = async ()=> { if(confirm('Borrar ficha?')){ try{ await deleteDoc(doc(db,'wanted',w.id)); await log(`Wanted ${w.id} borrado`); loadWanted(q); }catch(e){ console.error(e); alert('Error'); } } };
-        btns.appendChild(del);
-      }
-      it.appendChild(btns); list.appendChild(it);
-    }
-  }catch(e){ console.error('loadWanted', e); list.innerHTML = '<div class="muted small">Error cargando</div>'; }
-}
-
-/* ---------------- Panel: Assignments ---------------- */
-async function panelAssignments(container){
-  setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>Asignaciones</strong><div class="muted small">Crear y asignar tareas (solo Mando/Admin para asignar)</div></div>
-    <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
-  </div>
-  <div style="margin-top:12px;display:grid;grid-template-columns:1fr 360px;gap:12px">
-    <div>
-      <div style="display:flex;gap:8px;margin-bottom:8px"><input id="assignQ" placeholder="Buscar por título o descripción..." style="flex:1"/><button id="createAssignBtn" class="btn">Crear</button></div>
-      <div id="assignmentsList" class="list"></div>
-    </div>
-    <div>
-      <div class="muted small">Crear / Editar asignación</div>
-      <input id="as_title" placeholder="Título"/><textarea id="as_desc" placeholder="Descripción"></textarea>
-      <label class="muted small" style="margin-top:8px">Asignar a:</label>
-      <select id="as_assign_to" style="width:100%"></select>
-      <div style="display:flex;gap:8px;margin-top:8px"><button id="as_save" class="btn">Guardar</button><button class="btn-ghost close-panel">Cancelar</button></div>
-    </div>
-  </div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-  enableRefresh(container, ()=> loadAssignments($('#assignQ',container).value));
-  $('#assignQ',container).addEventListener('input', ()=> loadAssignments($('#assignQ',container).value));
-  $('#createAssignBtn',container).addEventListener('click', ()=> { $('#as_title').value=''; $('#as_desc').value=''; $('#as_assign_to').value=''; $('#as_save').dataset.id=''; });
-  $('#as_save',container).addEventListener('click', async ()=>{
-    if(!STATE.userProfile) return alert('Inicia sesión');
-    const title = $('#as_title').value.trim(), desc = $('#as_desc').value.trim(), assign_to = $('#as_assign_to').value || null;
-    const existingId = $('#as_save').dataset.id;
-    if(!title) return alert('Título requerido');
-    try{
-      if(existingId){
-        await updateDoc(doc(db,'assignments', existingId), { title, description: desc, assigned_to: assign_to, updated_at: Date.now() });
-        await log(`Asignación ${existingId} editada`);
-      } else {
-        await addDoc(COL('assignments'), { title, description: desc, assigned_to: assign_to, status:'open', created_at: Date.now(), author: STATE.userProfile.display, authorUid: auth.currentUser.uid });
-        await log(`Asignación creada: ${title}`);
-      }
-      loadAssignments($('#assignQ',container).value);
-    }catch(e){ console.error('save assignment', e); alert('Error guardando asignación'); }
-  });
-  await populateAssignToSelect($('#as_assign_to',container));
-  if(STATE.unsub.assignments) STATE.unsub.assignments();
-  STATE.unsub.assignments = onSnapshot(COL('assignments'), ()=> loadAssignments($('#assignQ',container).value));
-  STATE.unsub.current = STATE.unsub.assignments;
-  await loadAssignments('');
-}
-async function populateAssignToSelect(selectEl){
-  try{
-    const snap = await getDocs(COL('users'));
-    selectEl.innerHTML = '<option value="">-- Sin asignar --</option>';
-    snap.forEach(s=> { const d = s.data(); const opt = document.createElement('option'); opt.value = s.id; opt.textContent = `${d.display || d.username} (${d.role||'—'})`; selectEl.appendChild(opt); });
-  }catch(e){ console.error('populateAssignToSelect', e); }
-}
-async function loadAssignments(q=''){
-  const list = $('#assignmentsList'); if(!list) return;
-  try{
-    const snap = await getDocs(query(COL('assignments'), orderBy('created_at','desc')));
-    const arr=[]; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
-    const out = arr.filter(a => q.trim()==='' ? true : ((a.title||'').toLowerCase().includes(q.toLowerCase()) || (a.description||'').toLowerCase().includes(q.toLowerCase())));
-    if(!out.length){ list.innerHTML = '<div class="muted small">No hay asignaciones</div>'; return; }
-    list.innerHTML = '';
-    for(const a of out){
-      const it = document.createElement('div'); it.className='item';
-      const assignedLabel = a.assigned_to ? 'Asignado' : 'Sin asignar';
-      it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(a.title)}</div><div class="muted small">${escapeHtml((a.description||'').slice(0,140))}</div></div><div style="text-align:right"><div class="muted tiny">${a.created_at?new Date(a.created_at).toLocaleString():''}</div><div class="muted tiny">${assignedLabel}</div></div>`;
-      const btns = document.createElement('div'); btns.style.marginLeft='12px';
-      if(STATE.userProfile && (STATE.userProfile.role === 'admin' || STATE.userProfile.role === 'mando' || a.authorUid === auth.currentUser.uid)){
-        const edit = document.createElement('button'); edit.className='btn-ghost'; edit.textContent='Editar';
-        edit.onclick = async ()=> { $('#as_title').value = a.title; $('#as_desc').value = a.description || ''; $('#as_save').dataset.id = a.id; await populateAssignToSelect($('#as_assign_to')); if(a.assigned_to) $('#as_assign_to').value = a.assigned_to; };
-        btns.appendChild(edit);
-      }
-      if(STATE.userProfile && (STATE.userProfile.role === 'admin' || STATE.userProfile.role === 'mando')){
-        const assignBtn = document.createElement('button'); assignBtn.className='btn'; assignBtn.style.marginLeft='6px'; assignBtn.textContent='Asignar';
-        assignBtn.onclick = async ()=>{
-          const usersSnap = await getDocs(COL('users')); const users=[]; usersSnap.forEach(u=> users.push({ id:u.id, ...u.data() }));
-          const sel = prompt('Introduce el username a asignar (disponibles: ' + users.map(u=>u.username).join(', ') + ')');
-          if(!sel) return;
-          const target = users.find(u=>u.username === sel);
-          if(!target) return alert('Usuario no encontrado');
-          try{ await updateDoc(doc(db,'assignments', a.id), { assigned_to: target.id, updated_at: Date.now() }); await log(`Asignación ${a.id} -> ${target.username} por ${STATE.userProfile.username}`); loadAssignments(q); }catch(e){ console.error(e); alert('Error asignando'); }
-        };
-        btns.appendChild(assignBtn);
-      }
-      it.appendChild(btns); list.appendChild(it);
-    }
-  }catch(e){ console.error('loadAssignments', e); list.innerHTML = '<div class="muted small">Error</div>'; }
-}
-
-/* ---------------- Panel: Fines ---------------- */
-async function panelFines(container){
-  setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>Multas</strong><div class="muted small">Generar sanciones</div></div>
-    <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
-  </div>
-  <div style="margin-top:12px" class="form-row"><input id="fineOff" placeholder="Infractor"/><input id="fineAmt" placeholder="Importe"/></div>
-  <div style="margin-top:8px"><textarea id="fineReason" placeholder="Motivo..."></textarea></div>
-  <div style="margin-top:8px;display:flex;gap:8px"><button id="saveFine" class="btn">Emitir multa</button><button class="btn-ghost close-panel">Cancelar</button></div>
-  <div style="margin-top:12px"><strong>Multas</strong><div id="finesList" class="list" style="margin-top:8px"></div></div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-  enableRefresh(container, ()=> loadFines());
-  $('#saveFine',container).addEventListener('click', async ()=>{
-    if(!STATE.userProfile) return alert('Inicia sesión');
-    if(!(await hasPermission('create_fine'))) return alert('No tienes permiso para multar');
-    const off = $('#fineOff',container).value.trim(), amt = parseInt($('#fineAmt',container).value||'0',10); const reason = $('#fineReason',container).value.trim();
-    if(!off || !amt) return alert('Infractor e importe requeridos');
-    try{ await addDoc(COL('fines'), { offender: off, amount: amt, reason, author: STATE.userProfile.display, authorUid: auth.currentUser.uid, created_at: Date.now() }); await log(`Multa: ${off} ${amt}€`); loadFines(); }catch(e){ console.error(e); alert('Error'); }
-  });
-  if(STATE.unsub.fines) STATE.unsub.fines();
-  STATE.unsub.fines = onSnapshot(COL('fines'), ()=> loadFines());
-  STATE.unsub.current = STATE.unsub.fines;
-  await loadFines();
-}
-async function loadFines(){
-  const list = $('#finesList'); if(!list) return;
-  try{
-    const snap = await getDocs(query(COL('fines'), orderBy('created_at','desc')));
-    const arr=[]; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
-    if(!arr.length){ list.innerHTML = '<div class="muted small">No hay multas</div>'; return; }
-    list.innerHTML = '';
-    for(const f of arr){
-      const it = document.createElement('div'); it.className='item'; it.innerHTML = `<div style="flex:1"><b>${escapeHtml(f.offender)} • ${f.amount}€</b><div class="muted small">${escapeHtml(f.reason)}</div></div><div class="muted tiny">${f.created_at?new Date(f.created_at).toLocaleString():''}</div>`;
-      const btns = document.createElement('div'); btns.style.marginLeft='12px';
-      if(STATE.userProfile && (STATE.userProfile.role === 'admin' || STATE.userProfile.display === f.author)){
-        const del = document.createElement('button'); del.className='btn'; del.textContent='Borrar'; del.onclick = async ()=> { if(confirm('Borrar multa?')){ try{ await deleteDoc(doc(db,'fines',f.id)); await log(`Multa ${f.id} borrada`); loadFines(); }catch(e){ console.error(e); } } };
-        btns.appendChild(del);
-      }
-      it.appendChild(btns); list.appendChild(it);
-    }
-  }catch(e){ console.error('loadFines', e); list.innerHTML = '<div class="muted small">Error</div>'; }
-}
-
-/* ---------------- Panel: Service (duty) ---------------- */
-async function panelService(container){
-  setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>Servicio</strong><div class="muted small">Ponte en servicio o sal</div></div>
-    <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
-  </div>
-  <div style="margin-top:12px;display:flex;gap:8px;align-items:center"><div class="muted small">Tu estado:</div><div id="serviceBox" class="pill">Desconocido</div><div style="margin-left:auto"><button id="toggleDuty" class="btn">Cambiar</button></div></div>
-  <div style="margin-top:12px"><strong>Policías en servicio</strong><div id="dutyList" class="list" style="margin-top:8px"></div></div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-  enableRefresh(container, ()=> loadDutyList());
-  if(!STATE.userProfile){ $('#serviceBox', container).textContent='Inicia sesión'; $('#toggleDuty', container).onclick = ()=> alert('Inicia sesión'); return; }
-  const s = await getDocs(query(COL('users'), where('__name__','==', STATE.userProfile.id)));
-  let userObj = null; s.forEach(d=> userObj = d.data());
-  const on = userObj?.onDuty || false; $('#serviceBox',container).textContent = on ? 'En servicio' : 'Fuera de servicio';
-  $('#toggleDuty',container).onclick = async ()=> {
-    try{ await updateDoc(doc(db,'users',STATE.userProfile.id), { onDuty: !on }); await log(`${STATE.userProfile.username} toggled duty`); panelService(container); updateHeader(); }catch(e){ console.error(e); alert('Error'); }
-  };
-  await loadDutyList();
-}
-async function loadDutyList(){
-  const list = $('#dutyList'); if(!list) return;
-  try{ const snap = await getDocs(COL('users')); const active=[]; snap.forEach(s=> { const d=s.data(); if(d.onDuty) active.push(d.display || d.username); }); list.innerHTML = active.map(a=> `<div class="item">${escapeHtml(a)}</div>`).join('') || '<div class="muted small">Nadie en servicio</div>'; }catch(e){ console.error('loadDutyList', e); list.innerHTML = '<div class="muted small">Error</div>'; }
-}
-
-/* ---------------- Panel: Alerts ---------------- */
-async function panelAlerts(container){
-  setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>Alertas</strong><div class="muted small">Crear alertas de la ciudad</div></div>
-    <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
-  </div>
-  <div style="margin-top:12px" class="form-row"><select id="alertLevel"><option value="verde">Verde</option><option value="amarilla">Amarilla</option><option value="roja">Roja</option></select><input id="alertTitle" placeholder="Título"/></div>
-  <div style="margin-top:8px"><textarea id="alertMsg" placeholder="Mensaje..."></textarea></div>
-  <div style="margin-top:8px;display:flex;gap:8px"><button id="createAlertBtn" class="btn">Crear alerta</button><button class="btn-ghost close-panel">Cancelar</button></div>
-  <div style="margin-top:12px"><strong>Alertas actuales</strong><div id="alertsList" class="list" style="margin-top:8px"></div></div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-  enableRefresh(container, ()=> loadAlerts());
-  $('#createAlertBtn',container).addEventListener('click', async ()=>{
-    if(!STATE.userProfile) return alert('Inicia sesión');
-    const lvl = $('#alertLevel',container).value, title = $('#alertTitle',container).value.trim(), msg = $('#alertMsg',container).value.trim();
-    if(!title || !msg) return alert('Título y mensaje obligatorios');
-    try{ await addDoc(COL('alerts'), { title, message: msg, level: lvl, author: STATE.userProfile.username || STATE.userProfile.display, authorUid: auth.currentUser.uid, created_at: Date.now() }); await log(`Alerta creada: ${title}`); $('#alertTitle',container).value=''; $('#alertMsg',container).value=''; loadAlerts(); updateAlertCount(); }catch(e){ console.error(e); alert('Error creando alerta'); }
-  });
-  if(STATE.unsub.alerts) STATE.unsub.alerts();
-  STATE.unsub.alerts = onSnapshot(COL('alerts'), ()=> loadAlerts());
-  STATE.unsub.current = STATE.unsub.alerts;
-  await loadAlerts();
-}
-async function loadAlerts(){
-  const list = $('#alertsList'); if(!list) return;
-  try{
-    const snap = await getDocs(query(COL('alerts'), orderBy('created_at','desc')));
-    const arr=[]; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
-    if(!arr.length){ list.innerHTML = '<div class="muted small">No hay alertas</div>'; return; }
-    list.innerHTML = '';
-    for(const a of arr){
-      const it = document.createElement('div'); it.className='item';
-      it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${escapeHtml(a.title)} <span class="muted tiny">[${escapeHtml(a.level||'—')}]</span></div><div class="muted small">${escapeHtml((a.message||'').slice(0,200))}</div></div><div style="text-align:right"><div class="muted tiny">${a.created_at?new Date(a.created_at).toLocaleString():''}</div></div>`;
-      const btns = document.createElement('div'); btns.style.marginLeft='12px';
-      if(STATE.userProfile && (STATE.userProfile.role === 'admin' && STATE.adminMode || a.authorUid === auth.currentUser.uid)){
-        const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
-        del.onclick = async ()=>{ if(confirm('Borrar alerta?')){ try{ await deleteDoc(doc(db,'alerts',a.id)); await log(`Alerta ${a.id} borrada`); loadAlerts(); updateAlertCount(); }catch(e){ console.error(e); } } };
-        btns.appendChild(del);
-      }
-      it.appendChild(btns); list.appendChild(it);
-    }
-  }catch(e){ console.error('loadAlerts', e); list.innerHTML = '<div class="muted small">Error cargando</div>'; }
-}
-
-/* ---------------- Panel: Radio (messages + presence) ---------------- */
-async function panelRadio(container){
-  setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>Radios</strong><div class="muted small">Chat por canales (mensajes + presencia)</div></div>
-    <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
-  </div>
-  <div style="margin-top:12px" class="radio-wrap">
-    <div class="radio-left">
-      <div style="display:flex;gap:8px;align-items:center">
-        <select id="radioChannelSelect"></select>
-        <div style="margin-left:auto;display:flex;gap:8px"><input id="radioNewChannel" placeholder="Nuevo canal"/><button id="radioCreateChannel" class="btn-ghost">Crear</button><button id="radioRefreshChannels" class="btn-ghost">Refrescar</button></div>
-      </div>
-      <div id="radioStatus" class="muted small" style="margin-top:6px"></div>
-      <div id="radioMessages" class="radio-messages" style="margin-top:12px"></div>
-      <div style="display:flex;gap:8px;margin-top:8px"><input id="radioMsgInput" placeholder="Escribe mensaje..." /><button id="radioSend" class="btn">Enviar</button></div>
-    </div>
-    <div class="radio-right">
-      <h4 style="margin:0 0 8px 0">Canales</h4>
-      <input id="radioSearchChannels" placeholder="Buscar canales..." style="width:100%;padding:8px;border-radius:8px"/>
-      <div id="radioChannelsList" class="list" style="margin-top:8px"></div>
-      <div style="margin-top:12px"><strong>Oyentes</strong><div id="radioListeners" class="list" style="margin-top:8px"></div></div>
-    </div>
-  </div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> { stopHeartbeats(); clearExpanded(); }));
-  enableRefresh(container, ()=> loadRadioChannels());
-  $('#radioCreateChannel').addEventListener('click', async ()=> { const val = $('#radioNewChannel').value.trim(); if(!val) return; try{ await addDoc(COL('radio_channels'), { id: val, name: val, created_at: Date.now() }); await log(`Canal radio creado: ${val}`); $('#radioNewChannel').value=''; loadRadioChannels(); }catch(e){ console.error(e); alert('Error creando canal'); }});
-  $('#radioRefreshChannels').addEventListener('click', ()=> loadRadioChannels());
-  $('#radioSend').addEventListener('click', sendRadioMessage);
-  $('#radioMsgInput').addEventListener('keydown', (e)=> { if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendRadioMessage(); }});
-  $('#radioSearchChannels').addEventListener('input', (e)=> { const q=(e.target.value||'').toLowerCase(); document.querySelectorAll('#radioChannelsList .item').forEach(it=> it.style.display = (it.dataset.name||'').toLowerCase().includes(q) ? '' : 'none'); });
-
-  if(STATE.unsub.radio_channels) STATE.unsub.radio_channels();
-  STATE.unsub.radio_channels = onSnapshot(COL('radio_channels'), snap => renderChannelList(snap.docs.map(d=>({ id:d.id, ...d.data() }))));
-  STATE.unsub.current = STATE.unsub.radio_channels;
-  await loadRadioChannels();
-}
-async function loadRadioChannels(){
-  const list = $('#radioChannelsList'); const select = $('#radioChannelSelect');
-  if(!list || !select) return;
-  try{
-    const snap = await getDocs(COL('radio_channels'));
-    const arr=[]; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
-    renderChannelList(arr);
-  }catch(e){ console.error('loadRadioChannels', e); list.innerHTML = '<div class="muted small">Error</div>'; }
-}
-function renderChannelList(arr){
-  const list = $('#radioChannelsList'); const select = $('#radioChannelSelect'); if(!list || !select) return;
-  list.innerHTML = ''; select.innerHTML = '';
-  arr.forEach(ch=>{
-    const id = ch.id || ch.name; const name = ch.name || id;
-    const it = document.createElement('div'); it.className='item'; it.dataset.name = name;
-    it.innerHTML = `<div style="flex:1"><b>${escapeHtml(name)}</b><div class="muted small">${escapeHtml(id)}</div></div><div><button class="btn-ghost" data-id="${escapeHtml(id)}">Unirse</button></div>`;
-    it.querySelector('button').onclick = ()=> switchRadioChannel(id);
-    list.appendChild(it);
-    const opt = document.createElement('option'); opt.value = id; opt.textContent = name; select.appendChild(opt);
-  });
-  if(!STATE.selectedChannel && arr[0]) switchRadioChannel(arr[0].id);
-}
-async function switchRadioChannel(channelId){
-  if(!channelId) return;
-  STATE.selectedChannel = channelId;
-  const sel = $('#radioChannelSelect'); if(sel) sel.value = channelId;
-  const messagesEl = $('#radioMessages'); if(!messagesEl) return; messagesEl.innerHTML = '<div class="muted small">Cargando mensajes...</div>';
-  if(STATE.unsub.radio_messages) STATE.unsub.radio_messages();
-  STATE.unsub.radio_messages = onSnapshot(COL('radio_messages'), snap=>{
-    const msgs = [];
-    snap.forEach(s=> { const d = s.data(); if((d.channel||'') === channelId) msgs.push({ id:s.id, ...d }); });
-    msgs.sort((a,b)=> (a.created_at||0) - (b.created_at||0));
-    renderRadioMessages(msgs);
-  });
-  startHeartbeat(channelId);
-  loadRadioListeners(channelId);
-  $('#radioStatus').textContent = `Conectado al canal: ${channelId}`;
-  STATE.unsub.current = STATE.unsub.radio_messages;
-}
-function renderRadioMessages(msgs){
-  const messagesEl = $('#radioMessages'); if(!messagesEl) return; messagesEl.innerHTML = '';
-  if(!msgs.length){ messagesEl.innerHTML = '<div class="muted small">Sin mensajes</div>'; return; }
-  msgs.forEach(m=>{
-    const me = STATE.userProfile && (STATE.userProfile.display === m.author || STATE.userProfile.username === m.author_username);
-    const it = document.createElement('div'); it.className = 'radio-msg ' + (me ? 'me' : '');
-    const avatar = document.createElement('div'); avatar.className='radio-avatar'; avatar.textContent = (m.author||'G').split(' ').map(s=>s[0]||'').slice(0,2).join('').toUpperCase();
-    const bubble = document.createElement('div'); bubble.className='radio-bubble ' + (me ? 'me' : '');
-    bubble.innerHTML = `<div style="font-weight:700">${escapeHtml(m.author||'Anon')}</div><div>${escapeHtml(m.text||'')}</div><div class="radio-meta">${new Date(m.created_at||0).toLocaleString()}</div>`;
-    it.appendChild(avatar); it.appendChild(bubble); messagesEl.appendChild(it);
-  });
-  messagesEl.scrollTop = messagesEl.scrollHeight;
-}
-async function sendRadioMessage(){
-  const input = $('#radioMsgInput'); if(!input) return; const text = input.value.trim(); if(!text) return;
-  const channel = STATE.selectedChannel || $('#radioChannelSelect')?.value; if(!channel) return alert('Selecciona un canal');
-  try{ await addDoc(COL('radio_messages'), { channel, text, author: STATE.userProfile?STATE.userProfile.display:'Invitado', author_username: STATE.userProfile?STATE.userProfile.username:'guest', created_at: Date.now() }); await log(`Mensaje radio (${channel})`); input.value=''; }catch(e){ console.error('sendRadioMessage', e); alert('Error enviando mensaje'); }
-}
-async function startHeartbeat(channel){
-  if(!STATE.userProfile) return;
-  stopHeartbeats();
-  const key = `${channel}_${STATE.userProfile.uid}`;
-  const ref = doc(db,'radio_presence', key);
-  try{ await setDoc(ref, { channel, uid: STATE.userProfile.uid, display: STATE.userProfile.display, role: STATE.userProfile.role, lastSeen: Date.now() }); }catch(e){}
-  const timer = setInterval(async ()=>{ try{ await updateDoc(ref, { lastSeen: Date.now() }); }catch(e){} }, 20000);
-  STATE.heartbeatTimers[channel] = { timer, key };
-  window.addEventListener('beforeunload', async ()=> { try{ await deleteDoc(doc(db,'radio_presence', key)); }catch(e){} });
-}
-async function loadRadioListeners(channel){
-  const list = $('#radioListeners'); if(!list) return;
-  try{
-    const snap = await getDocs(COL('radio_presence'));
-    const arr=[]; snap.forEach(s=> { const d = s.data(); if(d.channel === channel) arr.push(d); });
-    list.innerHTML = arr.length ? arr.map(p=> `<div class="item"><div style="display:flex;gap:10px;align-items:center"><div style="width:36px;height:36px;border-radius:8px;background:linear-gradient(90deg,var(--accent),var(--accent-2));display:flex;align-items:center;justify-content:center;font-weight:800;color:#031018">${escapeHtml((p.display||'').split(' ').map(s=>s[0]||'').slice(0,2).join(''))}</div><div><b>${escapeHtml(p.display||p.username)}</b><div class="muted small">${escapeHtml(p.role||'')}</div></div></div></div>`).join('') : '<div class="muted small">Nadie escuchando</div>';
-  }catch(e){ console.error('loadRadioListeners', e); list.innerHTML = '<div class="muted small">Error</div>'; }
-}
-function stopHeartbeats(){ for(const k in STATE.heartbeatTimers) clearInterval(STATE.heartbeatTimers[k].timer); STATE.heartbeatTimers = {}; }
-
-/* ---------------- Panel: Admin & Roles (full) ---------------- */
-async function panelAdmin(container){
-  setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>Administración</strong><div class="muted small">Gestiona roles, permisos y usuarios</div></div>
-    <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
-  </div>
-  <div style="margin-top:12px" id="adminNotice"></div>
-  <div style="margin-top:12px;display:flex;gap:12px">
-    <div style="flex:1"><h4>Usuarios</h4><div id="usersAdminList" class="list"></div></div>
-    <div style="width:360px"><h4>Crear usuario (profile)</h4><input id="adm_newUser" placeholder="username/email"><input id="adm_newDisplay" placeholder="display">
-      <select id="adm_newRole"></select>
-      <div style="display:flex;gap:8px;margin-top:8px"><button id="adm_createUser" class="btn">Crear</button><button id="adm_refresh" class="btn-ghost">Refrescar</button></div>
-      <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
-      <h4>Roles</h4><div style="display:flex;gap:8px"><input id="adm_newRoleName" placeholder="nuevo rol"><button id="adm_createRole" class="btn">Crear rol</button></div>
-      <div id="rolesAdminList" style="margin-top:12px"></div>
-    </div>
-  </div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-  enableRefresh(container, ()=> panelAdmin(container));
-  const notice = $('#adminNotice');
-  if(!STATE.userProfile || STATE.userProfile.role !== 'admin'){
-    notice.innerHTML = `<div class="item"><div style="flex:1"><b>Acceso denegado</b><div class="muted small">Necesitas ser admin para gestionar cuentas.</div></div></div>`; return;
-  }
-  if(!STATE.adminMode){
-    notice.innerHTML = `<div class="item"><div style="flex:1"><b>Admin Mode OFF</b><div class="muted small">Activa Admin Mode para operaciones sensibles</div></div><div><button id="enableAdminMode" class="btn">Activar</button></div></div>`;
-    $('#enableAdminMode').addEventListener('click', async ()=> {
-      const pwd = prompt('Reingresa tu contraseña para activar Admin Mode:'); if(!pwd) return;
+    // Seed initial demo data if collections are empty (only if Firestore rules allow)
+    async function seedIfEmpty(){
       try{
-        const credential = EmailAuthProvider.credential(auth.currentUser.email, pwd);
-        await reauthenticateWithCredential(auth.currentUser, credential);
-        STATE.adminMode = true; updateHeader(); await log(`Admin Mode activado por ${auth.currentUser.uid}`); panelAdmin(container);
-      }catch(e){ console.error('reauth', e); alert('Contraseña incorrecta o error al reautenticar'); }
-    });
-  } else {
-    notice.innerHTML = `<div class="item"><div style="flex:1"><b>Admin Mode ON</b><div class="muted small">Puedes realizar acciones administrativas</div></div><div><button id="disableAdminMode" class="btn-ghost">Desactivar</button></div></div>`;
-    $('#disableAdminMode').addEventListener('click', ()=> { if(confirm('Desactivar Admin Mode?')){ STATE.adminMode = false; updateHeader(); panelAdmin(container); } });
-  }
-
-  // roles select
-  const rolesSnap = await getDocs(COL('roles'));
-  const roleSelect = $('#adm_newRole'); roleSelect.innerHTML=''; rolesSnap.forEach(r=> roleSelect.appendChild(Object.assign(document.createElement('option'), { value:r.id, textContent:r.id })));
-  $('#adm_createUser').addEventListener('click', async ()=> {
-    if(!STATE.adminMode) return alert('Activa Admin Mode');
-    const username = $('#adm_newUser').value.trim(); if(!username) return alert('username requerido');
-    const display = $('#adm_newDisplay').value.trim() || username; const role = $('#adm_newRole').value;
-    try{ await addDoc(COL('users'), { username, display, role, badge:'', onDuty:false }); await log(`Usuario creado: ${username}`); panelAdmin(container); }catch(e){ console.error(e); alert('Error creando usuario'); }
-  });
-  $('#adm_createRole').addEventListener('click', async ()=> { if(!STATE.adminMode) return alert('Activa Admin Mode'); const name = $('#adm_newRoleName').value.trim(); if(!name) return alert('Nombre rol requerido'); try{ await setDoc(doc(db,'roles',name), { name, color:'#999999', permissions:[] }); await log(`Rol creado: ${name}`); panelAdmin(container); }catch(e){ console.error(e); alert('Error creando rol'); }});
-  $('#adm_refresh').addEventListener('click', ()=> panelAdmin(container));
-
-  await loadUsersAdmin(container); await loadRolesAdmin(container);
-}
-async function loadUsersAdmin(container){
-  const list = $('#usersAdminList', container); list.innerHTML = '<div class="muted small">Cargando...</div>';
-  try{
-    const snap = await getDocs(COL('users')); const users=[]; snap.forEach(s=> users.push({ id:s.id, ...s.data() }));
-    list.innerHTML = ''; for(const u of users){
-      const div = document.createElement('div'); div.className='item';
-      const canPerform = STATE.adminMode && STATE.userProfile && STATE.userProfile.role === 'admin';
-      div.innerHTML = `<div><b>${escapeHtml(u.display)} (${escapeHtml(u.username||u.uid||'')})</b><div class="muted small">Rol: ${escapeHtml(u.role||'—')} • Badge: ${escapeHtml(u.badge||'—')}</div></div><div style="text-align:right"><select data-uid="${u.id}" ${canPerform?'' : 'disabled'} class="adm-role-sel"></select><div style="margin-top:6px"><button data-uid="${u.id}" ${canPerform?'' : 'disabled'} class="btn-ghost btn-small" data-act="del">Borrar</button> <button data-uid="${u.id}" ${canPerform?'' : 'disabled'} class="btn btn-small" data-act="imp">Impersonar</button></div></div>`;
-      list.appendChild(div);
-    }
-    const rolesSnap = await getDocs(COL('roles')); const roleKeys=[]; rolesSnap.forEach(r=> roleKeys.push(r.id));
-    list.querySelectorAll('.adm-role-sel').forEach(sel=>{
-      sel.innerHTML = roleKeys.map(k=> `<option value="${k}">${k}</option>`).join('');
-      (async ()=>{ const uid = sel.dataset.uid; const s = await getDocs(query(COL('users'), where('__name__','==', uid))); let userObj=null; s.forEach(d=> userObj = d.data()); if(userObj) sel.value = userObj.role || ''; })();
-      sel.onchange = async e=> { if(!STATE.adminMode) return alert('Activa Admin Mode'); const uid = e.target.dataset.uid; const newRole = e.target.value; try{ await updateDoc(doc(db,'users',uid), { role: newRole }); await log(`Rol cambiado: ${uid} -> ${newRole}`); loadUsersAdmin(container); }catch(e){ console.error(e); alert('Error cambiando rol'); } };
-    });
-    list.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=> { if(!STATE.adminMode) return alert('Activa Admin Mode'); const uid = b.dataset.uid; if(!confirm('Borrar usuario?')) return; try{ const s = await getDocs(query(COL('users'), where('__name__','==', uid))); let u=null; s.forEach(d=> u=d.data()); if(u && u.username==='admin') return alert('No puedes borrar admin seed'); await deleteDoc(doc(db,'users',uid)); await log(`Usuario borrado: ${uid}`); loadUsersAdmin(container); }catch(e){ console.error(e); alert('Error borrando'); }});
-    list.querySelectorAll('button[data-act="imp"]').forEach(b=> b.onclick = async ()=> { if(!STATE.adminMode) return alert('Activa Admin Mode'); const uid = b.dataset.uid; try{ const s = await getDocs(query(COL('users'), where('__name__','==', uid))); let userObj=null; s.forEach(d=> userObj={ id:d.id, ...d.data() }); if(!userObj) return alert('Usuario no encontrado'); STATE.userProfile = userObj; updateHeader(); await log(`Impersonación: ${userObj.username}`); renderCards(); alert('Impersonando: ' + userObj.display); }catch(e){ console.error(e); alert('Error impersonando'); }});
-  }catch(e){ console.error('loadUsersAdmin', e); list.innerHTML = '<div class="muted small">Error cargando usuarios</div>'; }
-}
-async function loadRolesAdmin(container){
-  const out = $('#rolesAdminList', container); out.innerHTML='';
-  try{
-    const snap = await getDocs(COL('roles'));
-    snap.forEach(s=>{ const r=s.data(); const div=document.createElement('div'); div.className='item'; div.innerHTML = `<div style="flex:1"><b>${s.id}</b><div class="muted small">Permisos: ${(r.permissions||[]).join(', ') || 'Sin permisos'}</div></div><div style="text-align:right"><button data-role="${s.id}" class="btn-ghost" data-act="edit">Editar</button> <button data-role="${s.id}" class="btn" data-act="del">Borrar</button></div>`; out.appendChild(div); });
-    out.querySelectorAll('button[data-act="edit"]').forEach(b=> b.onclick = async ()=> { if(!STATE.adminMode) return alert('Activa Admin Mode'); const roleKey = b.dataset.role; const modal = document.createElement('div'); modal.className='overlay'; modal.innerHTML = `<div class="modal"><h3>Editar rol: ${roleKey}</h3><div class="muted small">Permisos (separados por comas)</div><textarea id="permArea" style="width:100%;height:100px;margin-top:8px"></textarea><div style="display:flex;gap:8px;margin-top:12px"><button id="saveRole" class="btn">Guardar</button><button id="cancelRole" class="btn-ghost">Cancelar</button></div></div>`; document.body.appendChild(modal); const rSnap = await getDocs(query(COL('roles'), where('__name__','==', roleKey))); let roleObj=null; rSnap.forEach(d=> roleObj = d.data()); $('#permArea', modal).value = (roleObj && roleObj.permissions) ? roleObj.permissions.join(',') : ''; $('#cancelRole', modal).onclick = ()=> modal.remove(); $('#saveRole', modal).onclick = async ()=> { const perms = $('#permArea', modal).value.split(',').map(x=>x.trim()).filter(Boolean); await setDoc(doc(db,'roles',roleKey), { name: roleKey, color: roleObj?.color || '#999999', permissions: perms }); await log(`Rol editado: ${roleKey}`); modal.remove(); loadRolesAdmin(container); loadUsersAdmin(container); }; });
-    out.querySelectorAll('button[data-act="del"]').forEach(b=> b.onclick = async ()=> { if(!STATE.adminMode) return alert('Activa Admin Mode'); const roleKey = b.dataset.role; if(!confirm('Borrar rol?')) return; try{ await deleteDoc(doc(db,'roles',roleKey)); const usersSnap = await getDocs(COL('users')); usersSnap.forEach(async u=>{ const d=u.data(); if(d.role === roleKey) await updateDoc(doc(db,'users',u.id), { role: '' }); }); await log(`Rol borrado: ${roleKey}`); loadRolesAdmin(container); loadUsersAdmin(container); }catch(e){ console.error(e); alert('Error borrando rol'); }});
-  }catch(e){ console.error('loadRolesAdmin', e); out.innerHTML = '<div class="muted small">Error cargando roles</div>'; }
-}
-
-/* ---------------- Panel: Logs ---------------- */
-async function panelLogs(container){
-  setHTML(container, `<div style="display:flex;justify-content:space-between;align-items:center">
-    <div><strong>Auditoría</strong><div class="muted small">Últimas acciones</div></div>
-    <div style="display:flex;gap:8px"><button class="btn-ghost refresh-panel">Refrescar</button><button class="btn btn-small close-panel">Cerrar</button></div>
-  </div><div style="margin-top:12px" id="logsList" class="list"></div>`);
-  container.querySelectorAll('.close-panel').forEach(b=>b.addEventListener('click', ()=> clearExpanded()));
-  enableRefresh(container, ()=> panelLogs(container));
-  const list = $('#logsList', container);
-  if(STATE.unsub.logs) STATE.unsub.logs();
-  STATE.unsub.logs = onSnapshot(query(COL('logs'), orderBy('t','desc')), snap=>{
-    list.innerHTML = ''; snap.forEach(s=> { const d=s.data(); const it=document.createElement('div'); it.className='item'; it.innerHTML = `<div><div style="font-weight:700">${escapeHtml(d.msg)}</div><div class="muted small">${new Date(d.t).toLocaleString()}</div></div>`; list.appendChild(it); });
-  });
-  STATE.unsub.current = STATE.unsub.logs;
-}
-
-/* ---------------- Auth flows (Email + Google) ---------------- */
-$('#btnLogin').addEventListener('click', ()=> $('#loginModal').style.display='flex');
-$('#btnSignUp').addEventListener('click', async ()=> {
-  const email = $('#authEmail').value.trim(), pass = $('#authPass').value.trim();
-  if(!email || !pass) return $('#authMsg').textContent = 'Email y contraseña requeridos';
-  try{
-    const userCred = await createUserWithEmailAndPassword(auth, email, pass);
-    const uid = userCred.user.uid;
-    await setDoc(doc(db,'users',uid), { uid, username: email.split('@')[0], display: email.split('@')[0], role:'officer', badge:'', onDuty:false });
-    $('#authMsg').textContent = 'Cuenta creada. Inicia sesión.';
-  }catch(e){ console.error(e); $('#authMsg').textContent = 'Error creando cuenta: ' + e.message; }
-});
-$('#btnSignIn').addEventListener('click', async ()=> {
-  const email = $('#authEmail').value.trim(), pass = $('#authPass').value.trim();
-  if(!email || !pass) return $('#authMsg').textContent = 'Email y contraseña requeridos';
-  try{ await signInWithEmailAndPassword(auth, email, pass); $('#authMsg').textContent = 'Sesión iniciada'; $('#loginModal').style.display='none'; }catch(e){ console.error(e); $('#authMsg').textContent = 'Error login: ' + e.message; }
-});
-$('#btnGoogle').addEventListener('click', async ()=> {
-  try{
-    const result = await signInWithPopup(auth, provider);
-    const user = result.user;
-    const profRef = doc(db,'users',user.uid);
-    const prof = await getDoc(profRef);
-    if(!prof.exists()){
-      await setDoc(profRef, { uid: user.uid, username: user.email?user.email.split('@')[0]:user.uid, display: user.displayName || (user.email?user.email.split('@')[0]:'User'), role:'officer', badge:'', onDuty:false });
-    }
-    $('#loginModal').style.display='none';
-  }catch(e){ console.error('google sign in', e); $('#authMsg').textContent = 'Error Google Sign-In: ' + e.message; }
-});
-$('#btnReset').addEventListener('click', async ()=> {
-  const email = $('#authEmail').value.trim();
-  if(!email) return $('#authMsg').textContent = 'Introduce tu email';
-  try{ await sendPasswordResetEmail(auth, email); $('#authMsg').textContent = 'Email de recuperación enviado'; }catch(e){ console.error(e); $('#authMsg').textContent = 'Error: ' + e.message; }
-});
-
-/* ---------------- Auth state change ---------------- */
-onAuthStateChanged(auth, async user => {
-  if(user){
-    try{
-      const profRef = doc(db,'users', user.uid);
-      const profSnap = await getDoc(profRef);
-      if(!profSnap.exists()){
-        await setDoc(profRef, { uid: user.uid, username: user.email?user.email.split('@')[0]:user.uid, display: user.displayName || (user.email?user.email.split('@')[0]:'User'), role:'officer', badge:'', onDuty:false });
-        STATE.userProfile = { uid: user.uid, username: user.email?user.email.split('@')[0]:user.uid, display: user.displayName || (user.email?user.email.split('@')[0]:'User'), role:'officer' };
-      } else {
-        STATE.userProfile = { id: profSnap.id, uid: user.uid, ...profSnap.data() };
+        const usersSnap = await getDocs(COL('users'));
+        if(usersSnap.empty){
+          await addDoc(COL('users'), { username:'admin', display:'Admin', password:'admin123', role:'admin', badge:'ADM-001', onDuty:false });
+          await addDoc(COL('users'), { username:'dispatcher', display:'Dispatch', password:'dispatch', role:'dispatcher', badge:'DISP', onDuty:false });
+          await addDoc(COL('users'), { username:'perety04', display:'Perety 04', password:'peretypass', role:'officer', badge:'PD-314', onDuty:false });
+        }
+        const rolesSnap = await getDocs(COL('roles'));
+        if(rolesSnap.empty){
+          await setDoc(doc(db,'roles','officer'), { name:'Officer', color:'#7c3aed', permissions:['create_reports','create_pda','create_call'] });
+          await setDoc(doc(db,'roles','sergeant'), { name:'Sergeant', color:'#3b82f6', permissions:['create_reports','create_pda','create_call','delete_reports'] });
+          await setDoc(doc(db,'roles','dispatcher'), { name:'Dispatcher', color:'#f97316', permissions:['create_call','assign_call'] });
+          await setDoc(doc(db,'roles','admin'), { name:'Admin', color:'#10b981', permissions:['all'] });
+        }
+        const channelsSnap = await getDocs(COL('radio_channels'));
+        if(channelsSnap.empty){
+          await addDoc(COL('radio_channels'), { id:'general', name:'General', created_at:Date.now() });
+          await addDoc(COL('radio_channels'), { id:'police', name:'Police', created_at:Date.now() });
+          await addDoc(COL('radio_channels'), { id:'medical', name:'Medical', created_at:Date.now() });
+        }
+        const logsSnap = await getDocs(COL('logs'));
+        if(logsSnap.empty){
+          await addDoc(COL('logs'), { t: Date.now(), msg: 'Seed inicial (Firestore)' });
+        }
+      }catch(e){
+        console.warn('Seed: write operations might be blocked by security rules or offline:', e);
       }
-      updateHeader();
+    }
+
+    // Permission check: reads roles collection to verify permission
+    async function hasPerm(perm){
+      if(!APP.currentUser) return perm === 'create_call' ? true : false;
+      try{
+        const r = await getDocs(query(COL('roles'), where('__name__','==', APP.currentUser.role)));
+        let role = null; r.forEach(d=> role = d.data());
+        if(!role) return false;
+        if(Array.isArray(role.permissions) && role.permissions.includes('all')){
+          const sensitive = ['delete_reports','delete_alerts','manage_users','manage_roles','delete_all_alerts','impersonate','view_logs','all'];
+          if(sensitive.includes(perm)) return APP.adminMode === true;
+          return true;
+        }
+        return role.permissions && role.permissions.includes(perm);
+      }catch(e){ console.warn('hasPerm error', e); return false; }
+    }
+
+    // fetch single doc data by id (via query on __name__)
+    async function fetchDoc(collectionName, id){
+      try{
+        const s = await getDocs(query(COL(collectionName), where('__name__','==', id)));
+        let data = null; s.forEach(d=> data = d.data());
+        return data;
+      }catch(e){ console.warn('fetchDoc', e); return null; }
+    }
+
+    /* ---------- UI wiring ---------- */
+    const cardsRoot = document.getElementById('cardsRoot');
+    const expandedRoot = document.getElementById('expandedRoot');
+    const userDisplay = document.getElementById('userDisplay');
+    const dutyStatus = document.getElementById('dutyStatus');
+    const btnLogin = document.getElementById('btnLogin');
+    const btnExport = document.getElementById('btnExport');
+    const adminModeWrap = document.getElementById('adminModeWrap');
+    const adminModePill = document.getElementById('adminModePill');
+    const notifPill = document.getElementById('notifPill');
+
+    const CARDS = [
+      {id:'pda', title:'PDA / Fichas', desc:'Buscar y crear fichas', icon:'🚓'},
+      {id:'calls', title:'Dispatch / Llamadas', desc:'Crear/Asignar llamadas', icon:'📞'},
+      {id:'reports', title:'Informes', desc:'Crear / Editar informes', icon:'📑'},
+      {id:'wanted', title:'BOLO / Wanted', desc:'Fichas buscados', icon:'🚨'},
+      {id:'fines', title:'Multas', desc:'Generar sanciones', icon:'💸'},
+      {id:'service', title:'Servicio', desc:'Entrar / Salir de servicio', icon:'🟢'},
+      {id:'alerts', title:'Alertas', desc:'Crear y gestionar alertas', icon:'⚠️'},
+      {id:'radio', title:'Radios', desc:'Chat por canales', icon:'📡'},
+      {id:'admin', title:'Administración', desc:'Roles y usuarios (avanzado)', icon:'⚙️'},
+      {id:'logs', title:'Auditoría', desc:'Historial de acciones', icon:'📜'}
+    ];
+
+    function renderCards(){
+      cardsRoot.innerHTML = '';
+      const isAdmin = APP.currentUser && APP.currentUser.role === 'admin';
+      CARDS.forEach(c=>{
+        if((c.id === 'admin' || c.id === 'logs') && !isAdmin) return;
+        const el = document.createElement('div'); el.className='card fade-in';
+        el.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+          <div><div class="title">${c.title}</div><div class="desc">${c.desc}</div></div>
+          <div class="icon">${c.icon}</div></div>
+          <div style="display:flex;justify-content:space-between;align-items:center"><div class="muted tiny">Acción rápida</div><div><button class="btn-ghost" data-open="${c.id}">Abrir</button></div></div>`;
+        el.querySelector('button[data-open]').onclick = (e)=>{ e.stopPropagation(); openCard(c.id); };
+        el.onclick = ()=> openCard(c.id);
+        cardsRoot.appendChild(el);
+      });
+    }
+
+    function updateHeader(){
+      userDisplay.textContent = APP.currentUser ? `${APP.currentUser.display} (${APP.currentUser.role})` : 'No conectado';
+      // duty count
+      getDocs(COL('users')).then(snap=>{
+        let cnt = 0; snap.forEach(d=> { const r = d.data(); if(r.onDuty) cnt++; });
+        dutyStatus.textContent = `En servicio: ${cnt}`;
+      }).catch(()=> dutyStatus.textContent = 'En servicio: —');
+      adminModeWrap.style.display = APP.currentUser && APP.currentUser.role === 'admin' ? 'inline-block' : 'none';
+      adminModePill.textContent = `Admin: ${APP.adminMode ? 'ON' : 'OFF'}`;
+      updateNotifCount();
+    }
+
+    adminModePill.addEventListener('click', async ()=>{
+      if(!APP.currentUser || APP.currentUser.role !== 'admin'){ alert('Solo admin puede activar Admin Mode'); return; }
+      if(APP.adminMode){
+        if(confirm('Desactivar Admin Mode?')){ APP.adminMode = false; updateHeader(); renderCards(); }
+        return;
+      }
+      const pass = prompt('Reingresa la contraseña del admin para activar Admin Mode:');
+      if(!pass) return;
+      try{
+        const snap = await getDocs(query(COL('users'), where('username','==', APP.currentUser.username), where('password','==', pass)));
+        if(snap.empty){ alert('Contraseña incorrecta'); return; }
+        APP.adminMode = true; updateHeader(); await pushLog(`Admin Mode activado por ${APP.currentUser.username}`); renderCards();
+      }catch(e){ console.error(e); alert('Error validando contraseña'); }
+    });
+
+    function openCard(id){
+      expandedRoot.innerHTML = '';
+      if(id === 'admin' && (!APP.currentUser || APP.currentUser.role !== 'admin')){ alert('Acceso denegado: admin required'); return; }
+      if(id === 'logs' && (!APP.currentUser || APP.currentUser.role !== 'admin' || !APP.adminMode)){ alert('Acceso denegado: logs require Admin Mode'); return; }
+      const panel = document.createElement('div'); panel.className='expanded fade-in';
+      expandedRoot.appendChild(panel);
+      switch(id){
+        case 'pda': renderPDA(panel); break;
+        case 'calls': renderCalls(panel); break;
+        case 'reports': renderReports(panel); break;
+        case 'wanted': renderWanted(panel); break;
+        case 'fines': renderFines(panel); break;
+        case 'service': renderService(panel); break;
+        case 'alerts': renderAlerts(panel); break;
+        case 'radio': renderRadio(panel); break;
+        case 'admin': renderAdmin(panel); break;
+        case 'logs': renderLogs(panel); break;
+      }
+      window.scrollTo({ top: panel.offsetTop-20, behavior:'smooth' });
+    }
+
+    /* ----------------- Implement panels (Firestore-backed) ----------------- */
+
+    // PDA
+    async function renderPDA(container){
+      container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>PDA / Fichas</strong><div class="muted small">Buscar y crear fichas</div></div>
+        <div><button class="btn btn-small" id="closeP">Cerrar</button></div></div>
+        <div style="margin-top:12px;display:grid;grid-template-columns:1fr 340px;gap:12px">
+          <div>
+            <input id="pdaQ" placeholder="Buscar..." style="width:100%;margin-bottom:8px"/>
+            <div id="pdaResults" class="list"></div>
+          </div>
+          <div>
+            <div class="muted small">Nueva ficha</div>
+            <textarea id="pdaTxt"></textarea>
+            <div style="display:flex;gap:8px;margin-top:8px"><button id="createPDA" class="btn">Crear</button></div>
+          </div>
+        </div>`;
+      container.querySelector('#closeP').onclick = ()=> expandedRoot.innerHTML = '';
+      container.querySelector('#createPDA').onclick = async ()=>{
+        if(!await hasPerm('create_pda')){ alert('No tienes permiso'); return; }
+        const text = document.getElementById('pdaTxt').value.trim();
+        if(!text) return alert('Rellena la ficha');
+        try{ await addDoc(COL('pda'), { text, author: APP.currentUser ? APP.currentUser.username : 'Invitado', created_at: Date.now() }); await pushLog('Ficha PDA creada'); document.getElementById('pdaTxt').value=''; }catch(e){ console.error(e); alert('Error creando ficha'); }
+      };
+      if(APP.unsub.pda) APP.unsub.pda();
+      APP.unsub.pda = onSnapshot(COL('pda'), ()=> loadPDAs(document.getElementById('pdaQ')?.value || '', container));
+      document.getElementById('pdaQ').addEventListener('input', ()=> loadPDAs(document.getElementById('pdaQ').value, container));
+      loadPDAs('', container);
+    }
+    async function loadPDAs(q, container){
+      const res = container.querySelector('#pdaResults');
+      const snap = await getDocs(COL('pda'));
+      const arr = []; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
+      const out = arr.filter(p => (q||'').trim() === '' ? true : (p.text||'').toLowerCase().includes(q.toLowerCase()));
+      res.innerHTML = out.map(p=>`<div class="item"><div style="flex:1"><b>${(p.text||'').slice(0,40)}</b><div class="muted small">${(p.text||'').slice(0,140)}</div></div>
+        <div><button class="btn-ghost" data-id="${p.id}" data-act="view">Ver</button> <button class="btn-ghost" data-id="${p.id}" data-act="del">Borrar</button></div></div>`).join('') || '<div class="muted small">Sin fichas</div>';
+      res.querySelectorAll('button[data-act]').forEach(b=>{
+        b.onclick = async ()=>{
+          const id = b.dataset.id;
+          if(b.dataset.act==='view'){ const doc = await fetchDoc('pda', id); alert(`Ficha:\n\n${doc?.text||'No encontrada'}\n\nAutor: ${doc?.author||'—'}`); }
+          else if(b.dataset.act==='del'){
+            if(!confirm('Borrar ficha?')) return;
+            if(!await hasPerm('delete_reports')){ alert('Admin Mode o permisos necesarios para borrar'); return; }
+            try{ await deleteDoc(doc(db,'pda',id)); await pushLog(`Ficha PDA ${id} borrada`); }catch(e){ console.error(e); alert('Error borrando ficha'); }
+          }
+        };
+      });
+    }
+
+    // Calls
+    async function renderCalls(container){
+      container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>Dispatch / Llamadas</strong><div class="muted small">Crear y asignar llamadas</div></div>
+        <div><button class="btn btn-small" id="closeC">Cerrar</button></div></div>
+        <div style="margin-top:12px;display:flex;gap:8px"><input id="callFrom" placeholder="Remitente (opcional)"/><input id="callMsg" placeholder="Mensaje"/><button id="callCreate" class="btn">Crear</button></div>
+        <div style="margin-top:12px"><strong>Llamadas</strong><div id="callsList" class="list" style="margin-top:8px"></div></div>`;
+      container.querySelector('#closeC').onclick = ()=> expandedRoot.innerHTML = '';
+      container.querySelector('#callCreate').onclick = async ()=>{
+        const caller = document.getElementById('callFrom').value.trim() || 'Anonimo';
+        const message = document.getElementById('callMsg').value.trim();
+        if(!message) return alert('Introduce mensaje');
+        try{ await addDoc(COL('calls'), { caller, message, status:'pending', assigned_to:null, created_at:Date.now() }); await pushLog('Llamada creada'); document.getElementById('callMsg').value=''; }catch(e){ console.error(e); alert('Error'); }
+      };
+      if(APP.unsub.calls) APP.unsub.calls();
+      APP.unsub.calls = onSnapshot(COL('calls'), ()=> loadCalls());
+      loadCalls();
+    }
+    async function loadCalls(){
+      const list = document.getElementById('callsList'); const snap = await getDocs(COL('calls')); const arr=[]; snap.forEach(s=> arr.push({id:s.id, ...s.data()}));
+      if(!arr.length){ list.innerHTML = '<div class="muted small">No hay llamadas</div>'; return; }
+      list.innerHTML = '';
+      const usersSnap = await getDocs(COL('users')); const users=[]; usersSnap.forEach(u=> users.push({ id:u.id, ...u.data() }));
+      for(const c of arr){
+        const assignee = c.assigned_to ? (users.find(u=>u.id===c.assigned_to)?.display || '—') : '—';
+        const el = document.createElement('div'); el.className='item';
+        el.innerHTML = `<div style="flex:1"><b>${c.caller}</b><div class="muted small">${c.message}</div></div>
+          <div style="text-align:right"><div class="muted tiny">${new Date(c.created_at||0).toLocaleString()}</div><div class="muted tiny">Asig: ${assignee}</div></div>`;
+        const btns = document.createElement('div'); btns.style.marginLeft='12px';
+        if(await hasPerm('assign_call') && APP.currentUser){
+          const assign = document.createElement('button'); assign.className='btn-ghost'; assign.textContent='Asignar a mí';
+          assign.onclick = async ()=> { try{ await updateDoc(doc(db,'calls',c.id), { status:'assigned', assigned_to: APP.currentUser.id }); await pushLog(`Llamada ${c.id} asignada a ${APP.currentUser.username}`); }catch(e){ console.error(e); } };
+          btns.appendChild(assign);
+        }
+        if(APP.currentUser && (APP.currentUser.role==='admin' || (c.assigned_to && APP.currentUser.id === c.assigned_to))){
+          const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
+          del.onclick = async ()=> { if(confirm('Borrar llamada?')){ try{ await deleteDoc(doc(db,'calls',c.id)); await pushLog(`Llamada ${c.id} borrada`); }catch(e){ console.error(e); } } };
+          btns.appendChild(del);
+        }
+        el.appendChild(btns); list.appendChild(el);
+      }
+    }
+
+    // Reports (fixed)
+    async function renderReports(container){
+      container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>Informes</strong><div class="muted small">Crear y consultar informes</div></div>
+        <div><button class="btn btn-small" id="closeR">Cerrar</button></div></div>
+        <div style="margin-top:12px"><div class="muted small">Plantilla (meta/templates)</div><textarea id="tplReport" style="min-height:80px"></textarea></div>
+        <div style="margin-top:8px" class="form-row"><input id="repTitle" placeholder="Título"/><input id="repAuthor" placeholder="Autor (auto)"/></div>
+        <div style="margin-top:8px"><textarea id="repDesc" placeholder="Descripción..."></textarea></div>
+        <div style="margin-top:8px;display:flex;gap:8px"><button id="saveRep" class="btn">Guardar</button><button id="clearRep" class="btn-ghost">Limpiar</button></div>
+        <div style="margin-top:12px"><strong>Últimos informes</strong><div id="reportsList" class="list" style="margin-top:8px"></div></div>`;
+      container.querySelector('#closeR').onclick = ()=> expandedRoot.innerHTML = '';
+      document.getElementById('repAuthor').value = APP.currentUser ? APP.currentUser.display : 'Invitado';
+      document.getElementById('saveRep').onclick = async ()=>{
+        if(!await hasPerm('create_reports')){ alert('No tienes permiso'); return; }
+        const title = document.getElementById('repTitle').value.trim(); const desc = document.getElementById('repDesc').value.trim();
+        if(!title || !desc) return alert('Título y descripción');
+        try{ await addDoc(COL('reports'), { title, description: desc, author: APP.currentUser ? APP.currentUser.display : 'Invitado', created_at: Date.now() }); await pushLog(`Informe creado: ${title}`); loadReports(); }catch(e){ console.error(e); alert('Error'); }
+      };
+      if(APP.unsub.reports) APP.unsub.reports();
+      APP.unsub.reports = onSnapshot(COL('reports'), ()=> loadReports());
+      loadReports();
+    }
+    async function loadReports(){
+      const list = document.getElementById('reportsList'); if(!list) return;
+      const snap = await getDocs(query(COL('reports'), orderBy('created_at','desc')));
+      const arr = []; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
+      if(!arr.length){ list.innerHTML = '<div class="muted small">No hay informes</div>'; return; }
+      list.innerHTML = '';
+      for(const r of arr){
+        const it = document.createElement('div'); it.className='item';
+        it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${r.title}</div><div class="muted small">${(r.description||'').slice(0,160)}</div></div>
+          <div style="text-align:right"><div class="muted tiny">${new Date(r.created_at||0).toLocaleString()}</div><div class="muted tiny">${r.author||''}</div></div>`;
+        const btns = document.createElement('div'); btns.style.marginLeft='12px';
+        const view = document.createElement('button'); view.className='btn-ghost'; view.textContent='Ver';
+        view.onclick = ()=> alert(`Informe — ${r.title}\n\n${r.description}\n\nAutor: ${r.author}\nFecha: ${new Date(r.created_at||0).toLocaleString()}`);
+        btns.appendChild(view);
+        if(APP.currentUser && (APP.currentUser.role==='admin' || APP.currentUser.role==='sergeant')){
+          const del = document.createElement('button'); del.className='btn'; del.style.marginLeft='6px'; del.textContent='Borrar';
+          del.onclick = async ()=> {
+            if(!await hasPerm('delete_reports')){ alert('Admin Mode requerido'); return; }
+            if(!confirm('Borrar informe?')) return;
+            try{ await deleteDoc(doc(db,'reports',r.id)); await pushLog(`Informe ${r.id} borrado`); }catch(e){ console.error(e); alert('Error'); }
+          };
+          btns.appendChild(del);
+        }
+        it.appendChild(btns); list.appendChild(it);
+      }
+    }
+
+    // Alerts (notifications)
+    async function renderAlerts(container){
+      container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>Alertas</strong><div class="muted small">Crear alertas de la ciudad</div></div>
+        <div><button class="btn btn-small" id="closeA">Cerrar</button></div>
+      </div>
+      <div style="margin-top:12px" class="form-row"><select id="alertLevel"><option value="verde">Verde</option><option value="amarilla">Amarilla</option><option value="roja">Roja</option></select><input id="alertTitle" placeholder="Título"/></div>
+      <div style="margin-top:8px"><textarea id="alertMsg" placeholder="Mensaje..."></textarea></div>
+      <div style="margin-top:8px;display:flex;gap:8px"><button id="createAlertBtn" class="btn">Crear</button><button id="refreshAlerts" class="btn-ghost">Refrescar</button></div>
+      <div style="margin-top:12px"><strong>Alertas actuales</strong><div id="alertsList" class="list" style="margin-top:8px"></div></div>
+      <div id="alertsFooter" style="margin-top:8px;text-align:right"></div>`;
+      container.querySelector('#closeA').onclick = ()=> expandedRoot.innerHTML = '';
+      container.querySelector('#createAlertBtn').onclick = async ()=>{
+        if(!APP.currentUser) return alert('Inicia sesión');
+        const lvl = document.getElementById('alertLevel').value; const title = document.getElementById('alertTitle').value.trim(); const msg = document.getElementById('alertMsg').value.trim();
+        if(!title || !msg) return alert('Título y mensaje');
+        try{ await addDoc(COL('alerts'), { title, message: msg, level: lvl, author: APP.currentUser.username, created_at: Date.now() }); await pushLog(`Alerta creada: ${title}`); document.getElementById('alertTitle').value=''; document.getElementById('alertMsg').value=''; loadAlerts(); updateNotifCount(); }catch(e){ console.error(e); alert('Error'); }
+      };
+      if(APP.unsub.alerts) APP.unsub.alerts();
+      APP.unsub.alerts = onSnapshot(COL('alerts'), ()=> { loadAlerts(); updateNotifCount(); });
+      loadAlerts(); updateNotifCount();
+    }
+    async function loadAlerts(){
+      const list = document.getElementById('alertsList'); if(!list) return;
+      const snap = await getDocs(query(COL('alerts'), orderBy('created_at','desc')));
+      const arr = []; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
+      if(!arr.length){ list.innerHTML = '<div class="muted small">No hay alertas</div>'; return; }
+      list.innerHTML = '';
+      for(const a of arr){
+        const it = document.createElement('div'); it.className='item';
+        it.innerHTML = `<div style="flex:1"><div style="font-weight:700">${a.title} <span class="muted tiny">[${a.level||'—'}]</span></div><div class="muted small">${(a.message||'').slice(0,200)}</div></div>
+          <div style="text-align:right"><div class="muted tiny">${a.created_at? new Date(a.created_at).toLocaleString() : ''}</div></div>`;
+        const btns = document.createElement('div'); btns.style.marginLeft='12px';
+        if(APP.currentUser && (APP.currentUser.role==='admin' && APP.adminMode || a.author === (APP.currentUser && APP.currentUser.username))){
+          const del = document.createElement('button'); del.className='btn-danger-small'; del.style.marginLeft='6px'; del.textContent='Borrar';
+          del.onclick = async ()=>{ if(confirm('Borrar alerta?')){ try{ await deleteDoc(doc(db,'alerts',a.id)); await pushLog(`Alerta ${a.id} borrada`); loadAlerts(); updateNotifCount(); }catch(e){ console.error(e); } } };
+          btns.appendChild(del);
+        }
+        it.appendChild(btns); list.appendChild(it);
+      }
+    }
+
+    async function updateNotifCount(){
+      try{
+        const snap = await getDocs(COL('alerts'));
+        const count = snap.size;
+        if(count>0){ notifPill.style.display='inline-block'; notifPill.textContent = `Alertas ${count}`; notifPill.onclick = ()=> openCard('alerts'); }
+        else notifPill.style.display='none';
+      }catch(e){ console.warn('notif count', e); }
+    }
+
+    // Admin (users & roles)
+    async function renderAdmin(container){
+      container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>Administración</strong><div class="muted small">Gestiona roles y usuarios</div></div>
+        <div><button class="btn btn-small" id="closeA">Cerrar</button></div></div>
+        <div style="margin-top:12px" id="adminNotice"></div>
+        <div style="margin-top:12px;display:flex;gap:12px">
+          <div style="flex:1"><h4>Usuarios</h4><div id="usersAdminList" class="list"></div></div>
+          <div style="width:360px"><h4>Crear usuario</h4><input id="adm_newUser" placeholder="username"><input id="adm_newDisplay" placeholder="display"><input id="adm_newPass" placeholder="password">
+          <select id="adm_newRole"></select>
+          <div style="display:flex;gap:8px;margin-top:8px"><button id="adm_createUser" class="btn">Crear</button><button id="adm_refresh" class="btn-ghost">Refrescar</button></div>
+          <hr style="margin:12px 0;border:none;border-top:1px solid rgba(255,255,255,0.03)">
+          <h4>Roles</h4><div style="display:flex;gap:8px"><input id="adm_newRoleName" placeholder="nuevo rol"><button id="adm_createRole" class="btn">Crear rol</button></div>
+          <div id="rolesAdminList" style="margin-top:12px"></div></div>
+        </div>`;
+      container.querySelector('#closeA').onclick = ()=> expandedRoot.innerHTML = '';
+      if(!APP.currentUser || APP.currentUser.role !== 'admin'){
+        container.querySelector('#adminNotice').innerHTML = '<div class="item"><div style="flex:1"><b>Acceso denegado</b><div class="muted small">Necesitas ser admin.</div></div></div>';
+        return;
+      }
+      const notice = container.querySelector('#adminNotice');
+      if(!APP.adminMode){
+        notice.innerHTML = `<div class="item"><div style="flex:1"><b>Admin Mode OFF</b><div class="muted small">Activa para operaciones sensibles</div></div><div><button id="enableAdminMode" class="btn">Activar</button></div></div>`;
+        notice.querySelector('#enableAdminMode').onclick = async ()=>{
+          const pass = prompt('Reingresa la contraseña:'); if(!pass) return;
+          const snap = await getDocs(query(COL('users'), where('username','==', APP.currentUser.username), where('password','==', pass)));
+          if(snap.empty){ alert('Contraseña incorrecta'); return; }
+          APP.adminMode = true; updateHeader(); await pushLog(`Admin Mode activado por ${APP.currentUser.username}`); renderAdmin(container);
+        };
+      } else {
+        notice.innerHTML = `<div class="item"><div style="flex:1"><b>Admin Mode ON</b><div class="muted small">Puedes administrar</div></div><div><button id="disableAdminMode" class="btn-danger-small">Desactivar</button></div></div>`;
+        notice.querySelector('#disableAdminMode').onclick = ()=> { if(confirm('Desactivar Admin Mode?')){ APP.adminMode=false; updateHeader(); renderAdmin(container); } };
+      }
+
+      // populate roles select
+      const rolesSnap = await getDocs(COL('roles'));
+      const roleSelect = container.querySelector('#adm_newRole'); roleSelect.innerHTML = '';
+      rolesSnap.forEach(r => roleSelect.appendChild(Object.assign(document.createElement('option'), { value: r.id, textContent: r.id })));
+      container.querySelector('#adm_createUser').onclick = async ()=>{
+        if(!APP.adminMode){ alert('Activa Admin Mode'); return; }
+        const username = container.querySelector('#adm_newUser').value.trim(); if(!username) return alert('username requerido');
+        const display = container.querySelector('#adm_newDisplay').value.trim() || username;
+        const pass = container.querySelector('#adm_newPass').value.trim() || '1234';
+        const role = container.querySelector('#adm_newRole').value;
+        try{ await addDoc(COL('users'), { username, display, password: pass, role, badge:'', onDuty:false }); await pushLog(`Usuario creado: ${username}`); renderAdmin(container); }catch(e){ console.error(e); alert('Error creando usuario'); }
+      };
+      container.querySelector('#adm_refresh').onclick = ()=> renderAdmin(container);
+      container.querySelector('#adm_createRole').onclick = async ()=>{
+        if(!APP.adminMode){ alert('Activa Admin Mode'); return; }
+        const name = container.querySelector('#adm_newRoleName').value.trim(); if(!name) return alert('Nombre rol requerido');
+        try{ await setDoc(doc(db,'roles',name), { name, color:'#999999', permissions:[] }); await pushLog(`Rol creado: ${name}`); renderAdmin(container); }catch(e){ console.error(e); alert('Error creando rol'); }
+      };
+      await loadUsersAdmin(container);
+      await loadRolesAdmin(container);
+    }
+
+    async function loadUsersAdmin(container){
+      const list = container.querySelector('#usersAdminList'); list.innerHTML = '<div class="muted small">Cargando...</div>';
+      const snap = await getDocs(COL('users')); const users = []; snap.forEach(s=> users.push({ id:s.id, ...s.data() }));
+      list.innerHTML = '';
+      for(const u of users){
+        const div = document.createElement('div'); div.className='item';
+        const canPerform = APP.adminMode && APP.currentUser && APP.currentUser.role === 'admin';
+        div.innerHTML = `<div><b>${u.display} (${u.username})</b><div class="muted small">Rol: <span>${u.role||'—'}</span> • Badge: ${u.badge||'—'}</div></div>
+          <div style="text-align:right"><select data-uid="${u.id}" ${canPerform ? '' : 'disabled'} class="adm-role-sel"></select>
+          <div style="margin-top:6px"><button data-uid="${u.id}" ${canPerform ? '' : 'disabled'} class="btn-ghost btn-small" data-act="del">Borrar</button> <button data-uid="${u.id}" ${canPerform ? '' : 'disabled'} class="btn btn-small" data-act="imp">Impersonar</button></div></div>`;
+        list.appendChild(div);
+      }
+      // fill role selects
+      const rolesSnap = await getDocs(COL('roles')); const roleKeys = []; rolesSnap.forEach(r=> roleKeys.push(r.id));
+      list.querySelectorAll('.adm-role-sel').forEach(sel=>{
+        sel.innerHTML = roleKeys.map(k=> `<option value="${k}">${k}</option>` ).join('');
+        (async ()=>{
+          const uid = sel.dataset.uid;
+          const s = await getDocs(query(COL('users'), where('__name__','==', uid)));
+          let uobj = null; s.forEach(d=> uobj = d.data());
+          if(uobj) sel.value = uobj.role || '';
+        })();
+        sel.onchange = async (e)=> {
+          if(!APP.adminMode) return alert('Activa Admin Mode');
+          const newRole = e.target.value; const uid = e.target.dataset.uid;
+          try{ await updateDoc(doc(db,'users',uid), { role: newRole }); await pushLog(`Rol cambiado: ${uid} -> ${newRole}`); loadUsersAdmin(container); }catch(e){ console.error(e); alert('Error'); }
+        };
+      });
+      list.querySelectorAll('button[data-act="del"]').forEach(b=>{
+        b.onclick = async ()=> {
+          if(!APP.adminMode) return alert('Activa Admin Mode');
+          const uid = b.dataset.uid; if(!confirm('Borrar usuario?')) return;
+          try{
+            const s = await getDocs(query(COL('users'), where('__name__','==', uid)));
+            let uobj = null; s.forEach(d=> uobj = d.data());
+            if(uobj && uobj.username === 'admin'){ return alert('No puedes borrar admin seed'); }
+            await deleteDoc(doc(db,'users',uid)); await pushLog(`Usuario borrado: ${uid}`); loadUsersAdmin(container);
+          }catch(e){ console.error(e); alert('Error'); }
+        };
+      });
+      list.querySelectorAll('button[data-act="imp"]').forEach(b=>{
+        b.onclick = async ()=> {
+          if(!APP.adminMode) return alert('Activa Admin Mode');
+          const uid = b.dataset.uid;
+          const s = await getDocs(query(COL('users'), where('__name__','==', uid)));
+          let uobj = null; s.forEach(d=> uobj = { id:d.id, ...d.data() });
+          if(!uobj) return alert('Usuario no encontrado');
+          APP.currentUser = uobj; updateHeader(); await pushLog(`Impersonación: ${uobj.username}`); renderCards(); alert('Impersonando: ' + uobj.display);
+        };
+      });
+    }
+
+    async function loadRolesAdmin(container){
+      const out = container.querySelector('#rolesAdminList'); out.innerHTML = '';
+      const snap = await getDocs(COL('roles'));
+      snap.forEach(s => {
+        const r = s.data();
+        const div = document.createElement('div'); div.className='item';
+        div.innerHTML = `<div style="flex:1"><b>${s.id}</b><div class="muted small">Permisos: ${(r.permissions||[]).join(', ') || 'Sin permisos'}</div></div>
+          <div style="text-align:right"><button data-role="${s.id}" class="btn-ghost" data-act="edit">Editar</button> <button data-role="${s.id}" class="btn" data-act="del">Borrar</button></div>`;
+        out.appendChild(div);
+      });
+      out.querySelectorAll('button[data-act="edit"]').forEach(b=>{
+        b.onclick = async ()=>{
+          if(!APP.adminMode) return alert('Activa Admin Mode');
+          const roleKey = b.dataset.role;
+          const modal = document.createElement('div'); modal.className='overlay';
+          modal.innerHTML = `<div class="modal"><h3>Editar rol: ${roleKey}</h3><div class="muted small">Permisos (separados por comas)</div><textarea id="permArea" style="width:100%;height:100px;margin-top:8px"></textarea><div style="display:flex;gap:8px;margin-top:12px"><button id="saveRole" class="btn">Guardar</button><button id="cancelRole" class="btn-ghost">Cancelar</button></div></div>`;
+          document.body.appendChild(modal);
+          const rSnap = await getDocs(query(COL('roles'), where('__name__','==', roleKey)));
+          let roleObj = null; rSnap.forEach(d=> roleObj = d.data());
+          document.getElementById('permArea').value = (roleObj && roleObj.permissions) ? roleObj.permissions.join(',') : '';
+          document.getElementById('cancelRole').onclick = ()=> modal.remove();
+          document.getElementById('saveRole').onclick = async ()=>{
+            const perms = document.getElementById('permArea').value.split(',').map(x=>x.trim()).filter(Boolean);
+            await setDoc(doc(db,'roles',roleKey), { name: roleKey, color: roleObj?.color || '#999999', permissions: perms });
+            await pushLog(`Rol editado: ${roleKey}`);
+            modal.remove(); loadRolesAdmin(container); loadUsersAdmin(container);
+          };
+        };
+      });
+      out.querySelectorAll('button[data-act="del"]').forEach(b=>{
+        b.onclick = async ()=>{
+          if(!APP.adminMode) return alert('Activa Admin Mode');
+          const roleKey = b.dataset.role;
+          if(!confirm('Borrar rol? Los usuarios con este rol quedarán con rol vacío')) return;
+          try{ await deleteDoc(doc(db,'roles',roleKey));
+            const usersSnap = await getDocs(COL('users'));
+            usersSnap.forEach(async u=> { const d = u.data(); if(d.role === roleKey) await updateDoc(doc(db,'users',u.id), { role: '' }); });
+            await pushLog(`Rol borrado: ${roleKey}`); loadRolesAdmin(container); loadUsersAdmin(container);
+          }catch(e){ console.error(e); alert('Error borrando rol'); }
+        };
+      });
+    }
+
+    // Logs viewer
+    async function renderLogs(container){
+      container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>Auditoría</strong><div class="muted small">Últimas acciones</div></div>
+        <div><button class="btn btn-small" id="closeL">Cerrar</button></div>
+      </div><div style="margin-top:12px" id="logsList" class="list"></div>`;
+      container.querySelector('#closeL').onclick = ()=> expandedRoot.innerHTML = '';
+      const list = container.querySelector('#logsList'); if(APP.unsub.logs) APP.unsub.logs();
+      APP.unsub.logs = onSnapshot(query(COL('logs'), orderBy('t','desc')), snap=>{
+        list.innerHTML = '';
+        snap.forEach(s=> {
+          const d = s.data();
+          const it = document.createElement('div'); it.className='item'; it.innerHTML = `<div><div style="font-weight:700">${d.msg}</div><div class="muted small">${new Date(d.t).toLocaleString()}</div></div>`;
+          list.appendChild(it);
+        });
+      });
+    }
+
+    // Radio system
+    async function renderRadio(container){
+      container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>Radios</strong><div class="muted small">Chat por canales (realtime)</div></div>
+        <div><button class="btn btn-small" id="closeRadio">Cerrar</button></div></div>
+        <div style="margin-top:12px;display:flex;gap:12px">
+          <div style="flex:1">
+            <div style="display:flex;gap:8px;align-items:center"><select id="radioChannelSelect" class="muted small"></select><div style="margin-left:auto;display:flex;gap:8px"><input id="radioNewChannel" placeholder="Nuevo canal"/><button id="radioCreateChannel" class="btn-ghost">Crear</button><button id="radioRefresh" class="btn-ghost">Refrescar</button></div></div>
+            <div id="radioMessages" class="radio-messages" style="margin-top:12px"></div>
+            <div style="display:flex;gap:8px;margin-top:8px"><input id="radioMsgInput" placeholder="Escribe mensaje..." /><button id="radioSend" class="btn">Enviar</button></div>
+          </div>
+          <div style="width:320px">
+            <h4 style="margin:0 0 8px 0">Canales</h4>
+            <input id="radioSearchChannels" placeholder="Buscar..." style="width:100%;padding:8px;border-radius:8px"/>
+            <div id="radioChannelsList" class="list" style="margin-top:8px"></div>
+          </div>
+        </div>`;
+      container.querySelector('#closeRadio').onclick = ()=> expandedRoot.innerHTML = '';
+      container.querySelector('#radioCreateChannel').onclick = async ()=>{
+        const val = container.querySelector('#radioNewChannel').value.trim(); if(!val) return;
+        try{ await addDoc(COL('radio_channels'), { id: val, name: val, created_at: Date.now() }); await pushLog(`Canal radio creado: ${val}`); loadRadioChannels(); container.querySelector('#radioNewChannel').value=''; }catch(e){ console.error(e); alert('Error'); }
+      };
+      container.querySelector('#radioRefresh').onclick = loadRadioChannels;
+      container.querySelector('#radioSend').onclick = sendRadioMessage;
+      container.querySelector('#radioMsgInput').addEventListener('keydown', (e)=> { if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendRadioMessage(); }});
+      container.querySelector('#radioSearchChannels').addEventListener('input', (e)=> { const q=(e.target.value||'').toLowerCase(); document.querySelectorAll('#radioChannelsList .item').forEach(it=> it.style.display = (it.dataset.name||'').toLowerCase().includes(q) ? '' : 'none'); });
+      if(APP.unsub.radio_channels) APP.unsub.radio_channels();
+      APP.unsub.radio_channels = onSnapshot(COL('radio_channels'), snap => renderChannelList(snap.docs.map(d=>({ id:d.id, ...d.data() }))));
+      loadRadioChannels();
+    }
+
+    async function loadRadioChannels(){
+      const list = document.getElementById('radioChannelsList'), select = document.getElementById('radioChannelSelect');
+      if(!list || !select) return;
+      const snap = await getDocs(COL('radio_channels'));
+      const arr = []; snap.forEach(s=> arr.push({ id:s.id, ...s.data() }));
+      renderChannelList(arr);
+    }
+    function renderChannelList(arr){
+      const list = document.getElementById('radioChannelsList'), select = document.getElementById('radioChannelSelect');
+      if(!list || !select) return;
+      list.innerHTML = ''; select.innerHTML = '';
+      arr.forEach(ch=>{
+        const id = ch.id || ch.name; const name = ch.name || id;
+        const it = document.createElement('div'); it.className='item'; it.dataset.name = name;
+        it.innerHTML = `<div style="flex:1"><b>${name}</b><div class="muted small">${id}</div></div><div><button class="btn-ghost" data-id="${id}">Unirse</button></div>`;
+        it.querySelector('button').onclick = ()=> switchRadioChannel(id);
+        list.appendChild(it);
+        const opt = document.createElement('option'); opt.value = id; opt.textContent = name; select.appendChild(opt);
+      });
+    }
+    async function switchRadioChannel(channelId){
+      if(!channelId) return; APP.selectedChannel = channelId;
+      const sel = document.getElementById('radioChannelSelect'); if(sel) sel.value = channelId;
+      const messagesEl = document.getElementById('radioMessages'); if(!messagesEl) return;
+      messagesEl.innerHTML = '<div class="muted small">Cargando mensajes...</div>';
+      if(APP.unsub.radio_messages) APP.unsub.radio_messages();
+      APP.unsub.radio_messages = onSnapshot(COL('radio_messages'), snap=>{
+        const msgs = []; snap.forEach(s=> { const d = s.data(); if((d.channel||'') === channelId) msgs.push({ id:s.id, ...d }); });
+        msgs.sort((a,b)=> (a.created_at||0) - (b.created_at||0));
+        renderRadioMessages(msgs);
+      });
+    }
+    function renderRadioMessages(msgs){
+      const messagesEl = document.getElementById('radioMessages'); if(!messagesEl) return;
+      messagesEl.innerHTML = '';
+      if(!msgs.length){ messagesEl.innerHTML = '<div class="muted small">Sin mensajes</div>'; return; }
+      msgs.forEach(m=>{
+        const me = APP.currentUser && (APP.currentUser.display === m.author || APP.currentUser.username === m.author_username);
+        const it = document.createElement('div'); it.className = 'radio-msg '+(me ? 'me' : '');
+        const avatar = document.createElement('div'); avatar.className='radio-avatar'; avatar.textContent = (m.author||'G').split(' ').map(s=>s[0]||'').slice(0,2).join('').toUpperCase();
+        const bubble = document.createElement('div'); bubble.className = 'radio-bubble ' + (me ? 'me' : '');
+        bubble.innerHTML = `<div style="font-weight:700">${m.author||'Anon'}</div><div>${escapeHtml(m.text||'')}</div><div class="radio-meta">${new Date(m.created_at||0).toLocaleString()}</div>`;
+        it.appendChild(avatar); it.appendChild(bubble);
+        messagesEl.appendChild(it);
+      });
+      messagesEl.scrollTop = messagesEl.scrollHeight;
+    }
+    async function sendRadioMessage(){
+      const input = document.getElementById('radioMsgInput'); const text = (input.value||'').trim();
+      if(!text) return;
+      const channel = APP.selectedChannel || document.getElementById('radioChannelSelect').value;
+      if(!channel) return alert('Selecciona un canal');
+      try{ await addDoc(COL('radio_messages'), { channel, text, author: APP.currentUser ? APP.currentUser.display : 'Invitado', author_username: APP.currentUser ? APP.currentUser.username : 'guest', created_at: Date.now() }); await pushLog(`Mensaje radio (${channel})`); input.value=''; }catch(e){ console.error(e); alert('Error enviando'); }
+    }
+
+    // Service panel (on duty)
+    async function renderService(container){
+      container.innerHTML = `<div style="display:flex;justify-content:space-between;align-items:center">
+        <div><strong>Servicio</strong><div class="muted small">Ponte en servicio o sal</div></div>
+        <div><button class="btn btn-small" id="closeS">Cerrar</button></div></div>
+        <div style="margin-top:12px;display:flex;gap:8px;align-items:center"><div class="muted small">Tu estado:</div><div id="serviceBox" class="pill">Desconocido</div><div style="margin-left:auto"><button id="toggleDuty" class="btn">Cambiar</button></div></div>
+        <div style="margin-top:12px"><strong>Policías en servicio</strong><div id="dutyList" class="list" style="margin-top:8px"></div></div>`;
+      container.querySelector('#closeS').onclick = ()=> expandedRoot.innerHTML = '';
+      if(!APP.currentUser){ container.querySelector('#serviceBox').textContent = 'Inicia sesión'; container.querySelector('#toggleDuty').onclick = ()=> alert('Inicia sesión'); return; }
+      const s = await getDocs(query(COL('users'), where('__name__','==', APP.currentUser.id)));
+      let userObj = null; s.forEach(d=> userObj = d.data());
+      const on = userObj?.onDuty || false; container.querySelector('#serviceBox').textContent = on ? 'En servicio' : 'Fuera de servicio';
+      container.querySelector('#toggleDuty').onclick = async ()=>{
+        try{ await updateDoc(doc(db,'users',APP.currentUser.id), { onDuty: !on }); await pushLog(`${APP.currentUser.username} toggled duty`); renderService(container); updateHeader(); }catch(e){ console.error(e); alert('Error'); }
+      };
+      loadDutyList();
+    }
+    async function loadDutyList(){
+      const list = document.getElementById('dutyList'); if(!list) return;
+      const snap = await getDocs(COL('users'));
+      const active = []; snap.forEach(s=> { const d = s.data(); if(d.onDuty) active.push(d.display || d.username); });
+      list.innerHTML = active.map(a=> `<div class="item">${a}</div>` ).join('') || '<div class="muted small">Nadie en servicio</div>';
+    }
+
+    // render admin, reports, alerts, radios done above
+
+    // login modal wiring
+    document.getElementById('btnLogin').onclick = ()=> {
+      document.getElementById('loginModal').style.display = 'flex';
+    };
+    document.getElementById('guestBtn').onclick = ()=> { APP.currentUser = null; APP.adminMode = false; updateHeader(); document.getElementById('loginModal').style.display='none'; };
+    document.getElementById('showReg').onclick = ()=> { const el = document.getElementById('registerBlock'); el.style.display = el.style.display==='none' ? 'block' : 'none'; };
+    document.getElementById('regCancel').onclick = ()=> document.getElementById('registerBlock').style.display='none';
+
+    document.getElementById('loginBtnModal').onclick = async ()=>{
+      const u = document.getElementById('loginUser').value.trim(); const p = document.getElementById('loginPass').value.trim();
+      if(!u || !p){ document.getElementById('loginError').style.display='block'; document.getElementById('loginError').textContent='Usuario y contraseña requeridos'; return; }
+      try{
+        const snap = await getDocs(query(COL('users'), where('username','==', u), where('password','==', p)));
+        if(snap.empty){ document.getElementById('loginError').style.display='block'; document.getElementById('loginError').textContent='Usuario o contraseña incorrectos'; return; }
+        let found = null; snap.forEach(d=> found = { id: d.id, ...d.data() });
+        APP.currentUser = found; APP.adminMode = false; updateHeader(); document.getElementById('loginModal').style.display='none'; await pushLog(`Sesión iniciada: ${found.username}`); renderCards();
+      }catch(e){ console.error(e); document.getElementById('loginError').style.display='block'; document.getElementById('loginError').textContent='Error en login'; }
+    };
+
+    document.getElementById('regCreate').onclick = async ()=>{
+      const username = document.getElementById('regUser').value.trim();
+      const display = document.getElementById('regName').value.trim() || username;
+      const pass = document.getElementById('regPass').value.trim() || '1234';
+      const role = document.getElementById('regRole').value || 'officer';
+      if(!username){ document.getElementById('regMsg').textContent='Usuario requerido'; return; }
+      try{
+        const exists = await getDocs(query(COL('users'), where('username','==', username)));
+        if(!exists.empty){ document.getElementById('regMsg').textContent='Usuario ya existe'; return; }
+        await addDoc(COL('users'), { username, display, password: pass, role, badge:'', onDuty:false });
+        document.getElementById('regMsg').textContent='Cuenta creada. Inicia sesión.';
+        await pushLog(`Cuenta creada: ${username}`);
+      }catch(e){ console.error(e); document.getElementById('regMsg').textContent='Error creando cuenta'; }
+    };
+
+    // Export button: export collection snapshots to JSON file
+    document.getElementById('btnExport').onclick = async ()=>{
+      try{
+        const collections = ['users','roles','reports','wanted','calls','pda','fines','alerts','radio_channels','radio_messages','logs'];
+        const data = {};
+        for(const c of collections){
+          const snap = await getDocs(COL(c));
+          data[c] = []; snap.forEach(s=> data[c].push({ id: s.id, ...s.data() }));
+        }
+        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'firestore_export_'+Date.now()+'.json'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+      }catch(e){ console.error(e); alert('Error exportando'); }
+    };
+
+    // update notifications count realtime
+    if(APP.unsub.alertCount) APP.unsub.alertCount();
+    APP.unsub.alertCount = onSnapshot(COL('alerts'), ()=> updateNotifCount());
+
+    // Init: seed and render
+    (async ()=>{
+      await seedIfEmpty();
       renderCards();
-    }catch(e){ console.error('onAuthState', e); }
-  } else {
-    STATE.userProfile = null; STATE.adminMode = false; updateHeader(); renderCards();
-  }
-});
+      updateHeader();
+    })();
 
-/* ---------------- Header update & alert count ---------------- */
-async function updateHeader(){
-  $('#userDisplay').textContent = STATE.userProfile ? `${STATE.userProfile.display} (${STATE.userProfile.role})` : 'No conectado';
-  try{ const s = await getDocs(COL('users')); let cnt=0; s.forEach(d=> { if(d.data().onDuty) cnt++; }); $('#dutyStatus').textContent = `En servicio: ${cnt}`; }catch(e){ $('#dutyStatus').textContent = 'En servicio: —'; }
-  $('#adminModeWrap').style.display = STATE.userProfile && STATE.userProfile.role === 'admin' ? 'inline-block' : 'none';
-  $('#adminModePill').textContent = `Admin: ${STATE.adminMode ? 'ON' : 'OFF'}`;
-  updateAlertCount();
-}
-if(STATE.unsub.alertCount) STATE.unsub.alertCount();
-STATE.unsub.alertCount = onSnapshot(COL('alerts'), ()=> updateAlertCount());
-async function updateAlertCount(){ try{ const s = await getDocs(COL('alerts')); const count = s.size; if(count>0){ $('#notifPill').style.display='inline-block'; $('#notifPill').textContent = `Alertas ${count}`; $('#notifPill').onclick = ()=> openCard('alerts'); } else $('#notifPill').style.display='none'; }catch(e){ console.warn(e); } }
-
-/* ---------------- Misc helpers: CSV export, JSON import/export ---------------- */
-function downloadJSON(data, filename='firestore_export.json'){ const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); }
-function arrayToCSV(rows){
-  const esc = v => `"${(''+(v==null?'':v)).replace(/"/g,'""')}"`;
-  return rows.map(r => Object.values(r).map(esc).join(',')).join('\n');
-}
-async function exportAllJSON(){
-  try{
-    const collections = ['users','roles','reports','wanted','calls','pda','fines','alerts','radio_channels','radio_messages','assignments','logs'];
-    const data = {};
-    for(const c of collections){ const s = await getDocs(COL(c)); data[c]=[]; s.forEach(d=> data[c].push({ id:d.id, ...d.data() })); }
-    downloadJSON(data, 'firestore_export_'+Date.now()+'.json');
-  }catch(e){ console.error('exportAllJSON', e); alert('Error exportando'); }
-}
-$('#btnExport').addEventListener('click', exportAllJSON);
-
-/* ---------------- Global init ---------------- */
-(async ()=>{ await seedIfEmpty(); renderCards(); updateHeader(); })();
-
-/* ---------------- Expose debug ---------------- */
-window.__APP = { db, auth, STATE, renderCards, openCard };
-
-/* Note: The file is large. If you want further refinements (more animations, CSV per-panel buttons wired, or splitting into modules),
-   I can generate a repo layout and PR. Also copy the Firestore rules sample above into your console and adapt as required.
-*/
-</script>
+    // expose for debugging
+    window.__APP = { APP, db, openCard };
+  </script>
 </body>
 </html>
