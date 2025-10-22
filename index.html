@@ -299,3 +299,145 @@
         <div class="muted small">Sin notificaciones previas...</div>
       </div>
     </div>
+  <!-- ========================= SCRIPTS ========================= -->
+  <script>
+  // --- utilidades básicas ---
+  const $ = s => document.querySelector(s);
+  const $$ = s => document.querySelectorAll(s);
+
+  // --- notificaciones estilo entorno / FiveM ---
+  function pushNotif(msg, type="info") {
+    const toasts = $('#toasts');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `
+      <div class="t-body">${msg}</div>
+      <button class="t-close" aria-label="Cerrar">&times;</button>
+    `;
+    toasts.appendChild(toast);
+
+    toast.querySelector('.t-close').onclick = () => toast.remove();
+
+    // eliminar automáticamente después de 5 segundos
+    setTimeout(() => toast.remove(), 5000);
+  }
+
+  // --- Simulación de datos de Firestore ---
+  const demoData = {
+    bolos: [
+      { nombre: "John Doe", motivo: "Robo a mano armada", nivel: "Alto" },
+      { nombre: "Sofía R.", motivo: "Conducción temeraria", nivel: "Medio" }
+    ],
+    multas: [
+      { infractor: "Carlos P.", motivo: "Exceso de velocidad", cantidad: 500 },
+      { infractor: "Laura T.", motivo: "Estacionar en zona prohibida", cantidad: 250 }
+    ],
+    alertas: [
+      { tipo: "Llamada 911", detalle: "Posible altercado en Strawberry Ave." },
+      { tipo: "Refuerzo", detalle: "Unidad 42 solicita apoyo en Vespucci Blvd." }
+    ],
+    entornos: [
+      { autor: "Ofc. Pérez", descripcion: "Persona sospechosa cerca de Legion Square" },
+      { autor: "Sgt. López", descripcion: "Vehículo abandonado en Grove Street" }
+    ]
+  };
+
+  // --- rellenar paneles con datos ---
+  function loadPanel(panelId, dataList) {
+    const panel = $(`#${panelId}Preview`);
+    if (!panel) return;
+    panel.innerHTML = "";
+
+    if (dataList.length === 0) {
+      panel.innerHTML = `<div class="muted small">Sin registros.</div>`;
+      return;
+    }
+
+    dataList.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "item";
+      if (panelId === "bolos") {
+        div.innerHTML = `<div class="item-left"><div class="item-title">${item.nombre}</div><div class="item-meta">${item.motivo} — Nivel: ${item.nivel}</div></div>`;
+      } else if (panelId === "multas") {
+        div.innerHTML = `<div class="item-left"><div class="item-title">${item.infractor}</div><div class="item-meta">${item.motivo} — $${item.cantidad}</div></div>`;
+      } else if (panelId === "alertas") {
+        div.innerHTML = `<div class="item-left"><div class="item-title">${item.tipo}</div><div class="item-meta">${item.detalle}</div></div>`;
+      } else if (panelId === "entornos") {
+        div.innerHTML = `<div class="item-left"><div class="item-title">${item.autor}</div><div class="item-meta">${item.descripcion}</div></div>`;
+      } else {
+        div.innerHTML = `<div class="item-left"><div class="item-title">${item.titulo || "Registro"}</div><div class="item-meta">${item.detalle || ""}</div></div>`;
+      }
+      panel.appendChild(div);
+    });
+  }
+
+  // --- refrescar datos ---
+  function refreshPanel(panelKey) {
+    console.log(`Refrescando panel: ${panelKey}`);
+    const data = demoData[panelKey] || [];
+    loadPanel(panelKey, data);
+    pushNotif(`Panel "${panelKey.toUpperCase()}" actualizado`, "info");
+  }
+
+  function refreshAllPanels() {
+    Object.keys(demoData).forEach(k => refreshPanel(k));
+  }
+
+  // --- iniciar listeners ---
+  window.addEventListener('DOMContentLoaded', () => {
+    // refresco individual
+    $$('[data-refresh]').forEach(btn => {
+      btn.addEventListener('click', e => {
+        const key = e.target.dataset.refresh;
+        refreshPanel(key);
+        btn.classList.add("pulse");
+        setTimeout(() => btn.classList.remove("pulse"), 800);
+      });
+    });
+
+    // refrescar todos
+    $('#refreshAll')?.addEventListener('click', () => {
+      refreshAllPanels();
+    });
+
+    // mostrar notificaciones automáticas simuladas
+    setTimeout(() => {
+      pushNotif("Nueva alerta: Vehículo sospechoso en Legion Square.");
+      pushNotif("Central: Código 3 en progreso. Unidades disponibles, acudan.");
+    }, 2000);
+
+    // simulación inicial de carga
+    refreshAllPanels();
+  });
+
+  // --- login modal básico (simulación) ---
+  const loginModal = $('#loginModal');
+  $('#btnLogin')?.addEventListener('click', () => {
+    loginModal.style.display = "flex";
+  });
+  $('#guestBtnModal')?.addEventListener('click', () => {
+    loginModal.style.display = "none";
+    $('#userDisplay').textContent = "Modo invitado";
+    pushNotif("Entraste como invitado.", "info");
+  });
+  $('#regCancel')?.addEventListener('click', () => {
+    $('#registerBlock').style.display = "none";
+  });
+  $('#showReg')?.addEventListener('click', () => {
+    $('#registerBlock').style.display = "block";
+  });
+  $('#loginBtnModal')?.addEventListener('click', () => {
+    const user = $('#loginUser').value.trim();
+    if (user === "") {
+      $('#loginError').textContent = "Introduce un usuario válido";
+      $('#loginError').style.display = "block";
+      return;
+    }
+    loginModal.style.display = "none";
+    $('#userDisplay').textContent = user;
+    pushNotif(`Bienvenido, ${user}`, "info");
+  });
+  </script>
+
+</body>
+</html>
