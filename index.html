@@ -1,122 +1,164 @@
 <!doctype html>
 <html lang="es">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>PDA — Daynight RP (Neon Accent, Firestore-ready)</title>
-<meta name="description" content="PDA/CAD minimal, BOLO, Multas, Alertas, notifs estilo FiveM.">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PDA — Daynight RP (Neon Accent)</title>
+  <meta name="description" content="PDA/CAD minimal, BOLO, Multas, Alertas, Entornos Policiales, notifs estilo FiveM.">
 
-<style>
-  /* ================= Theme: Neon Accent (clean, professional) ================= */
-  :root{
-    --bg:#030417;
-    --panel: rgba(255,255,255,0.03);
-    --glass: rgba(255,255,255,0.025);
-    --border: rgba(255,255,255,0.05);
-    --muted:#9fb3bd;
-    --text:#e9f9ff;
-    --accent1:#7c3aed; /* violet */
-    --accent2:#06b6e4; /* cyan */
-    --success:#30d39a;
-    --danger:#ff6b6b;
-    --radius:12px;
-    --shadow: 0 18px 48px rgba(2,6,10,0.6);
-  }
+  <!-- ==================== ESTILOS GLOBALES (PARTE 1) ==================== -->
+  <style>
+    :root{
+      --bg: #040615;
+      --panel: rgba(255,255,255,0.03);
+      --glass: rgba(255,255,255,0.02);
+      --border: rgba(255,255,255,0.05);
+      --muted: #A9C0CC;
+      --text: #E9F9FF;
+      --accent-violet: #7C3AED;
+      --accent-cyan: #06B6E4;
+      --success: #30D39A;
+      --danger: #FF6B6B;
+      --radius: 12px;
+      --card-shadow: 0 16px 48px rgba(3,6,14,0.65);
+      --glass-blur: blur(8px);
+      --transition-fast: 180ms;
+      --transition-medium: 280ms;
+    }
 
-  html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; -webkit-font-smoothing:antialiased}
-  body{
-    min-height:100vh;
-    background:
-      radial-gradient(800px 360px at 12% 12%, rgba(124,58,237,0.06), transparent 25%),
-      linear-gradient(180deg,var(--bg), #071428 60%);
-    color:var(--text);
-    padding:20px;
-  }
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial; -webkit-font-smoothing:antialiased;}
+    body{
+      min-height:100vh;
+      background:
+        radial-gradient(900px 380px at 14% 8%, rgba(124,58,237,0.06), transparent 20%),
+        linear-gradient(180deg,var(--bg), #071428 60%);
+      color:var(--text);
+      padding:18px;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+      -webkit-touch-callout:none;
+    }
 
-  /* subtle grain */
-  body::before{
-    content:""; position:fixed; inset:0; pointer-events:none;
-    background-image: linear-gradient(135deg, rgba(255,255,255,0.01) 1px, transparent 1px);
-    background-size: 6px 6px; opacity:0.6; mix-blend-mode: overlay;
-  }
+    /* sutil overlay de textura */
+    body::before{
+      content:""; position:fixed; inset:0; pointer-events:none;
+      background-image: linear-gradient(135deg, rgba(255,255,255,0.01) 1px, transparent 1px);
+      background-size: 6px 6px; opacity:0.6; mix-blend-mode: overlay;
+    }
 
-  /* Layout */
-  .wrap{max-width:1100px;margin:0 auto}
-  header{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;gap:12px}
-  .brand{display:flex;gap:12px;align-items:center}
-  .logo{width:56px;height:56px;border-radius:10px;background:linear-gradient(135deg,var(--accent1),var(--accent2));display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,0.6)}
-  .brand h1{margin:0;font-size:18px;letter-spacing:0.6px}
-  .subtitle{font-size:12px;color:var(--muted)}
+    /* Contenedor principal */
+    .wrap{max-width:1200px;margin:0 auto}
+    header{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:12px;
+      padding:10px 6px;
+      margin-bottom:14px;
+    }
 
-  .controls{display:flex;gap:8px;align-items:center}
-  .pill{background:var(--glass);padding:8px 10px;border-radius:999px;color:var(--muted);font-weight:700;font-size:13px}
+    /* marca */
+    .brand{display:flex;gap:12px;align-items:center}
+    .logo{
+      width:56px;height:56px;border-radius:10px;
+      background:linear-gradient(135deg,var(--accent-violet),var(--accent-cyan));
+      display:grid;place-items:center;box-shadow:0 10px 30px rgba(0,0,0,0.6);
+      border:1px solid rgba(255,255,255,0.04);
+    }
+    .brand h1{margin:0;font-size:16px;font-weight:800;color:var(--text)}
+    .brand .subtitle{font-size:12px;color:var(--muted)}
 
-  .btn{background:linear-gradient(90deg,var(--accent1),var(--accent2));border:none;padding:8px 12px;border-radius:10px;color:#02141a;cursor:pointer;font-weight:800}
-  .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);padding:7px 10px;border-radius:10px;cursor:pointer}
-  .btn-sm{padding:6px 8px;border-radius:8px;font-size:13px}
+    /* controles superiores */
+    .controls{display:flex;gap:10px;align-items:center}
+    .pill{
+      background:var(--glass); padding:8px 12px;border-radius:999px;color:var(--muted);font-weight:700;font-size:13px;border:1px solid rgba(255,255,255,0.02)
+    }
 
-  /* Grid of panels */
-  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-  @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} }
-  @media (max-width:640px){ .grid{grid-template-columns:1fr} }
+    .btn{
+      background:linear-gradient(90deg,var(--accent-violet),var(--accent-cyan));
+      border:none;color:#02141a;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:800;transition:filter var(--transition-fast);
+      box-shadow:0 10px 26px rgba(20,10,60,0.12);
+    }
+    .btn:hover{ filter:brightness(1.05) }
 
-  .panel{
-    background:var(--panel);
-    border:1px solid var(--border);
-    border-radius:var(--radius);
-    padding:14px;
-    box-shadow:var(--shadow);
-    display:flex;
-    flex-direction:column;
-    gap:10px;
-    transition: transform .22s ease, box-shadow .22s ease, border-color .22s ease;
-  }
-  .panel:hover{ transform:translateY(-6px); box-shadow:0 30px 80px rgba(0,0,0,0.6); border-color: rgba(124,58,237,0.12) }
+    .btn-ghost{
+      background:transparent;border:1px solid var(--border);color:var(--muted);padding:7px 10px;border-radius:10px;cursor:pointer;
+      transition:color var(--transition-fast), border-color var(--transition-fast)
+    }
+    .btn-ghost:hover{ color:var(--accent-violet); border-color: rgba(124,58,237,0.18) }
 
-  .panel-header{display:flex;justify-content:space-between;align-items:center}
-  .panel-title{font-weight:900;color:var(--accent1);font-size:15px}
-  .panel-sub{font-size:13px;color:var(--muted)}
+    .btn-sm{padding:6px 8px;font-size:13px;border-radius:9px}
 
-  .panel-body{flex:1; overflow:auto; font-size:14px; color:var(--muted); padding-right:6px}
-  .list{display:flex;flex-direction:column;gap:8px}
+    /* GRID de paneles (mantendremos la estructura del index original) */
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+    @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} }
+    @media (max-width:640px){ .grid{grid-template-columns:1fr} }
 
-  .list .item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
-  .item-left{max-width:72%}
-  .item-title{font-weight:800;color:var(--text)}
-  .item-meta{font-size:13px;color:var(--muted);margin-top:4px}
+    /* panel (tarjeta) */
+    .panel{
+      background:var(--panel); border:1px solid var(--border); border-radius:var(--radius);
+      padding:14px; box-shadow:var(--card-shadow); display:flex; flex-direction:column; gap:10px;
+      transition: transform var(--transition-medium) cubic-bezier(.2,.9,.2,.99), box-shadow var(--transition-fast), border-color var(--transition-fast);
+    }
+    .panel:hover{ transform: translateY(-6px); box-shadow: 0 30px 80px rgba(0,0,0,0.6); border-color: rgba(124,58,237,0.12) }
 
-  .panel-actions{display:flex;gap:8px;justify-content:flex-end;align-items:center}
+    .panel-header{display:flex;justify-content:space-between;align-items:center}
+    .panel-title{font-weight:900;color:var(--accent-violet);font-size:15px}
+    .panel-sub{font-size:13px;color:var(--muted)}
 
-  footer{margin-top:18px;padding:12px;text-align:center;color:var(--muted);font-size:13px}
+    .panel-body{flex:1;overflow:auto;color:var(--muted);font-size:14px;padding-right:6px}
 
-  /* notifications (FiveM-like toasts) */
-  #toasts{position:fixed; right:18px; top:80px; z-index:99999; display:flex;flex-direction:column;gap:10px; width:320px; pointer-events:none}
-  .toast{pointer-events:auto;display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;background:linear-gradient(90deg,var(--accent2),var(--accent1));color:#02141a;font-weight:800;box-shadow:0 12px 34px rgba(0,0,0,0.6);animation:toastIn .22s ease both}
-  @keyframes toastIn{from{opacity:0;transform:translateY(-8px) scale(.98)}to{opacity:1;transform:none}}
-  .toast .t-body{font-weight:600;color:rgba(2,20,26,0.95)}
-  .toast .t-close{margin-left:auto;background:transparent;border:none;color:rgba(2,20,26,0.85);font-weight:900;cursor:pointer}
+    .list{display:flex;flex-direction:column;gap:8px}
+    .list .item{
+      display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,255,255,0.02);
+      border-radius:10px;border:1px solid rgba(255,255,255,0.03)
+    }
+    .item-left{max-width:72%}
+    .item-title{font-weight:800;color:var(--text)}
+    .item-meta{font-size:13px;color:var(--muted);margin-top:4px}
 
-  /* small helpers */
-  .muted{color:var(--muted)}
-  .hidden{display:none}
+    .panel-actions{display:flex;gap:8px;justify-content:flex-end;align-items:center}
 
-  /* refresh pulse */
-  .pulse{animation:pulse .9s ease}
-  @keyframes pulse{0%{box-shadow:0 0 0 rgba(124,58,237,0.12)}70%{box-shadow:0 0 30px rgba(124,58,237,0.04)}100%{box-shadow:none}}
+    /* area expandida (panel grande que se abre) */
+    #expandedRoot .expanded{
+      margin-top:12px;border-radius:12px;padding:16px;background:linear-gradient(180deg, rgba(255,255,255,0.016), rgba(0,0,0,0.03));
+      border:1px solid rgba(255,255,255,0.03); box-shadow:0 30px 44px rgba(0,0,0,0.55);
+      animation: panelIn var(--transition-medium) cubic-bezier(.2,.9,.2,.99) both;
+    }
+    @keyframes panelIn { from{opacity:0; transform:translateY(12px) scale(.995)} to{opacity:1; transform:none} }
+    @keyframes panelOut { from{opacity:1} to{opacity:0; transform:translateY(8px)} }
 
-  /* modal */
-  .modal-back{position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,0.5);z-index:999999}
-  .modal{background:var(--panel);border-radius:12px;padding:16px;min-width:320px;max-width:760px;box-shadow:var(--shadow)}
-  .form-row{display:flex;gap:8px;align-items:center;margin-top:8px}
-  input,textarea,select{background:transparent;border:1px solid var(--border);color:var(--text);padding:8px;border-radius:8px;width:100%}
-</style>
+    /* notificaciones estilo FiveM (en esquina superior derecha) */
+    #toasts{position:fixed; right:18px; top:80px; z-index:99999; display:flex; flex-direction:column; gap:10px; width:320px; pointer-events:none}
+    .toast{
+      pointer-events:auto; display:flex; gap:10px; align-items:flex-start; padding:12px; border-radius:10px;
+      background: linear-gradient(90deg, var(--accent-cyan), var(--accent-violet)); color:#02141a; font-weight:800;
+      box-shadow: 0 12px 38px rgba(2,6,10,0.6); animation: toastIn .22s ease both;
+    }
+    @keyframes toastIn { from{opacity:0; transform:translateY(-8px) scale(.98)} to{opacity:1; transform:none} }
+    .toast .t-body{font-weight:700;color:rgba(2,20,26,0.92)}
+    .toast .t-close{margin-left:auto;background:transparent;border:none;color:rgba(2,20,26,0.85);font-weight:900;cursor:pointer}
+
+    /* modal (sencillo) */
+    .modal-back{position:fixed;inset:0;display:grid;place-items:center;background:rgba(0,0,0,0.5);z-index:999999}
+    .modal{background:var(--panel);border-radius:12px;padding:16px;min-width:320px;max-width:760px;box-shadow:var(--card-shadow)}
+    .form-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+    input,textarea,select{background:transparent;border:1px solid var(--border);color:var(--text);padding:8px;border-radius:8px;width:100%}
+
+    /* helpers */
+    .muted{color:var(--muted)}
+    .hidden{display:none}
+    .pulse{animation:pulse .9s ease}
+    @keyframes pulse{0%{box-shadow:0 0 0 rgba(124,58,237,0.12)}70%{box-shadow:0 0 30px rgba(124,58,237,0.04)}100%{box-shadow:none}}
+  </style>
+  <!-- ==================== FIN ESTILOS PARTE 1 ==================== -->
 </head>
 <body>
   <div class="wrap" role="main">
     <header>
       <div class="brand">
         <div class="logo" aria-hidden="true">
-          <!-- simple icon -->
+          <!-- icono sencillo -->
           <svg width="34" height="34" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <rect x="0" y="0" width="24" height="24" rx="5" fill="white" fill-opacity="0.06"/>
             <path d="M6 7h12M6 12h12M6 17h12" stroke="white" stroke-opacity="0.9" stroke-width="1.2" stroke-linecap="round"/>
@@ -124,24 +166,40 @@
         </div>
         <div>
           <h1>PDA — Daynight RP</h1>
-          <div class="subtitle">BOLO | Multas | Alertas — Notifs estilo FiveM</div>
+          <div class="subtitle">BOLO / Buscados · Multas · Alertas · Entornos Policiales</div>
         </div>
       </div>
 
       <div class="controls">
         <div id="userDisplay" class="pill">No conectado</div>
-        <button id="refreshAll" class="btn-ghost">Refrescar Todo</button>
+        <button id="refreshAll" class="btn-ghost">Refrescar todo</button>
         <button id="exportBtn" class="btn">Exportar</button>
       </div>
     </header>
 
+    <!-- ================ AQUI (PARTE 2) IRÁN TODOS LOS PANELES TRADUCIDOS ================ -->
     <section class="grid" id="panelsRoot">
-      <!-- Panels will be rendered into this grid, but we include initial markup for clarity -->
+      <!-- Parte 2: paneles individuales (BOLOs, Multas, Alertas, Entornos y resto) -->
+    </section>
+
+    <!-- área para panel expandido (cuando se abre uno) -->
+    <div id="expandedRoot" style="margin-top:14px"></div>
+
+    <footer style="margin-top:18px;color:var(--muted);text-align:center;font-size:13px">
+      Interfaz profesional • Neon Accent • Mantén Firebase inicializado en otro script (este archivo detecta la presencia)
+    </footer>
+  </div>
+
+  <!-- contenedor de toasts (notificaciones FiveM-like) -->
+  <div id="toasts" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- ==================== FIN PARTE 1 ==================== -->
+      <!-- ==================== PANEL: BUSCADOS (BOLO / Wanted) ==================== -->
       <div class="panel" id="panel-wanted">
         <div class="panel-header">
           <div>
-            <div class="panel-title">BOLO / Wanted</div>
-            <div class="panel-sub muted">Listados y prioridades</div>
+            <div class="panel-title">🚓 Buscados / BOLO</div>
+            <div class="panel-sub muted">Personas con orden o búsqueda activa</div>
           </div>
           <div class="panel-actions">
             <button class="btn-ghost btn-sm" data-refresh="wanted">⟳</button>
@@ -149,15 +207,16 @@
           </div>
         </div>
         <div class="panel-body" id="wantedPreview">
-          <div class="muted">Cargando...</div>
+          <div class="muted">Cargando datos...</div>
         </div>
       </div>
 
+      <!-- ==================== PANEL: MULTAS Y SANCIONES ==================== -->
       <div class="panel" id="panel-fines">
         <div class="panel-header">
           <div>
-            <div class="panel-title">Multas</div>
-            <div class="panel-sub muted">Gestionar multas y pagos</div>
+            <div class="panel-title">💰 Multas y Sanciones</div>
+            <div class="panel-sub muted">Registro de infracciones y pagos</div>
           </div>
           <div class="panel-actions">
             <button class="btn-ghost btn-sm" data-refresh="fines">⟳</button>
@@ -165,15 +224,16 @@
           </div>
         </div>
         <div class="panel-body" id="finesPreview">
-          <div class="muted">Cargando...</div>
+          <div class="muted">Esperando conexión...</div>
         </div>
       </div>
 
+      <!-- ==================== PANEL: ALERTAS Y LLAMADAS ==================== -->
       <div class="panel" id="panel-alerts">
         <div class="panel-header">
           <div>
-            <div class="panel-title">Alertas</div>
-            <div class="panel-sub muted">Enviar alertas a la ciudad</div>
+            <div class="panel-title">🚨 Alertas y Llamadas</div>
+            <div class="panel-sub muted">Avisos activos del entorno y central</div>
           </div>
           <div class="panel-actions">
             <button class="btn-ghost btn-sm" data-refresh="alerts">⟳</button>
@@ -181,650 +241,841 @@
           </div>
         </div>
         <div class="panel-body" id="alertsPreview">
-          <div class="muted">Cargando...</div>
+          <div class="muted">Sin alertas registradas...</div>
         </div>
       </div>
-    </section>
 
-    <!-- Expanded panel area -->
-    <div id="expandedRoot" style="margin-top:14px"></div>
+      <!-- ==================== PANEL: ENTORNOS POLICIALES (AUTOMÁTICO) ==================== -->
+      <div class="panel" id="panel-entornos">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">🗒️ Entornos Policiales</div>
+            <div class="panel-sub muted">Registro de actividades y reportes del entorno</div>
+          </div>
+          <div class="panel-actions">
+            <button class="btn-ghost btn-sm" data-refresh="entornos">⟳</button>
+            <button class="btn btn-sm" data-open="entornos">Abrir</button>
+          </div>
+        </div>
+        <div class="panel-body" id="entornosPreview">
+          <div class="muted">Sin entornos cargados...</div>
+        </div>
+      </div>
 
-    <footer>Interfaz profesional • Mantén Firebase inicializado en otro script (este archivo detecta la presencia)</footer>
-  </div>
+      <!-- ==================== PANEL: VEHÍCULOS REGISTRADOS ==================== -->
+      <div class="panel" id="panel-vehicles">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">🚗 Vehículos Registrados</div>
+            <div class="panel-sub muted">Consultas de matrícula y propietario</div>
+          </div>
+          <div class="panel-actions">
+            <button class="btn-ghost btn-sm" data-refresh="vehicles">⟳</button>
+            <button class="btn btn-sm" data-open="vehicles">Abrir</button>
+          </div>
+        </div>
+        <div class="panel-body" id="vehiclesPreview">
+          <div class="muted">Esperando datos de tráfico...</div>
+        </div>
+      </div>
 
-  <!-- Toasts -->
-  <div id="toasts" aria-live="polite" aria-atomic="true"></div>
+      <!-- ==================== PANEL: ARMAMENTO Y EQUIPO ==================== -->
+      <div class="panel" id="panel-armas">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">🔫 Armamento y Equipamiento</div>
+            <div class="panel-sub muted">Control de armas asignadas y en depósito</div>
+          </div>
+          <div class="panel-actions">
+            <button class="btn-ghost btn-sm" data-refresh="armas">⟳</button>
+            <button class="btn btn-sm" data-open="armas">Abrir</button>
+          </div>
+        </div>
+        <div class="panel-body" id="armasPreview">
+          <div class="muted">Inventario no cargado...</div>
+        </div>
+      </div>
 
+      <!-- ==================== PANEL: PERSONAL EN SERVICIO ==================== -->
+      <div class="panel" id="panel-oficiales">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">👮‍♂️ Personal en Servicio</div>
+            <div class="panel-sub muted">Estado actual del cuerpo policial</div>
+          </div>
+          <div class="panel-actions">
+            <button class="btn-ghost btn-sm" data-refresh="oficiales">⟳</button>
+            <button class="btn btn-sm" data-open="oficiales">Abrir</button>
+          </div>
+        </div>
+        <div class="panel-body" id="oficialesPreview">
+          <div class="muted">Cargando lista de oficiales...</div>
+        </div>
+      </div>
+
+      <!-- ==================== PANEL: INFORMES Y CASOS ==================== -->
+      <div class="panel" id="panel-informes">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">📂 Informes y Casos</div>
+            <div class="panel-sub muted">Seguimiento de investigaciones abiertas</div>
+          </div>
+          <div class="panel-actions">
+            <button class="btn-ghost btn-sm" data-refresh="informes">⟳</button>
+            <button class="btn btn-sm" data-open="informes">Abrir</button>
+          </div>
+        </div>
+        <div class="panel-body" id="informesPreview">
+          <div class="muted">Sin informes activos...</div>
+        </div>
+      </div>
+
+      <!-- ==================== PANEL: HISTORIAL DE NOTIFICACIONES ==================== -->
+      <div class="panel" id="panel-historial">
+        <div class="panel-header">
+          <div>
+            <div class="panel-title">🕓 Historial de Notificaciones</div>
+            <div class="panel-sub muted">Resumen automático de alertas recientes</div>
+          </div>
+          <div class="panel-actions">
+            <button class="btn-ghost btn-sm" data-refresh="historial">⟳</button>
+            <button class="btn btn-sm" data-open="historial">Abrir</button>
+          </div>
+        </div>
+        <div class="panel-body" id="historialPreview">
+          <div class="muted">Sin notificaciones previas...</div>
+        </div>
+      </div>
+  <!-- ==================== PARTE 3: SCRIPTS (JS) ==================== -->
   <script>
-/* ========================= PDA / CAD main script =========================
-   - Uses Firestore if already initialized in your app (supports modular & compat)
-   - Adds Refresh buttons, BOLO/Wanted, Multas, Alertas
-   - Notifications styled like FiveM (toasts)
-   - Keeps clean minimal neon-accent aesthetic and original structure
-   ===================================================================== */
-
-(function(){
-  /* ---------------- Firestore adapter (detect modular vs compat) ---------------- */
-  const FireDB = (function(){
-    const hasModular = (typeof getFirestore === 'function' && typeof collection === 'function');
-    const hasCompat = (typeof firebase !== 'undefined' && firebase.firestore);
-    let dbMod = null;
-    if(hasModular){
-      try { dbMod = getFirestore(); } catch(e){ dbMod = null; }
-    }
-
-    function available(){ return !!(hasModular || hasCompat); }
-
-    return {
-      available: available(),
-      hasModular, hasCompat, dbMod,
-      COL(name){
-        if(hasModular && dbMod) return collection(dbMod, name);
-        if(hasCompat) return firebase.firestore().collection(name);
-        return null;
-      },
-      async getAll(name){
-        try{
-          if(hasModular && dbMod){
-            if(typeof getDocs !== 'function') throw new Error('Missing getDocs import for modular SDK');
-            const snap = await getDocs(collection(dbMod, name));
-            const out = []; snap.forEach(d=> out.push({ id:d.id, ...d.data() }));
-            return out;
-          } else if(hasCompat){
-            const snap = await firebase.firestore().collection(name).get();
-            const out = []; snap.forEach(d=> out.push({ id:d.id, ...d.data() }));
-            return out;
-          }
-        }catch(e){ console.warn('FireDB.getAll error', e); }
-        return null;
-      },
-      async add(name, data){
-        try{
-          if(hasModular && dbMod){
-            if(typeof addDoc !== 'function') throw new Error('Missing addDoc import for modular SDK');
-            const res = await addDoc(collection(dbMod, name), data);
-            return { id: res.id, ...data };
-          } else if(hasCompat){
-            const ref = await firebase.firestore().collection(name).add(data);
-            return { id: ref.id, ...data };
-          }
-        }catch(e){ console.warn('FireDB.add error', e); }
-        return null;
-      },
-      async del(name, id){
-        try{
-          if(hasModular && dbMod){
-            if(typeof deleteDoc !== 'function' || typeof doc !== 'function') throw new Error('Missing deleteDoc/doc import');
-            await deleteDoc(doc(dbMod, name, id));
-            return true;
-          } else if(hasCompat){
-            await firebase.firestore().collection(name).doc(id).delete();
-            return true;
-          }
-        }catch(e){ console.warn('FireDB.del error', e); }
-        return false;
-      },
-      async update(name, id, patch){
-        try{
-          if(hasModular && dbMod){
-            if(typeof updateDoc !== 'function' || typeof doc !== 'function') throw new Error('Missing updateDoc/doc import');
-            await updateDoc(doc(dbMod, name, id), patch);
-            return true;
-          } else if(hasCompat){
-            await firebase.firestore().collection(name).doc(id).update(patch);
-            return true;
-          }
-        }catch(e){ console.warn('FireDB.update error', e); }
-        return false;
-      },
-      listen(name, onChange){
-        try{
-          if(hasModular && dbMod){
-            if(typeof onSnapshot !== 'function') { console.warn('onSnapshot missing for modular'); return null; }
-            const q = collection(dbMod, name);
-            return onSnapshot(q, snap => { const out=[]; snap.forEach(d=> out.push({ id:d.id, ...d.data() })); onChange(out); });
-          } else if(hasCompat){
-            return firebase.firestore().collection(name).onSnapshot(snap => { const out=[]; snap.forEach(d=> out.push({ id:d.id, ...d.data() })); onChange(out); });
-          }
-        }catch(e){ console.warn('FireDB.listen error', e); }
-        return null;
+  (function(){
+    /* ================= Firestore adapter (modular & compat detection) ================= */
+    const FireDB = (function(){
+      const hasModular = (typeof getFirestore === 'function' && typeof collection === 'function');
+      const hasCompat = (typeof firebase !== 'undefined' && firebase.firestore);
+      let dbMod = null;
+      if(hasModular){
+        try { dbMod = getFirestore(); } catch(e){ dbMod = null; }
       }
+      function available(){ return !!(hasModular || hasCompat); }
+
+      return {
+        available: available(),
+        hasModular, hasCompat, dbMod,
+        COL(name){
+          if(hasModular && dbMod) return collection(dbMod, name);
+          if(hasCompat) return firebase.firestore().collection(name);
+          return null;
+        },
+        async getAll(name){
+          try{
+            if(hasModular && dbMod){
+              if(typeof getDocs !== 'function') throw new Error('Missing getDocs (modular)');
+              const snap = await getDocs(collection(dbMod, name));
+              const out = []; snap.forEach(d=> out.push({ id:d.id, ...d.data() }));
+              return out;
+            } else if(hasCompat){
+              const snap = await firebase.firestore().collection(name).get();
+              const out = []; snap.forEach(d=> out.push({ id:d.id, ...d.data() }));
+              return out;
+            }
+          }catch(e){ console.warn('FireDB.getAll error', e); }
+          return null;
+        },
+        async add(name, data){
+          try{
+            if(hasModular && dbMod){
+              if(typeof addDoc !== 'function') throw new Error('Missing addDoc (modular)');
+              const res = await addDoc(collection(dbMod, name), data);
+              return { id: res.id, ...data };
+            } else if(hasCompat){
+              const ref = await firebase.firestore().collection(name).add(data);
+              return { id: ref.id, ...data };
+            }
+          }catch(e){ console.warn('FireDB.add error', e); }
+          return null;
+        },
+        async del(name, id){
+          try{
+            if(hasModular && dbMod){
+              if(typeof deleteDoc !== 'function' || typeof doc !== 'function') throw new Error('Missing deleteDoc/doc (modular)');
+              await deleteDoc(doc(dbMod, name, id));
+              return true;
+            } else if(hasCompat){
+              await firebase.firestore().collection(name).doc(id).delete();
+              return true;
+            }
+          }catch(e){ console.warn('FireDB.del error', e); }
+          return false;
+        },
+        async update(name, id, patch){
+          try{
+            if(hasModular && dbMod){
+              if(typeof updateDoc !== 'function' || typeof doc !== 'function') throw new Error('Missing updateDoc/doc (modular)');
+              await updateDoc(doc(dbMod, name, id), patch);
+              return true;
+            } else if(hasCompat){
+              await firebase.firestore().collection(name).doc(id).update(patch);
+              return true;
+            }
+          }catch(e){ console.warn('FireDB.update error', e); }
+          return false;
+        },
+        listen(name, onChange){
+          try{
+            if(hasModular && dbMod){
+              if(typeof onSnapshot !== 'function') { console.warn('onSnapshot missing (modular)'); return null; }
+              const q = collection(dbMod, name);
+              return onSnapshot(q, snap => { const out=[]; snap.forEach(d=> out.push({ id:d.id, ...d.data() })); onChange(out); });
+            } else if(hasCompat){
+              return firebase.firestore().collection(name).onSnapshot(snap => { const out=[]; snap.forEach(d=> out.push({ id:d.id, ...d.data() })); onChange(out); });
+            }
+          }catch(e){ console.warn('FireDB.listen error', e); }
+          return null;
+        }
+      };
+    })();
+
+    /* ================= State and collection names ================= */
+    const STATE = {
+      wanted: [],
+      fines: [],
+      alerts: [],
+      entornos: [],
+      vehicles: [],
+      armas: [],
+      oficiales: [],
+      informes: [],
+      historial: []
     };
-  })();
 
-  /* ---------------- State ---------------- */
-  const STATE = {
-    currentUser: null,
-    wanted: [],
-    fines: [],
-    alerts: []
-  };
+    const COLLECTIONS = {
+      wanted: 'wanted',
+      fines: 'fines',
+      alerts: 'alerts',
+      entornos: 'entornos',
+      vehicles: 'vehicles',
+      armas: 'armas',
+      oficiales: 'oficiales',
+      informes: 'informes',
+      historial: 'historial'
+    };
 
-  const COLLECTIONS = {
-    wanted: 'wanted',
-    fines: 'fines',
-    alerts: 'alerts',
-    users: 'users'
-  };
+    /* ================= DOM refs ================= */
+    const refs = {
+      wantedPreview: document.getElementById('wantedPreview'),
+      finesPreview: document.getElementById('finesPreview'),
+      alertsPreview: document.getElementById('alertsPreview'),
+      entornosPreview: document.getElementById('entornosPreview'),
+      vehiclesPreview: document.getElementById('vehiclesPreview'),
+      armasPreview: document.getElementById('armasPreview'),
+      oficialesPreview: document.getElementById('oficialesPreview'),
+      informesPreview: document.getElementById('informesPreview'),
+      historialPreview: document.getElementById('historialPreview'),
+      panelsRoot: document.getElementById('panelsRoot'),
+      expandedRoot: document.getElementById('expandedRoot'),
+      toasts: document.getElementById('toasts'),
+      userDisplay: document.getElementById('userDisplay'),
+      refreshAllBtn: document.getElementById('refreshAll'),
+      exportBtn: document.getElementById('exportBtn')
+    };
 
-  /* ---------------- DOM refs ---------------- */
-  const wantedPreview = document.getElementById('wantedPreview');
-  const finesPreview = document.getElementById('finesPreview');
-  const alertsPreview = document.getElementById('alertsPreview');
-  const expandedRoot = document.getElementById('expandedRoot');
-  const toasts = document.getElementById('toasts');
-  const userDisplay = document.getElementById('userDisplay');
+    /* ================= Utilities ================= */
+    function escapeHtml(s){ if(s===undefined||s===null) return ''; return String(s).replace(/[&<>"']/g, m=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]); }
+    function el(tag, props={}, children=[]){
+      const e = document.createElement(tag);
+      for(const k in props){
+        if(k === 'class') e.className = props[k];
+        else if(k === 'html') e.innerHTML = props[k];
+        else e.setAttribute(k, props[k]);
+      }
+      (Array.isArray(children) ? children : [children]).forEach(c=>{
+        if(!c) return;
+        if(typeof c === 'string') e.appendChild(document.createTextNode(c));
+        else if(c instanceof Node) e.appendChild(c);
+      });
+      return e;
+    }
 
-  /* ---------------- Notifications (FiveM-like) ---------------- */
-  let TOAST_ID = 0;
-  function notify(type, title, text, ttl=3500){
-    // type: info|success|warn|danger
-    const id = ++TOAST_ID;
-    const el = document.createElement('div');
-    el.className = 'toast';
-    el.dataset.id = id;
-    const emoji = type==='danger' ? '⚠️' : type==='success' ? '✅' : type==='warn' ? '🚨' : 'ℹ️';
-    el.innerHTML = `<div style="font-weight:900">${emoji} ${title}</div><div class="t-body" style="margin-left:8px">${text || ''}</div><button class="t-close" aria-label="Cerrar">×</button>`;
-    toasts.prepend(el);
-    el.querySelector('.t-close').addEventListener('click', ()=> removeToast(id));
-    if(ttl>0) setTimeout(()=> removeToast(id), ttl);
-    return id;
-  }
-  function removeToast(id){
-    const t = toasts.querySelector(`.toast[data-id="${id}"]`);
-    if(!t) return;
-    t.style.opacity = '0'; t.style.transform = 'translateY(-8px)';
-    setTimeout(()=> { if(t.parentNode) t.remove(); }, 220);
-  }
+    /* ================= Notifications (FiveM-like: automatic) ================= */
+    let TOAST_ID = 0;
+    function notify(type='info', title='', text='', ttl=4000){
+      const id = ++TOAST_ID;
+      const wrap = el('div',{class:'toast', 'data-id': id});
+      const emoji = type==='danger' ? '⚠️' : type==='success' ? '✅' : type==='warn' ? '🚨' : 'ℹ️';
+      wrap.innerHTML = `<div style="font-weight:900">${emoji} ${escapeHtml(title)}</div><div class="t-body" style="margin-left:8px">${escapeHtml(text)}</div><button class="t-close" aria-label="cerrar">×</button>`;
+      refs.toasts.prepend(wrap);
+      const close = wrap.querySelector('.t-close');
+      close.addEventListener('click', ()=> removeToast(id));
+      if(ttl>0) setTimeout(()=> removeToast(id), ttl);
+      return id;
+    }
+    function removeToast(id){
+      const t = refs.toasts.querySelector(`.toast[data-id="${id}"]`);
+      if(!t) return;
+      t.style.opacity = '0'; t.style.transform = 'translateY(-8px)';
+      setTimeout(()=> { if(t.parentNode) t.remove(); }, 220);
+    }
 
-  /* ---------------- Helpers ---------------- */
-  function el(tag, props={}, children=[]){
-    const e = document.createElement(tag);
-    Object.entries(props).forEach(([k,v])=>{
-      if(k === 'class') e.className = v;
-      else if(k.startsWith('data-')) e.setAttribute(k, v);
-      else if(k === 'html') e.innerHTML = v;
-      else e[k]=v;
-    });
-    (Array.isArray(children) ? children : [children]).forEach(c=>{
-      if(typeof c === 'string') e.appendChild(document.createTextNode(c));
-      else if(c instanceof Node) e.appendChild(c);
-    });
-    return e;
-  }
+    /* ================= Render PREVIEWS for each panel ================= */
+    function renderPreview(list, container, config = {}){
+      container.innerHTML = '';
+      const wrap = el('div',{class:'list'});
+      if(!list || list.length===0){ wrap.appendChild(el('div',{class:'muted'}, 'Sin registros')); container.appendChild(wrap); return; }
+      list.slice(0,6).forEach(item=>{
+        const left = el('div',{class:'item-left'}, [
+          el('div',{class:'item-title', html: escapeHtml(item.name || item.owner || item.title || item.displayName || '—') }),
+          el('div',{class:'item-meta', html: escapeHtml((item.reason || item.msg || item.role || '') + (item.amount ? ' • ' + item.amount + '€' : '')) })
+        ]);
+        const actions = el('div',{});
+        if(config.viewBtn) actions.appendChild(el('button',{class:'btn-ghost btn-sm', onclick: ()=> config.viewBtn(item.id)}, 'Ver'));
+        if(config.openBtn) actions.appendChild(el('button',{class:'btn btn-sm', onclick: ()=> openPanel(config.openBtn)}, 'Abrir'));
+        const row = el('div',{class:'item'}, [ left, actions ]);
+        wrap.appendChild(row);
+      });
+      container.appendChild(wrap);
+    }
 
-  function escapeHtml(s){ if(s===undefined||s===null) return ''; return String(s).replace(/[&<>"']/g, m=> ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]); }
+    /* ================= CRUD + Loaders for collections ================= */
+    async function loadCollection(name){
+      if(!FireDB.available) return null;
+      try { return await FireDB.getAll(name); } catch(e){ console.warn('loadCollection error', e); return null; }
+    }
 
-  /* ---------------- Panel: previews (first-load) ---------------- */
-  function renderWantedPreview(){
-    wantedPreview.innerHTML = '';
-    const list = el('div',{class:'list'});
-    const sample = STATE.wanted.slice(0,5);
-    if(sample.length===0) list.appendChild(el('div',{class:'muted'}, 'Sin BOLOs activos'));
-    else sample.forEach(w=>{
-      const itm = el('div',{class:'item'}, [
-        el('div',{class:'item-left'}, [
-          el('div',{class:'item-title', html:escapeHtml(w.name || w.name === 0 ? w.name : 'No identificado')}),
-          el('div',{class:'item-meta', html:escapeHtml((w.reason||'') + (w.priority ? ' • ' + w.priority : ''))})
-        ]),
+    // load each (tries Firestore, else keeps local)
+    async function loadWanted(){ const db = await loadCollection(COLLECTIONS.wanted); if(db) STATE.wanted = db; renderPreview(STATE.wanted, refs.wantedPreview, { viewBtn: viewWanted, openBtn: 'wanted' }); }
+    async function loadFines(){ const db = await loadCollection(COLLECTIONS.fines); if(db) STATE.fines = db; renderPreview(STATE.fines, refs.finesPreview, { viewBtn: viewFine, openBtn: 'fines' }); }
+    async function loadAlerts(){ const db = await loadCollection(COLLECTIONS.alerts); if(db) STATE.alerts = db; renderPreview(STATE.alerts, refs.alertsPreview, { viewBtn: viewAlert, openBtn: 'alerts' }); }
+    async function loadEntornos(){ const db = await loadCollection(COLLECTIONS.entornos); if(db) {
+        // sort by createdAt if possible
+        STATE.entornos = db.sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''));
+      } renderPreview(STATE.entornos, refs.entornosPreview, { viewBtn: viewEntorno, openBtn: 'entornos' }); }
+    async function loadVehicles(){ const db = await loadCollection(COLLECTIONS.vehicles); if(db) STATE.vehicles = db; renderPreview(STATE.vehicles, refs.vehiclesPreview, { viewBtn: viewVehicle, openBtn: 'vehicles' }); }
+    async function loadArmas(){ const db = await loadCollection(COLLECTIONS.armas); if(db) STATE.armas = db; renderPreview(STATE.armas, refs.armasPreview, { viewBtn: viewArma, openBtn: 'armas' }); }
+    async function loadOficiales(){ const db = await loadCollection(COLLECTIONS.oficiales); if(db) STATE.oficiales = db; renderPreview(STATE.oficiales, refs.oficialesPreview, { viewBtn: viewOficial, openBtn: 'oficiales' }); }
+    async function loadInformes(){ const db = await loadCollection(COLLECTIONS.informes); if(db) STATE.informes = db; renderPreview(STATE.informes, refs.informesPreview, { viewBtn: viewInforme, openBtn: 'informes' }); }
+    async function loadHistorial(){ const db = await loadCollection(COLLECTIONS.historial); if(db) STATE.historial = db; renderPreview(STATE.historial, refs.historialPreview, { viewBtn: viewHist, openBtn: 'historial' }); }
+
+    /* ================= Panel expanded rendering ================= */
+    function clearExpanded(){
+      if(!refs.expandedRoot.firstElementChild) return;
+      const node = refs.expandedRoot.firstElementChild;
+      node.style.animation = 'panelOut .18s ease forwards';
+      setTimeout(()=> refs.expandedRoot.innerHTML = '', 190);
+    }
+
+    function openPanel(name){
+      clearExpanded();
+      const panel = el('div',{class:'panel expanded'});
+      const header = el('div',{class:'panel-header'}, [
         el('div',{}, [
-          el('button',{class:'btn-ghost btn-sm', onclick:()=> openWantedView(w.id)}, 'Ver')
+          el('div',{class:'panel-title', html: panelTitleFor(name)}),
+          el('div',{class:'panel-sub muted', html: panelSubtitleFor(name)})
+        ]),
+        el('div',{class:'panel-actions'}, [
+          el('button',{class:'btn-ghost btn-sm', onclick: ()=> refreshOne(name)}, '⟳'),
+          el('button',{class:'btn btn-sm', onclick: ()=> clearExpanded()}, 'Cerrar')
         ])
       ]);
-      list.appendChild(itm);
-    });
-    wantedPreview.appendChild(list);
-  }
+      const body = el('div',{class:'panel-body'});
+      panel.appendChild(header);
+      panel.appendChild(body);
 
-  function renderFinesPreview(){
-    finesPreview.innerHTML = '';
-    const list = el('div',{class:'list'});
-    const sample = STATE.fines.slice(0,5);
-    if(sample.length===0) list.appendChild(el('div',{class:'muted'}, 'Sin multas'));
-    else sample.forEach(f=>{
-      const itm = el('div',{class:'item'}, [
-        el('div',{class:'item-left'}, [
-          el('div',{class:'item-title', html:escapeHtml(f.owner || '—')}),
-          el('div',{class:'item-meta', html:escapeHtml((f.reason||'') + (f.amount ? ' • ' + f.amount + '€' : ''))})
-        ]),
-        el('div',{}, [
-          el('button',{class:'btn-ghost btn-sm', onclick:()=> openFineView(f.id)}, 'Ver')
-        ])
+      refs.expandedRoot.appendChild(panel);
+      // populate body with appropriate full panel UI
+      switch(name){
+        case 'wanted': body.appendChild(WantedFullUI()); break;
+        case 'fines': body.appendChild(FinesFullUI()); break;
+        case 'alerts': body.appendChild(AlertsFullUI()); break;
+        case 'entornos': body.appendChild(EntornosFullUI()); break;
+        case 'vehicles': body.appendChild(VehiclesFullUI()); break;
+        case 'armas': body.appendChild(ArmasFullUI()); break;
+        case 'oficiales': body.appendChild(OficialesFullUI()); break;
+        case 'informes': body.appendChild(InformesFullUI()); break;
+        case 'historial': body.appendChild(HistorialFullUI()); break;
+        default: body.appendChild(el('div',{}, 'Panel no implementado')); break;
+      }
+      panel.scrollIntoView({behavior:'smooth', block:'center'});
+    }
+
+    function panelTitleFor(name){
+      const map = {
+        wanted: '🚓 Buscados / BOLO',
+        fines: '💰 Multas y Sanciones',
+        alerts: '🚨 Alertas y Llamadas',
+        entornos: '🗒️ Entornos Policiales',
+        vehicles: '🚗 Vehículos Registrados',
+        armas: '🔫 Armamento y Equipamiento',
+        oficiales: '👮‍♂️ Personal en Servicio',
+        informes: '📂 Informes y Casos',
+        historial: '🕓 Historial de Notificaciones'
+      };
+      return map[name] || name;
+    }
+    function panelSubtitleFor(name){
+      const map = {
+        wanted: 'Gestiona BOLOs — crear, ver, borrar',
+        fines: 'Gestiona multas — pagar, eliminar',
+        alerts: 'Enviar alertas a la ciudad',
+        entornos: 'Registros automáticos del entorno (notificaciones)',
+        vehicles: 'Búsqueda por matrícula y propietario',
+        armas: 'Control de armas asignadas',
+        oficiales: 'Estado del personal y turnos',
+        informes: 'Crear y consultar informes',
+        historial: 'Registro de notificaciones enviadas'
+      };
+      return map[name] || '';
+    }
+
+    /* ================= Full UI builders for each panel (forms, lists) ================= */
+
+    /* ---------- Wanted Full ---------- */
+    function WantedFullUI(){
+      const container = el('div',{});
+      const toolbar = el('div',{style:'display:flex;gap:8px;align-items:center'}, [
+        el('input',{id:'wantedSearch', placeholder:'Buscar nombre o motivo', style:'padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);flex:1'}),
+        el('button',{class:'btn btn-sm', onclick: ()=> triggerNewWanted()}, 'Nuevo BOLO'),
+        el('button',{class:'btn-ghost btn-sm', onclick: ()=> refreshOne('wanted')}, 'Refrescar')
       ]);
-      list.appendChild(itm);
-    });
-    finesPreview.appendChild(list);
-  }
+      const list = el('div',{id:'wantedListFull', class:'list', style:'margin-top:12px;max-height:420px;overflow:auto'});
 
-  function renderAlertsPreview(){
-    alertsPreview.innerHTML = '';
-    const list = el('div',{class:'list'});
-    const sample = STATE.alerts.slice(0,5);
-    if(sample.length===0) list.appendChild(el('div',{class:'muted'}, 'Sin alertas enviadas'));
-    else sample.forEach(a=>{
-      const itm = el('div',{class:'item'}, [
-        el('div',{class:'item-left'}, [
-          el('div',{class:'item-title', html:escapeHtml(a.title || 'Alerta')}),
-          el('div',{class:'item-meta', html:escapeHtml(a.msg || '')})
-        ]),
-        el('div',{}, [
-          el('button',{class:'btn-ghost btn-sm', onclick:()=> viewAlert(a.id)}, 'Ver')
-        ])
+      container.appendChild(toolbar);
+      container.appendChild(list);
+
+      function render(items){
+        list.innerHTML = '';
+        if(!items.length) { list.appendChild(el('div',{class:'muted'}, 'Sin BOLOs activos')); return; }
+        items.forEach(w=>{
+          const row = el('div',{class:'item'}, [
+            el('div',{class:'item-left'}, [
+              el('div',{class:'item-title', html: escapeHtml(w.name||'—')}),
+              el('div',{class:'item-meta', html: escapeHtml((w.reason||'') + (w.priority ? ' • '+w.priority : ''))})
+            ]),
+            el('div',{}, [
+              el('button',{class:'btn-ghost btn-sm', onclick: ()=> viewWanted(w.id)}, 'Ver'),
+              el('button',{class:'btn btn-sm', onclick: ()=> removeWanted(w.id)}, 'Borrar')
+            ])
+          ]);
+          list.appendChild(row);
+        });
+      }
+
+      // initial render
+      render(STATE.wanted);
+
+      // search
+      toolbar.querySelector('#wantedSearch').addEventListener('input', function(e){
+        const q = (e.target.value || '').toLowerCase().trim();
+        if(!q) render(STATE.wanted);
+        else render(STATE.wanted.filter(x => (x.name||'').toLowerCase().includes(q) || (x.reason||'').toLowerCase().includes(q)));
+      });
+
+      return container;
+    }
+
+    /* ---------- Fines Full ---------- */
+    function FinesFullUI(){
+      const container = el('div',{});
+      const toolbar = el('div',{style:'display:flex;gap:8px;align-items:center'}, [
+        el('input',{id:'finesSearch', placeholder:'Buscar titular o motivo', style:'padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);flex:1'}),
+        el('button',{class:'btn btn-sm', onclick: ()=> triggerNewFine()}, 'Nueva Multa'),
+        el('button',{class:'btn-ghost btn-sm', onclick: ()=> refreshOne('fines')}, 'Refrescar')
       ]);
-      list.appendChild(itm);
-    });
-    alertsPreview.appendChild(list);
-  }
+      const list = el('div',{id:'finesListFull', class:'list', style:'margin-top:12px;max-height:420px;overflow:auto'});
 
-  /* ---------------- Expanded panels (Wanted / Fines / Alerts) ---------------- */
-  function clearExpanded(){
-    if(!expandedRoot.firstElementChild) return;
-    const node = expandedRoot.firstElementChild;
-    node.style.animation = 'panelOut .18s ease forwards';
-    setTimeout(()=> expandedRoot.innerHTML='', 190);
-  }
+      container.appendChild(toolbar);
+      container.appendChild(list);
 
-  function openPanel(type){
-    clearExpanded();
-    const panel = el('div',{class:'panel expanded'});
-    panel.style.animation = 'none';
-    const header = el('div',{class:'panel-header'}, [
-      el('div',{}, [ el('div',{class:'panel-title', html: type==='wanted' ? 'BOLO / Wanted' : type==='fines' ? 'Multas' : 'Alertas'}), el('div',{class:'panel-sub muted', html: type==='wanted' ? 'Gestiona BOLOs' : type==='fines' ? 'Gestiona Multas' : 'Enviar alertas'}) ]),
-      el('div',{class:'panel-actions'}, [
-        el('button',{class:'btn-ghost btn-sm', onclick:()=> refreshOne(type)}, '⟳'),
-        el('button',{class:'btn btn-sm', onclick:()=> clearExpanded()}, 'Cerrar')
-      ])
-    ]);
-    const body = el('div',{class:'panel-body'});
-    panel.appendChild(header);
-    panel.appendChild(body);
+      function render(items){
+        list.innerHTML = '';
+        if(!items.length){ list.appendChild(el('div',{class:'muted'}, 'Sin multas')); return; }
+        items.forEach(f=>{
+          const row = el('div',{class:'item'}, [
+            el('div',{class:'item-left'}, [
+              el('div',{class:'item-title', html: escapeHtml(f.owner||'—')}),
+              el('div',{class:'item-meta', html: escapeHtml((f.reason||'') + (f.amount ? ' • ' + f.amount + '€' : ''))})
+            ]),
+            el('div',{}, [
+              el('button',{class:'btn-ghost btn-sm', onclick: ()=> viewFine(f.id)}, f.paid ? 'Reembolsar' : 'Pagar'),
+              el('button',{class:'btn btn-sm', onclick: ()=> removeFine(f.id)}, 'Eliminar')
+            ])
+          ]);
+          list.appendChild(row);
+        });
+      }
 
-    // content by type
-    if(type === 'wanted') {
-      body.appendChild(renderWantedPanelBody());
-    } else if(type === 'fines'){
-      body.appendChild(renderFinesPanelBody());
-    } else if(type === 'alerts'){
-      body.appendChild(renderAlertsPanelBody());
-    }
+      render(STATE.fines);
 
-    expandedRoot.appendChild(panel);
-    panel.scrollIntoView({behavior:'smooth', block:'center'});
-  }
-
-  function renderWantedPanelBody(){
-    const container = el('div',{});
-    const toolbar = el('div',{style:'display:flex;justify-content:space-between;align-items:center;gap:8px'}, [
-      el('div',{}, [ el('input',{id:'searchWanted', placeholder:'Buscar por nombre o motivo', style:'padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);width:100%'}) ]),
-      el('div',{}, [ el('button',{class:'btn btn-sm', onclick:()=> triggerNewWanted()}, 'Nuevo BOLO'), el('button',{class:'btn-ghost btn-sm', onclick:()=> refreshOne('wanted')}, 'Refrescar') ])
-    ]);
-    const list = el('div',{class:'list', id:'wantedListFull', style:'margin-top:12px;max-height:380px;overflow:auto'});
-
-    container.appendChild(toolbar);
-    container.appendChild(list);
-
-    // initial render
-    function renderList(items){
-      list.innerHTML = '';
-      if(!items.length) list.appendChild(el('div',{class:'muted'}, 'Sin BOLOs activos'));
-      else items.forEach(w=>{
-        const it = el('div',{class:'item'}, [
-          el('div',{class:'item-left'}, [ el('div',{class:'item-title', html:escapeHtml(w.name||'—')}), el('div',{class:'item-meta', html:escapeHtml((w.reason||'') + (w.priority ? ' • ' + w.priority : ''))}) ]),
-          el('div',{}, [
-            el('button',{class:'btn-sm btn-ghost', onclick:()=> viewWanted(w.id)}, 'Ver'),
-            el('button',{class:'btn-sm btn', onclick:()=> removeWanted(w.id)}, 'Borrar')
-          ])
-        ]);
-        list.appendChild(it);
+      toolbar.querySelector('#finesSearch').addEventListener('input', function(e){
+        const q = (e.target.value || '').toLowerCase().trim();
+        if(!q) render(STATE.fines);
+        else render(STATE.fines.filter(x => (x.owner||'').toLowerCase().includes(q) || (x.reason||'').toLowerCase().includes(q)));
       });
+
+      return container;
     }
 
-    renderList(STATE.wanted);
+    /* ---------- Alerts Full ---------- */
+    function AlertsFullUI(){
+      const container = el('div',{});
+      const toolbar = el('div',{style:'display:flex;gap:8px;align-items:center'}, [
+        el('input',{id:'alertsSearch', placeholder:'Buscar título o mensaje', style:'padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);flex:1'}),
+        el('button',{class:'btn btn-sm', onclick: ()=> triggerNewAlert()}, 'Nueva Alerta'),
+        el('button',{class:'btn-ghost btn-sm', onclick: ()=> refreshOne('alerts')}, 'Refrescar')
+      ]);
+      const list = el('div',{id:'alertsListFull', class:'list', style:'margin-top:12px;max-height:420px;overflow:auto'});
 
-    // search behavior
-    container.querySelector('#searchWanted').addEventListener('input', function(e){
-      const q = (e.target.value || '').toLowerCase().trim();
-      if(!q) renderList(STATE.wanted);
-      else renderList(STATE.wanted.filter(x => (x.name||'').toLowerCase().includes(q) || (x.reason||'').toLowerCase().includes(q)));
-    });
+      container.appendChild(toolbar);
+      container.appendChild(list);
 
-    return container;
-  }
+      function render(items){
+        list.innerHTML = '';
+        if(!items.length){ list.appendChild(el('div',{class:'muted'}, 'Sin alertas')); return; }
+        items.forEach(a=>{
+          const row = el('div',{class:'item'}, [
+            el('div',{class:'item-left'}, [
+              el('div',{class:'item-title', html: escapeHtml(a.title||'Alerta')}),
+              el('div',{class:'item-meta', html: escapeHtml(a.msg||'')})
+            ]),
+            el('div',{}, [
+              el('button',{class:'btn-ghost btn-sm', onclick: ()=> viewAlert(a.id)}, 'Ver'),
+              el('button',{class:'btn btn-sm', onclick: ()=> removeAlert(a.id)}, 'Eliminar')
+            ])
+          ]);
+          list.appendChild(row);
+        });
+      }
 
-  function renderFinesPanelBody(){
-    const container = el('div',{});
-    const toolbar = el('div',{style:'display:flex;justify-content:space-between;align-items:center;gap:8px'}, [
-      el('div',{}, [ el('input',{id:'searchFines', placeholder:'Buscar por titular o motivo', style:'padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);width:100%'}) ]),
-      el('div',{}, [ el('button',{class:'btn btn-sm', onclick:()=> triggerNewFine()}, 'Nueva Multa'), el('button',{class:'btn-ghost btn-sm', onclick:()=> refreshOne('fines')}, 'Refrescar') ])
-    ]);
-    const list = el('div',{class:'list', id:'finesListFull', style:'margin-top:12px;max-height:380px;overflow:auto'});
+      render(STATE.alerts);
 
-    container.appendChild(toolbar);
-    container.appendChild(list);
-
-    function renderList(items){
-      list.innerHTML = '';
-      if(!items.length) list.appendChild(el('div',{class:'muted'}, 'Sin multas'));
-      else items.forEach(f=>{
-        const it = el('div',{class:'item'}, [
-          el('div',{class:'item-left'}, [ el('div',{class:'item-title', html:escapeHtml(f.owner||'—')}), el('div',{class:'item-meta', html:escapeHtml((f.reason||'') + (f.amount ? ' • ' + f.amount + '€' : ''))}) ]),
-          el('div',{}, [
-            el('button',{class:'btn-sm btn-ghost', onclick:()=> viewFine(f.id)}, f.paid ? 'Reembolsar' : 'Pagar'),
-            el('button',{class:'btn-sm btn', onclick:()=> removeFine(f.id)}, 'Eliminar')
-          ])
-        ]);
-        list.appendChild(it);
+      toolbar.querySelector('#alertsSearch').addEventListener('input', function(e){
+        const q = (e.target.value || '').toLowerCase().trim();
+        if(!q) render(STATE.alerts);
+        else render(STATE.alerts.filter(x => (x.title||'').toLowerCase().includes(q) || (x.msg||'').toLowerCase().includes(q)));
       });
+
+      return container;
     }
 
-    renderList(STATE.fines);
+    /* ---------- Entornos Full (also drives automatic notifications) ---------- */
+    function EntornosFullUI(){
+      const container = el('div',{});
+      const toolbar = el('div',{style:'display:flex;gap:8px;align-items:center'}, [
+        el('div',{}, [ el('button',{class:'btn btn-sm', onclick: ()=> refreshOne('entornos')}, 'Refrescar') ])
+      ]);
+      const list = el('div',{id:'entornosListFull', class:'list', style:'margin-top:12px;max-height:420px;overflow:auto'});
 
-    container.querySelector('#searchFines').addEventListener('input', function(e){
-      const q = (e.target.value || '').toLowerCase().trim();
-      if(!q) renderList(STATE.fines);
-      else renderList(STATE.fines.filter(x => (x.owner||'').toLowerCase().includes(q) || (x.reason||'').toLowerCase().includes(q)));
-    });
+      container.appendChild(toolbar);
+      container.appendChild(list);
 
-    return container;
-  }
+      function render(items){
+        list.innerHTML = '';
+        if(!items.length){ list.appendChild(el('div',{class:'muted'}, 'Sin entornos')); return; }
+        items.forEach(a=>{
+          const row = el('div',{class:'item'}, [
+            el('div',{class:'item-left'}, [
+              el('div',{class:'item-title', html: escapeHtml(a.title || a.type || 'Evento')}),
+              el('div',{class:'item-meta', html: escapeHtml(a.msg || a.desc || '')})
+            ]),
+            el('div',{}, [ el('button',{class:'btn-ghost btn-sm', onclick: ()=> viewEntorno(a.id)}, 'Ver') ])
+          ]);
+          list.appendChild(row);
+        });
+      }
 
-  function renderAlertsPanelBody(){
-    const container = el('div',{});
-    const toolbar = el('div',{style:'display:flex;justify-content:space-between;align-items:center;gap:8px'}, [
-      el('div',{}, [ el('input',{id:'searchAlerts', placeholder:'Buscar por título o mensaje', style:'padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--text);width:100%'}) ]),
-      el('div',{}, [ el('button',{class:'btn btn-sm', onclick:()=> triggerNewAlert()}, 'Nueva Alerta'), el('button',{class:'btn-ghost btn-sm', onclick:()=> refreshOne('alerts')}, 'Refrescar') ])
-    ]);
-    const list = el('div',{class:'list', id:'alertsListFull', style:'margin-top:12px;max-height:380px;overflow:auto'});
+      render(STATE.entornos);
 
-    container.appendChild(toolbar);
-    container.appendChild(list);
-
-    function renderList(items){
-      list.innerHTML = '';
-      if(!items.length) list.appendChild(el('div',{class:'muted'}, 'Sin alertas'));
-      else items.forEach(a=>{
-        const it = el('div',{class:'item'}, [
-          el('div',{class:'item-left'}, [ el('div',{class:'item-title', html:escapeHtml(a.title||'Alerta')}), el('div',{class:'item-meta', html:escapeHtml(a.msg||'')}) ]),
-          el('div',{}, [ el('button',{class:'btn-sm btn-ghost', onclick:()=> viewAlert(a.id)}, 'Ver') ])
-        ]);
-        list.appendChild(it);
-      });
+      return container;
     }
 
-    renderList(STATE.alerts);
-
-    container.querySelector('#searchAlerts').addEventListener('input', function(e){
-      const q = (e.target.value || '').toLowerCase().trim();
-      if(!q) renderList(STATE.alerts);
-      else renderList(STATE.alerts.filter(x => (x.title||'').toLowerCase().includes(q) || (x.msg||'').toLowerCase().includes(q)));
-    });
-
-    return container;
-  }
-
-  /* ---------------- View / CRUD actions (Wanted) ---------------- */
-  async function loadWanted(){
-    try {
-      const dbdata = await FireDB.getAll(COLLECTIONS.wanted);
-      if(dbdata) STATE.wanted = dbdata;
-    } catch(e){ console.warn('loadWanted error', e); }
-    renderWantedPreview();
-  }
-
-  async function triggerNewWanted(){
-    const name = prompt('Nombre del sujeto:') || '';
-    if(!name) return;
-    const reason = prompt('Motivo:') || '';
-    const priority = prompt('Prioridad (Alta/Media/Baja):') || '';
-    const doc = { name, reason, priority, createdAt: new Date().toISOString() };
-    if(FireDB.available){
-      const created = await FireDB.add(COLLECTIONS.wanted, doc);
-      if(created) STATE.wanted.unshift(created);
-      else { doc.id = `bolo${Date.now().toString().slice(-5)}`; STATE.wanted.unshift(doc); notify('warn','BOLO guardado local','Firestore no respondió'); }
-    } else {
-      doc.id = `bolo${Date.now().toString().slice(-5)}`;
-      STATE.wanted.unshift(doc);
+    /* ---------- Vehicles, Armas, Oficiales, Informes, Historial (simple full UIs) ---------- */
+    function VehiclesFullUI(){
+      const c = el('div',{}, [ el('div',{class:'muted'}, 'Simple visor de vehículos (implementación básica)') ]);
+      return c;
     }
-    renderWantedPreview();
-    notify('success','BOLO creado', name);
-  }
+    function ArmasFullUI(){ return el('div',{}, [ el('div',{class:'muted'}, 'Control de armamento (visor básico)') ]); }
+    function OficialesFullUI(){ return el('div',{}, [ el('div',{class:'muted'}, 'Lista de oficiales — gestión básica') ]); }
+    function InformesFullUI(){ return el('div',{}, [ el('div',{class:'muted'}, 'Crear/Ver informes (implementación básica)') ]); }
+    function HistorialFullUI(){ return el('div',{}, [ el('div',{class:'muted'}, 'Historial de notificaciones y acciones') ]); }
 
-  async function removeWanted(id){
-    if(!id) return;
-    if(FireDB.available){
-      const ok = await FireDB.del(COLLECTIONS.wanted, id);
-      if(!ok){ notify('danger','Error','No se pudo borrar desde Firestore'); return; }
+    /* ================= Action handlers: create/remove/view ================= */
+
+    // Wanted
+    async function triggerNewWanted(){
+      const name = prompt('Nombre del sujeto:'); if(!name) return;
+      const reason = prompt('Motivo:') || '';
+      const priority = prompt('Prioridad (Alta/Media/Baja):') || '';
+      const doc = { name, reason, priority, createdAt: new Date().toISOString() };
+      if(FireDB.available){ const created = await FireDB.add(COLLECTIONS.wanted, doc); if(created) STATE.wanted.unshift(created); else { doc.id = `bolo${Date.now().toString().slice(-5)}`; STATE.wanted.unshift(doc); } }
+      else { doc.id = `bolo${Date.now().toString().slice(-5)}`; STATE.wanted.unshift(doc); }
+      renderPreview(STATE.wanted, refs.wantedPreview, { viewBtn: viewWanted, openBtn: 'wanted' });
+      notify('success','BOLO creado', name);
     }
-    STATE.wanted = STATE.wanted.filter(x=> x.id !== id);
-    const listFull = document.getElementById('wantedListFull'); if(listFull) listFull.dispatchEvent(new Event('refreshList') );
-    renderWantedPreview();
-    notify('info','BOLO eliminado', id || '');
-  }
-
-  function viewWanted(id){
-    const w = STATE.wanted.find(x=>x.id===id) || {};
-    const body = `<h3>${escapeHtml(w.name||'—')}</h3>
-      <p><b>Motivo:</b> ${escapeHtml(w.reason||'')}</p>
-      <p><b>Prioridad:</b> ${escapeHtml(w.priority||'')}</p>
-      <p class="muted small">${escapeHtml(w.notes||'')}</p>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-        <button id="closeModal" class="btn-ghost btn-sm">Cerrar</button>
-      </div>`;
-    const m = createModal(body);
-    m.querySelector('#closeModal').addEventListener('click', ()=> m.remove());
-  }
-
-  function openWantedView(id){
-    openPanel('wanted');
-    // small delay for rendering, then if id provided scroll into view / highlight
-    setTimeout(()=> {
+    async function removeWanted(id){
       if(!id) return;
-      const list = document.getElementById('wantedListFull');
-      if(list) {
-        // no exact mapping element ids, so leave as is — user can search
-      }
-    }, 300);
-  }
-
-  /* ---------------- Fines (Multas) CRUD ---------------- */
-  async function loadFines(){
-    try {
-      const dbdata = await FireDB.getAll(COLLECTIONS.fines);
-      if(dbdata) STATE.fines = dbdata;
-    } catch(e){ console.warn('loadFines error', e); }
-    renderFinesPreview();
-  }
-
-  async function triggerNewFine(){
-    const owner = prompt('Titular de la multa:') || '';
-    if(!owner) return;
-    const reason = prompt('Motivo:') || '';
-    const amountRaw = prompt('Importe (€):') || '0';
-    const amount = parseFloat(amountRaw) || 0;
-    const doc = { owner, reason, amount, paid: false, createdAt: new Date().toISOString() };
-    if(FireDB.available){
-      const created = await FireDB.add(COLLECTIONS.fines, doc);
-      if(created) STATE.fines.unshift(created);
-      else { doc.id = `fine${Date.now().toString().slice(-6)}`; STATE.fines.unshift(doc); notify('warn','Multa local','Firestore no respondió'); }
-    } else {
-      doc.id = `fine${Date.now().toString().slice(-6)}`; STATE.fines.unshift(doc);
-    }
-    renderFinesPreview();
-    notify('success','Multa creada', owner + ' • ' + amount + '€');
-  }
-
-  async function removeFine(id){
-    if(!id) return;
-    if(FireDB.available){
-      const ok = await FireDB.del(COLLECTIONS.fines, id);
-      if(!ok){ notify('danger','Error','No se pudo borrar desde Firestore'); return; }
-    }
-    STATE.fines = STATE.fines.filter(x=> x.id !== id);
-    renderFinesPreview();
-    notify('info','Multa eliminada', id || '');
-  }
-
-  function viewFine(id){
-    const f = STATE.fines.find(x=>x.id===id) || {};
-    const body = `<h3>${escapeHtml(f.owner||'—')}</h3>
-      <p><b>Motivo:</b> ${escapeHtml(f.reason||'')}</p>
-      <p><b>Importe:</b> ${escapeHtml(String(f.amount||0))}€</p>
-      <p><b>Estado:</b> ${f.paid ? 'Pagada' : 'Pendiente'}</p>
-      <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
-        <button id="togglePay" class="btn btn-sm">${f.paid ? 'Marcar sin pagar' : 'Marcar pagada'}</button>
-        <button id="closeModal" class="btn-ghost btn-sm">Cerrar</button>
-      </div>`;
-    const m = createModal(body);
-    m.querySelector('#closeModal').addEventListener('click', ()=> m.remove());
-    m.querySelector('#togglePay').addEventListener('click', async ()=>{
-      const newPaid = !f.paid;
       if(FireDB.available){
-        const ok = await FireDB.update(COLLECTIONS.fines, id, { paid: newPaid });
-        if(!ok) { notify('danger','Error','No se pudo actualizar en Firestore'); return; }
+        const ok = await FireDB.del(COLLECTIONS.wanted, id);
+        if(!ok){ notify('danger','Error','No se pudo eliminar en Firestore'); return; }
       }
-      f.paid = newPaid;
-      m.remove();
-      renderFinesPreview();
-      notify('success','Estado de multa actualizado', f.owner + ' • ' + (f.paid ? 'Pagada' : 'Pendiente'));
-    });
-  }
-
-  function openFineView(id){
-    openPanel('fines');
-  }
-
-  /* ---------------- Alerts ---------------- */
-  async function loadAlerts(){
-    try {
-      const dbdata = await FireDB.getAll(COLLECTIONS.alerts);
-      if(dbdata) STATE.alerts = dbdata;
-    } catch(e){ console.warn('loadAlerts error', e); }
-    renderAlertsPreview();
-  }
-
-  async function triggerNewAlert(){
-    const title = prompt('Título de la alerta:') || 'Alerta';
-    const msg = prompt('Mensaje:') || '';
-    const doc = { title, msg, createdAt: new Date().toISOString() };
-    if(FireDB.available){
-      const created = await FireDB.add(COLLECTIONS.alerts, doc);
-      if(created) STATE.alerts.unshift(created);
-      else { doc.id = `alert${Date.now().toString().slice(-6)}`; STATE.alerts.unshift(doc); notify('warn','Alerta local','Firestore no respondió'); }
-    } else {
-      doc.id = `alert${Date.now().toString().slice(-6)}`; STATE.alerts.unshift(doc);
+      STATE.wanted = STATE.wanted.filter(x=> x.id !== id);
+      // update expanded list if open
+      const listFull = document.getElementById('wantedListFull'); if(listFull) listFull.dispatchEvent(new Event('refreshList'));
+      renderPreview(STATE.wanted, refs.wantedPreview, { viewBtn: viewWanted, openBtn: 'wanted' });
+      notify('info','BOLO eliminado', id||'');
     }
-    renderAlertsPreview();
-    notify('warn','Alerta enviada', title);
-  }
+    function viewWanted(id){
+      const w = STATE.wanted.find(x => x.id === id) || {};
+      const body = `<h3>${escapeHtml(w.name||'—')}</h3>
+        <p><b>Motivo:</b> ${escapeHtml(w.reason||'')}</p>
+        <p><b>Prioridad:</b> ${escapeHtml(w.priority||'')}</p>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+          <button id="closeModal" class="btn-ghost btn-sm">Cerrar</button>
+        </div>`;
+      const m = createModal(body);
+      m.querySelector('#closeModal').addEventListener('click', ()=> m.remove());
+    }
 
-  function viewAlert(id){
-    const a = STATE.alerts.find(x=>x.id===id) || {};
-    const body = `<h3>${escapeHtml(a.title||'Alerta')}</h3><p>${escapeHtml(a.msg||'')}</p><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button id="closeModal" class="btn-ghost btn-sm">Cerrar</button></div>`;
-    const m = createModal(body);
-    m.querySelector('#closeModal').addEventListener('click', ()=> m.remove());
-  }
+    // Fines
+    async function triggerNewFine(){
+      const owner = prompt('Titular de la multa:'); if(!owner) return;
+      const reason = prompt('Motivo:') || '';
+      const amount = parseFloat(prompt('Importe (€):') || '0') || 0;
+      const doc = { owner, reason, amount, paid: false, createdAt: new Date().toISOString() };
+      if(FireDB.available){ const created = await FireDB.add(COLLECTIONS.fines, doc); if(created) STATE.fines.unshift(created); else { doc.id = `fine${Date.now().toString().slice(-6)}`; STATE.fines.unshift(doc); } }
+      else { doc.id = `fine${Date.now().toString().slice(-6)}`; STATE.fines.unshift(doc); }
+      renderPreview(STATE.fines, refs.finesPreview, { viewBtn: viewFine, openBtn: 'fines' });
+      notify('success','Multa creada', owner + ' • ' + amount + '€');
+    }
+    async function removeFine(id){
+      if(!id) return;
+      if(FireDB.available){
+        const ok = await FireDB.del(COLLECTIONS.fines, id);
+        if(!ok){ notify('danger','Error','No se pudo eliminar en Firestore'); return; }
+      }
+      STATE.fines = STATE.fines.filter(x=> x.id !== id);
+      renderPreview(STATE.fines, refs.finesPreview, { viewBtn: viewFine, openBtn: 'fines' });
+      notify('info','Multa eliminada', id||'');
+    }
+    async function viewFine(id){
+      const f = STATE.fines.find(x => x.id === id) || {};
+      const body = `<h3>${escapeHtml(f.owner||'—')}</h3>
+        <p><b>Motivo:</b> ${escapeHtml(f.reason||'')}</p>
+        <p><b>Importe:</b> ${escapeHtml(String(f.amount||0))}€</p>
+        <p><b>Estado:</b> ${f.paid ? 'Pagada' : 'Pendiente'}</p>
+        <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+          <button id="togglePay" class="btn btn-sm">${f.paid ? 'Marcar sin pagar' : 'Marcar pagada'}</button>
+          <button id="closeModal" class="btn-ghost btn-sm">Cerrar</button>
+        </div>`;
+      const m = createModal(body);
+      m.querySelector('#closeModal').addEventListener('click', ()=> m.remove());
+      m.querySelector('#togglePay').addEventListener('click', async ()=>{
+        const newPaid = !f.paid;
+        if(FireDB.available){
+          const ok = await FireDB.update(COLLECTIONS.fines, id, { paid: newPaid });
+          if(!ok){ notify('danger','Error','No se pudo actualizar en Firestore'); return; }
+        }
+        f.paid = newPaid;
+        m.remove();
+        renderPreview(STATE.fines, refs.finesPreview, { viewBtn: viewFine, openBtn: 'fines' });
+        notify('success','Estado de multa actualizado', f.owner + ' • ' + (f.paid ? 'Pagada' : 'Pendiente'));
+      });
+    }
 
-  /* ---------------- Utilities: modal & export ---------------- */
-  function createModal(innerHtml){
-    const wrap = el('div',{class:'modal-back'});
-    const box = el('div',{class:'modal', html: innerHtml});
-    wrap.appendChild(box);
-    document.body.appendChild(wrap);
-    wrap.addEventListener('click', function(e){ if(e.target === wrap) wrap.remove(); });
-    return wrap;
-  }
+    // Alerts
+    async function triggerNewAlert(){
+      const title = prompt('Título de la alerta:'); if(!title) return;
+      const msg = prompt('Mensaje:') || '';
+      const doc = { title, msg, createdAt: new Date().toISOString() };
+      if(FireDB.available){ const created = await FireDB.add(COLLECTIONS.alerts, doc); if(created) STATE.alerts.unshift(created); else { doc.id = `alert${Date.now().toString().slice(-6)}`; STATE.alerts.unshift(doc); } }
+      else { doc.id = `alert${Date.now().toString().slice(-6)}`; STATE.alerts.unshift(doc); }
+      renderPreview(STATE.alerts, refs.alertsPreview, { viewBtn: viewAlert, openBtn: 'alerts' });
+      notify('warn','Alerta enviada', title);
+    }
+    async function removeAlert(id){
+      if(!id) return;
+      if(FireDB.available){
+        const ok = await FireDB.del(COLLECTIONS.alerts, id);
+        if(!ok){ notify('danger','Error','No se pudo eliminar en Firestore'); return; }
+      }
+      STATE.alerts = STATE.alerts.filter(x=> x.id !== id);
+      renderPreview(STATE.alerts, refs.alertsPreview, { viewBtn: viewAlert, openBtn: 'alerts' });
+      notify('info','Alerta eliminada', id||'');
+    }
+    function viewAlert(id){
+      const a = STATE.alerts.find(x=> x.id === id) || {};
+      const body = `<h3>${escapeHtml(a.title||'Alerta')}</h3><p>${escapeHtml(a.msg||'')}</p><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button id="closeModal" class="btn-ghost btn-sm">Cerrar</button></div>`;
+      const m = createModal(body);
+      m.querySelector('#closeModal').addEventListener('click', ()=> m.remove());
+    }
 
-  async function exportData(){
-    const data = { wanted: STATE.wanted, fines: STATE.fines, alerts: STATE.alerts };
-    const blob = new Blob([JSON.stringify(data, null, 2)], { type:'application/json' });
-    const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'pda_export_' + Date.now() + '.json'; document.body.appendChild(a); a.click(); a.remove();
-    notify('success','Exportado','Datos descargados');
-  }
+    // Entornos: mainly read + automatic notifications for new records
+    async function viewEntorno(id){
+      const a = STATE.entornos.find(x=> x.id === id) || {};
+      const body = `<h3>${escapeHtml(a.title||a.type||'Evento')}</h3><p>${escapeHtml(a.msg||a.desc||'')}</p><div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px"><button id="closeModal" class="btn-ghost btn-sm">Cerrar</button></div>`;
+      const m = createModal(body);
+      m.querySelector('#closeModal').addEventListener('click', ()=> m.remove());
+    }
 
-  /* ---------------- Refresh and wiring ---------------- */
-  async function refreshOne(name){
-    const hostEl = document.querySelector(`[data-refresh="${name}"]`)?.closest('.panel');
-    if(hostEl) { hostEl.classList.add('pulse'); setTimeout(()=> hostEl.classList.remove('pulse'), 900); }
-    try{
-      if(name === 'wanted') await loadWanted();
-      if(name === 'fines') await loadFines();
-      if(name === 'alerts') await loadAlerts();
-    }catch(e){ console.warn('refreshOne error', e); }
-    notify('info','Refrescado', `Panel ${name} actualizado`);
-  }
+    /* ------------------ remove functions for other collections (basic) ------------------ */
+    async function removeGeneric(collection, id, stateKey, previewRef, viewFnName){
+      if(!id) return;
+      if(FireDB.available){
+        const ok = await FireDB.del(collection, id);
+        if(!ok){ notify('danger','Error','No se pudo eliminar en Firestore'); return; }
+      }
+      STATE[stateKey] = STATE[stateKey].filter(x=> x.id !== id);
+      renderPreview(STATE[stateKey], previewRef);
+      notify('info','Eliminado', id||'');
+    }
 
-  async function refreshAll(){
-    const panels = document.querySelectorAll('.panel');
-    panels.forEach(p=> p.classList.add('pulse'));
-    setTimeout(()=> panels.forEach(p=> p.classList.remove('pulse')), 900);
-    await Promise.all([loadWanted(), loadFines(), loadAlerts()]);
-    notify('info','Refrescado','Todos los paneles actualizados');
-  }
+    /* ================= Modal utility & export ================= */
+    function createModal(innerHtml){
+      const back = el('div',{class:'modal-back'});
+      const box = el('div',{class:'modal', html: innerHtml});
+      back.appendChild(box);
+      document.body.appendChild(back);
+      back.addEventListener('click', function(e){ if(e.target === back) back.remove(); });
+      return back;
+    }
+    function exportData(){
+      const data = {
+        wanted: STATE.wanted,
+        fines: STATE.fines,
+        alerts: STATE.alerts,
+        entornos: STATE.entornos,
+        vehicles: STATE.vehicles,
+        armas: STATE.armas,
+        oficiales: STATE.oficiales,
+        informes: STATE.informes,
+        historial: STATE.historial
+      };
+      const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+      const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'pda_export_' + Date.now() + '.json'; document.body.appendChild(a); a.click(); a.remove();
+      notify('success','Exportado','JSON descargado');
+    }
 
-  // wire initial buttons
-  document.querySelectorAll('[data-refresh]').forEach(btn=>{
-    btn.addEventListener('click', (e)=> {
-      const name = btn.getAttribute('data-refresh');
-      refreshOne(name);
-    });
-  });
-  document.querySelectorAll('[data-open]').forEach(btn=>{
-    btn.addEventListener('click', (e)=> {
-      const name = btn.getAttribute('data-open');
-      openPanel(name);
-    });
-  });
+    /* ================= Refresh wiring ================= */
+    async function refreshOne(name){
+      const hostBtn = document.querySelector(`[data-refresh="${name}"]`);
+      const hostPanel = hostBtn ? hostBtn.closest('.panel') : null;
+      if(hostPanel){ hostPanel.classList.add('pulse'); setTimeout(()=> hostPanel.classList.remove('pulse'), 900); }
+      try{
+        switch(name){
+          case 'wanted': await loadWanted(); break;
+          case 'fines': await loadFines(); break;
+          case 'alerts': await loadAlerts(); break;
+          case 'entornos': await loadEntornos(); break;
+          case 'vehicles': await loadVehicles(); break;
+          case 'armas': await loadArmas(); break;
+          case 'oficiales': await loadOficiales(); break;
+          case 'informes': await loadInformes(); break;
+          case 'historial': await loadHistorial(); break;
+          default: break;
+        }
+      }catch(e){ console.warn('refreshOne error', e); }
+      notify('info','Refrescado', `Panel ${panelTitleFor(name)} actualizado`);
+    }
 
-  document.getElementById('refreshAll').addEventListener('click', refreshAll);
-  document.getElementById('exportBtn').addEventListener('click', exportData);
+    async function refreshAll(){
+      const panels = document.querySelectorAll('.panel');
+      panels.forEach(p=> p.classList.add('pulse'));
+      setTimeout(()=> panels.forEach(p=> p.classList.remove('pulse')), 900);
+      await Promise.all([
+        loadWanted(), loadFines(), loadAlerts(), loadEntornos(), loadVehicles(),
+        loadArmas(), loadOficiales(), loadInformes(), loadHistorial()
+      ]);
+      notify('info','Refrescado','Todos los paneles actualizados');
+    }
 
-  /* ---------------- Initial load and optional realtime listeners ---------------- */
-  (async function init(){
-    // try realtime listeners if FireDB supports it (best-effort)
-    if(FireDB.available){
-      try {
-        // set current user display based on your auth (if available)
-        if(typeof firebase !== 'undefined' && firebase.auth) {
+    // wire data-open and data-refresh buttons
+    document.querySelectorAll('[data-refresh]').forEach(btn => btn.addEventListener('click', ()=> refreshOne(btn.getAttribute('data-refresh'))));
+    document.querySelectorAll('[data-open]').forEach(btn => btn.addEventListener('click', ()=> openPanel(btn.getAttribute('data-open'))));
+    refs.refreshAllBtn.addEventListener('click', refreshAll);
+    refs.exportBtn.addEventListener('click', exportData);
+
+    /* ================= Realtime: subscribe to entornos and generate automatic notifs ================= */
+    let lastEntornosIds = new Set();
+    function handleEntornosRealtime(arr){
+      // compare ids -> notify for new ones
+      const incomingIds = new Set(arr.map(x=> x.id));
+      // new ids = arr ids not in lastEntornosIds
+      arr.forEach(item => {
+        if(!lastEntornosIds.has(item.id)){
+          // produce an automatic notification for this entornos item
+          const title = item.title || item.type || 'Evento en entorno';
+          const text = item.msg || item.desc || '';
+          notify('warn', title, text, 6000);
+        }
+      });
+      lastEntornosIds = incomingIds;
+      STATE.entornos = arr.sort((a,b)=> (b.createdAt||'').localeCompare(a.createdAt||''));
+      renderPreview(STATE.entornos, refs.entornosPreview, { viewBtn: viewEntorno, openBtn: 'entornos' });
+      // update expanded list if open
+      const ef = document.getElementById('entornosListFull'); if(ef) { ef.dispatchEvent(new Event('refreshList')); }
+    }
+
+    async function startRealtimeIfPossible(){
+      if(!FireDB.available) return false;
+      try{
+        // try listeners for entornos (automatic notif) and others (keep previews updated)
+        const u1 = FireDB.listen(COLLECTIONS.entornos, handleEntornosRealtime);
+        const u2 = FireDB.listen(COLLECTIONS.wanted, arr => { STATE.wanted = arr; renderPreview(STATE.wanted, refs.wantedPreview, { viewBtn: viewWanted, openBtn: 'wanted' }); });
+        const u3 = FireDB.listen(COLLECTIONS.fines, arr => { STATE.fines = arr; renderPreview(STATE.fines, refs.finesPreview, { viewBtn: viewFine, openBtn: 'fines' }); });
+        const u4 = FireDB.listen(COLLECTIONS.alerts, arr => { STATE.alerts = arr; renderPreview(STATE.alerts, refs.alertsPreview, { viewBtn: viewAlert, openBtn: 'alerts' }); });
+        // other collections optional
+        const u5 = FireDB.listen(COLLECTIONS.historial, arr => { STATE.historial = arr; renderPreview(STATE.historial, refs.historialPreview); });
+        // If module not supporting onSnapshot returns null, we'll fallback to manual loads
+        if(!u1 && !u2 && !u3 && !u4) return false;
+        return true;
+      }catch(e){
+        console.warn('startRealtimeIfPossible error', e);
+        return false;
+      }
+    }
+
+    /* ================= Initial boot: load data and attempt realtime ================= */
+    (async function init(){
+      // Attempt realtime listeners. If not supported or imports missing, do manual fetch
+      let realtime = false;
+      if(FireDB.available){
+        realtime = await startRealtimeIfPossible();
+      }
+      if(!realtime){
+        // manual load
+        await Promise.all([ loadWanted(), loadFines(), loadAlerts(), loadEntornos(), loadVehicles(), loadArmas(), loadOficiales(), loadInformes(), loadHistorial() ]);
+      }
+
+      // fill previews (in case listeners didn't)
+      renderPreview(STATE.wanted, refs.wantedPreview, { viewBtn: viewWanted, openBtn: 'wanted' });
+      renderPreview(STATE.fines, refs.finesPreview, { viewBtn: viewFine, openBtn: 'fines' });
+      renderPreview(STATE.alerts, refs.alertsPreview, { viewBtn: viewAlert, openBtn: 'alerts' });
+      renderPreview(STATE.entornos, refs.entornosPreview, { viewBtn: viewEntorno, openBtn: 'entornos' });
+
+      // set user display if available
+      try{
+        if(typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser){
           const u = firebase.auth().currentUser;
-          if(u) userDisplay.textContent = u.displayName || u.email || 'Usuario';
+          refs.userDisplay.textContent = u.displayName || u.email || 'Usuario';
         }
-        // attempt to register listeners (if onSnapshot imported)
-        try {
-          const unsubWanted = FireDB.listen(COLLECTIONS.wanted, arr => { STATE.wanted = arr; renderWantedPreview(); });
-          const unsubFines = FireDB.listen(COLLECTIONS.fines, arr => { STATE.fines = arr; renderFinesPreview(); });
-          const unsubAlerts = FireDB.listen(COLLECTIONS.alerts, arr => { STATE.alerts = arr; renderAlertsPreview(); });
-          // if nulls returned, fall back to manual fetch
-          if(!unsubWanted && !unsubFines && !unsubAlerts){
-            await Promise.all([loadWanted(), loadFines(), loadAlerts()]);
-          }
-        } catch(e){
-          // modular onSnapshot etc may be missing imports: fallback to fetch
-          await Promise.all([loadWanted(), loadFines(), loadAlerts()]);
-        }
-        notify('success','Firestore detectado','Conexión activa (si la SDK está inicializada y los imports modulares existen)');
-      } catch(e){
-        console.warn('Realtime init error', e);
-        await Promise.all([loadWanted(), loadFines(), loadAlerts()]);
-        notify('warn','Firestore detectado parcialmente','Se han usado fetchs (exports/imports modulares podrían faltar)');
-      }
-    } else {
-      // no firestore: demo/local mode
-      await Promise.all([loadWanted(), loadFines(), loadAlerts()]);
-      notify('warn','Sin Firestore','Modo demo/local activo');
-    }
+      }catch(e){ /* ignore */ }
 
-    // initial render of previews
-    renderWantedPreview();
-    renderFinesPreview();
-    renderAlertsPreview();
+      // notify initial state
+      if(FireDB.available) notify('success','Firestore detectado','Conexión disponible (si la SDK está inicializada correctamente)');
+      else notify('warn','Sin Firestore','Modo demo/local activo — el sistema funcionará localmente');
+
+      // ensure buttons wired for 'refreshList' custom event (for expanded panels)
+      document.addEventListener('refreshList', ()=> {});
+    })();
+
+    /* ================= Expose for debugging (console) ================= */
+    window.PDA = {
+      STATE, COLLECTIONS, FireDB,
+      loadWanted, loadFines, loadAlerts, loadEntornos, loadVehicles, loadArmas, loadOficiales, loadInformes, loadHistorial,
+      openPanel, refreshOne, refreshAll, notify
+    };
+
   })();
-
-  /* ---------------- Expose some functions for console debugging if needed ---------------- */
-  window.PDA = {
-    STATE, loadWanted, loadFines, loadAlerts, openPanel, notify, FireDB
-  };
-
-})();
   </script>
+  <!-- ==================== FIN PARTE 3 ==================== -->
 </body>
 </html>
