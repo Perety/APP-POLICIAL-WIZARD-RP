@@ -3,428 +3,113 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Daynight RP — PDA / CAD (Completo)</title>
-  <meta name="description" content="PDA/CAD Daynight RP — BOLO, Multas, Alertas, Entornos, Notifs estilo FiveM.">
+  <title>Daynight RP — PDA / CAD (Final)</title>
+  <meta name="description" content="PDA/CAD Daynight RP — BOLO, Multas, Alertas, Entornos, Notificaciones estilo FiveM.">
 
-  <!-- ================== ESTILOS: Neon Accent (limpio y profesional) ================== -->
   <style>
     :root{
-      --bg-1:#040615; --bg-2:#071428;
-      --panel: rgba(255,255,255,0.03);
-      --glass: rgba(255,255,255,0.02);
-      --border: rgba(255,255,255,0.05);
-      --muted: #9fb3bd; --text:#E9F9FF;
-      --accent-violet:#7C3AED; --accent-cyan:#06B6E4;
-      --success:#30D39A; --danger:#FF6B6B;
-      --radius:12px; --shadow: 0 16px 48px rgba(2,6,10,0.65);
-      --fast:180ms; --med:280ms;
-      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      --bg-1:#040615;--bg-2:#071428;--panel:rgba(255,255,255,0.03);--glass:rgba(255,255,255,0.02);
+      --border:rgba(255,255,255,0.05);--muted:#9fb3bd;--text:#E9F9FF;
+      --accent-violet:#7C3AED;--accent-cyan:#06B6E4;--success:#30D39A;--danger:#FF6B6B;
+      --radius:12px;--shadow:0 16px 48px rgba(2,6,10,0.65);--fast:180ms;--med:280ms;
+      font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial;
     }
     html,body{height:100%;margin:0;background:
-      radial-gradient(900px 380px at 12% 8%, rgba(124,58,237,0.06), transparent 20%),
-      linear-gradient(180deg,var(--bg-1), var(--bg-2) 70%); color:var(--text); -webkit-font-smoothing:antialiased;}
+      radial-gradient(900px 380px at 12% 8%,rgba(124,58,237,0.06),transparent 20%),
+      linear-gradient(180deg,var(--bg-1),var(--bg-2) 70%);
+      color:var(--text);-webkit-font-smoothing:antialiased;}
     *{box-sizing:border-box}
-    a{color:var(--accent-cyan)}
-
-    /* background elements */
-    .bg { position:fixed; inset:0; z-index:0; pointer-events:none; }
-    .nebula{ position:absolute; width:60vmax; height:60vmax; left:-10vmin; top:-8vmin; background:
-      radial-gradient(circle at 30% 30%, rgba(124,58,237,0.24), transparent 30%),
-      radial-gradient(circle at 70% 70%, rgba(6,182,164,0.12), transparent 25%); filter:blur(56px) saturate(120%); opacity:0.95;}
-    .nebula.r{ right:-10vmin; left:auto; top:6vmin; background:
-      radial-gradient(circle at 70% 20%, rgba(255,80,120,0.20), transparent 30%),
-      radial-gradient(circle at 30% 80%, rgba(110,231,183,0.12), transparent 25%); animation-direction:reverse;}
-    .gridOverlay{ position:absolute; inset:0; background-image:
-      linear-gradient(transparent 96%, rgba(255,255,255,0.01) 96%),
-      linear-gradient(90deg, transparent 96%, rgba(255,255,255,0.01) 96%); background-size: 320px 320px; opacity:0.03; }
-    .stripes{ position:absolute; inset:0; opacity:0.12; filter: blur(18px) saturate(120%);
-      background: linear-gradient(90deg, rgba(124,58,237,0.06) 0 20%, transparent 20% 50%),
-                  linear-gradient(90deg, rgba(255,40,80,0.05) 50% 70%, transparent 70% 100%); }
-
-    @keyframes float { 0%{ transform:translateY(0) } 50%{ transform:translateY(-6px) } 100%{ transform:translateY(0) } }
-
-    /* layout */
     .wrap{max-width:1200px;margin:18px auto;padding:18px;position:relative;z-index:5}
     header{display:flex;align-items:center;justify-content:space-between;gap:12px}
     .brand{display:flex;gap:12px;align-items:center}
     .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent-cyan),var(--accent-violet));display:grid;place-items:center;color:#02141a;font-weight:900}
-    .brand h1{margin:0;font-size:18px}
-    .subtitle{font-size:12px;color:var(--muted)}
-
+    .brand h1{margin:0;font-size:18px}.subtitle{font-size:12px;color:var(--muted)}
     .top-right{display:flex;gap:8px;align-items:center}
     .pill{background:var(--glass);padding:8px 12px;border-radius:999px;color:var(--muted);font-weight:700}
     .btn{background:linear-gradient(90deg,var(--accent-violet),var(--accent-cyan));border:none;color:#02141a;padding:8px 12px;border-radius:10px;cursor:pointer;font-weight:800;box-shadow:0 10px 26px rgba(20,10,60,0.12)}
     .btn-ghost{background:transparent;border:1px solid var(--border);color:var(--muted);padding:7px 10px;border-radius:10px;cursor:pointer}
     .btn-sm{padding:6px 8px;font-size:13px;border-radius:9px}
-
-    /* grid */
     .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:14px}
-    @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} }
-    @media (max-width:640px){ .grid{grid-template-columns:1fr} }
-
-    /* card / panel */
-    .panel{background:var(--panel);border-radius:var(--radius);padding:14px;border:1px solid var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;min-height:120px;transition:transform var(--med) ease,box-shadow var(--fast)}
-    .panel:hover{transform:translateY(-6px);box-shadow:0 30px 80px rgba(0,0,0,0.6);border-color: rgba(124,58,237,0.12)}
-    .panel .title{font-weight:900;color:var(--accent-violet)}
-    .panel .sub{color:var(--muted);font-size:13px}
-
-    .panel .list{display:flex;flex-direction:column;gap:8px;overflow:auto}
+    @media(max-width:980px){.grid{grid-template-columns:repeat(2,1fr)}}
+    @media(max-width:640px){.grid{grid-template-columns:1fr}}
+    .panel{background:var(--panel);border-radius:var(--radius);padding:14px;border:1px solid var(--border);box-shadow:var(--shadow);display:flex;flex-direction:column;gap:10px;transition:transform var(--med) ease,box-shadow var(--fast)}
+    .panel:hover{transform:translateY(-6px);box-shadow:0 30px 80px rgba(0,0,0,0.6);border-color:rgba(124,58,237,0.12)}
+    .panel .title{font-weight:900;color:var(--accent-violet)}.panel .sub{color:var(--muted);font-size:13px}
+    .list{display:flex;flex-direction:column;gap:8px;overflow:auto}
     .item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:rgba(255,255,255,0.02);border-radius:10px;border:1px solid rgba(255,255,255,0.03)}
-    .item-left{max-width:72%}
-    .item-title{font-weight:800}
-    .item-meta{font-size:13px;color:var(--muted)}
-
+    .item-left{max-width:72%}.item-title{font-weight:800}.item-meta{font-size:13px;color:var(--muted)}
     .panel-actions{display:flex;gap:8px;justify-content:flex-end}
-
-    /* expanded panel */
-    #expandedRoot .expanded{margin-top:12px;border-radius:12px;padding:16px;background:linear-gradient(180deg, rgba(255,255,255,0.016), rgba(0,0,0,0.03));border:1px solid rgba(255,255,255,0.03);box-shadow:0 30px 44px rgba(0,0,0,0.55);animation: panelIn .28s both}
-    @keyframes panelIn{from{opacity:0;transform:translateY(12px) scale(.995)}to{opacity:1;transform:none}}
-    @keyframes panelOut{from{opacity:1}to{opacity:0;transform:translateY(8px)}}
-
-    /* toasts */
-    #toasts{position:fixed; right:18px; top:72px; z-index:99999; display:flex; flex-direction:column; gap:10px; width:360px; pointer-events:none}
+    #toasts{position:fixed;right:18px;top:72px;z-index:99999;display:flex;flex-direction:column;gap:10px;width:360px;pointer-events:none}
     .toast{pointer-events:auto;display:flex;gap:12px;align-items:flex-start;padding:12px;border-radius:10px;background:linear-gradient(90deg,var(--accent-cyan),var(--accent-violet));color:#02141a;font-weight:800;box-shadow:0 12px 38px rgba(2,6,10,0.6);animation:toastIn .22s}
     @keyframes toastIn{from{opacity:0;transform:translateY(-8px) scale(.98)}to{opacity:1;transform:none}}
-    .toast .t-body{font-weight:700;color:rgba(2,20,26,0.92)}
-    .toast .t-close{margin-left:auto;background:transparent;border:none;color:rgba(2,20,26,0.85);font-weight:900;cursor:pointer}
-
-    /* modal */
+    .toast .t-body{font-weight:700;color:rgba(2,20,26,0.92)}.toast .t-close{margin-left:auto;background:transparent;border:none;color:rgba(2,20,26,0.85);font-weight:900;cursor:pointer}
     .overlay{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,0.5);z-index:99999}
-    .modal{background:var(--panel);border-radius:12px;padding:16px;min-width:320px;max-width:760px;box-shadow:0 14px 40px rgba(2,6,10,0.6)}
-    input,textarea,select{background:transparent;border:1px solid var(--border);color:var(--text);padding:8px;border-radius:8px;width:100%}
-    .muted{color:var(--muted)}
-    .hidden{display:none}
-    .pulse{animation:pulse .9s}
-    @keyframes pulse{0%{box-shadow:0 0 0 rgba(124,58,237,0.12)}70%{box-shadow:0 0 30px rgba(124,58,237,0.04)}100%{box-shadow:none}}
+    .modal{background:var(--panel);border-radius:12px;padding:16px;min-width:320px;box-shadow:0 14px 40px rgba(2,6,10,0.6)}
+    input{background:transparent;border:1px solid var(--border);color:var(--text);padding:8px;border-radius:8px;width:100%}
+    .muted{color:var(--muted)}.hidden{display:none}.pulse{animation:pulse .9s}@keyframes pulse{0%{box-shadow:0 0 0 rgba(124,58,237,0.12)}70%{box-shadow:0 0 30px rgba(124,58,237,0.04)}100%{box-shadow:none}}
   </style>
-  <!-- ================== FIN ESTILOS ================== -->
 </head>
 <body>
-  <div class="bg" aria-hidden="true">
-    <div class="nebula"></div>
-    <div class="nebula r"></div>
-    <div class="gridOverlay"></div>
-    <div class="stripes"></div>
-  </div>
-
-  <div class="wrap" role="main">
+  <div class="wrap">
     <header>
       <div class="brand">
-        <div class="logo" aria-hidden="true">PDA</div>
+        <div class="logo">PDA</div>
         <div>
           <h1>Daynight RP — PDA / CAD</h1>
-          <div class="subtitle">Interfaz completa · BOLO · Multas · Alertas · Entornos</div>
+          <div class="subtitle">BOLO · Multas · Alertas · Entornos</div>
         </div>
       </div>
-
       <div class="top-right">
         <div id="userDisplay" class="pill">No conectado</div>
-        <div id="dutyStatus" class="pill">En servicio: <span id="onDutyCount">0</span></div>
-        <div id="notifCountWrap" class="pill muted small" style="display:none">Notifs: <span id="notifCount">0</span></div>
         <button id="refreshAll" class="btn-ghost">Refrescar todo</button>
         <button id="exportBtn" class="btn">Exportar</button>
         <button id="btnLogin" class="btn-ghost">Entrar</button>
       </div>
     </header>
 
-    <!-- GRID: paneles -->
-    <section class="grid" id="panelsRoot" aria-label="Paneles principales">
-      <!-- Panels will be injected / preserved in next block -->
+    <section class="grid" id="panelsRoot">
+      <div class="panel" id="panel-bolos"><div class="title">🚓 BOLOs</div><div class="sub">Personas o vehículos buscados</div><div class="panel-actions"><button class="btn-ghost btn-sm" data-refresh="bolos">⟳</button><button class="btn btn-sm" data-open="bolos">Abrir</button></div><div class="list" id="bolosPreview"><div class="muted">Cargando...</div></div></div>
+      <div class="panel" id="panel-multas"><div class="title">💰 Multas</div><div class="sub">Registro de infracciones</div><div class="panel-actions"><button class="btn-ghost btn-sm" data-refresh="multas">⟳</button><button class="btn btn-sm" data-open="multas">Abrir</button></div><div class="list" id="multasPreview"><div class="muted">Cargando...</div></div></div>
+      <div class="panel" id="panel-alertas"><div class="title">🚨 Alertas</div><div class="sub">Avisos y llamadas entrantes</div><div class="panel-actions"><button class="btn-ghost btn-sm" data-refresh="alertas">⟳</button><button class="btn btn-sm" data-open="alertas">Abrir</button></div><div class="list" id="alertasPreview"><div class="muted">Cargando...</div></div></div>
+      <div class="panel" id="panel-entornos"><div class="title">🗒️ Entornos</div><div class="sub">Registros automáticos y eventos</div><div class="panel-actions"><button class="btn-ghost btn-sm" data-refresh="entornos">⟳</button><button class="btn btn-sm" data-open="entornos">Abrir</button></div><div class="list" id="entornosPreview"><div class="muted">Cargando...</div></div></div>
+      <div class="panel" id="panel-vehiculos"><div class="title">🚗 Vehículos</div><div class="sub">Búsqueda y control</div><div class="panel-actions"><button class="btn-ghost btn-sm" data-refresh="vehiculos">⟳</button><button class="btn btn-sm" data-open="vehiculos">Abrir</button></div><div class="list" id="vehiculosPreview"><div class="muted">Cargando...</div></div></div>
+      <div class="panel" id="panel-armas"><div class="title">🔫 Armamento</div><div class="sub">Inventario y equipamiento</div><div class="panel-actions"><button class="btn-ghost btn-sm" data-refresh="armas">⟳</button><button class="btn btn-sm" data-open="armas">Abrir</button></div><div class="list" id="armasPreview"><div class="muted">Cargando...</div></div></div>
+      <div class="panel" id="panel-oficiales"><div class="title">👮‍♂️ Oficiales</div><div class="sub">Personal en servicio</div><div class="panel-actions"><button class="btn-ghost btn-sm" data-refresh="oficiales">⟳</button><button class="btn btn-sm" data-open="oficiales">Abrir</button></div><div class="list" id="oficialesPreview"><div class="muted">Cargando...</div></div></div>
+      <div class="panel" id="panel-informes"><div class="title">📂 Informes</div><div class="sub">Casos e investigaciones</div><div class="panel-actions"><button class="btn-ghost btn-sm" data-refresh="informes">⟳</button><button class="btn btn-sm" data-open="informes">Abrir</button></div><div class="list" id="informesPreview"><div class="muted">Cargando...</div></div></div>
+      <div class="panel" id="panel-historial"><div class="title">🕓 Historial</div><div class="sub">Notificaciones recientes</div><div class="panel-actions"><button class="btn-ghost btn-sm" data-refresh="historial">⟳</button><button class="btn btn-sm" data-open="historial">Abrir</button></div><div class="list" id="historialPreview"><div class="muted">Cargando...</div></div></div>
     </section>
 
-    <!-- expanded panel placeholder -->
-    <div id="expandedRoot" aria-live="polite"></div>
-
-    <footer style="margin-top:18px;color:var(--muted);text-align:center;font-size:13px">Daynight RP • Interfaz mejorada • Neon Accent</footer>
+    <div id="expandedRoot"></div>
   </div>
 
-  <!-- LOGIN modal (no registro) -->
-  <div id="loginModal" class="overlay" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true">
+  <div id="loginModal" class="overlay">
+    <div class="modal">
       <h3>Acceso — Daynight RP</h3>
-      <div class="muted small">Inicia sesión con tu cuenta. En caso de prueba, usa "Invitado".</div>
-      <div style="margin-top:12px">
-        <label class="muted small">Usuario</label>
-        <input id="loginUser" placeholder="usuario" autocomplete="username" />
-        <label class="muted small" style="margin-top:8px">Contraseña</label>
-        <input id="loginPass" type="password" placeholder="contraseña" autocomplete="current-password"/>
-        <div style="display:flex;gap:8px;margin-top:12px">
-          <button id="loginBtnModal" class="btn">Entrar</button>
-          <button id="guestBtnModal" class="btn-ghost">Invitado</button>
-          <button id="closeLoginModal" class="btn-ghost" style="margin-left:auto">Cerrar</button>
-        </div>
-        <div id="loginError" class="muted small" style="margin-top:8px;color:#ff9b9b;display:none"></div>
+      <div class="muted small">Introduce tus credenciales o entra como invitado.</div>
+      <label class="muted small">Usuario</label><input id="loginUser" placeholder="usuario"/>
+      <label class="muted small">Contraseña</label><input id="loginPass" type="password" placeholder="contraseña"/>
+      <div style="display:flex;gap:8px;margin-top:12px">
+        <button id="loginBtnModal" class="btn">Entrar</button>
+        <button id="guestBtnModal" class="btn-ghost">Invitado</button>
+        <button id="closeLoginModal" class="btn-ghost">Cerrar</button>
       </div>
+      <div id="loginError" class="muted small" style="margin-top:8px;color:#ff9b9b;display:none"></div>
     </div>
   </div>
 
-  <!-- toasts -->
-  <div id="toasts" aria-live="polite" aria-atomic="true"></div>
-      <!-- ========================= PANEL: BOLOS / BUSCADOS ========================= -->
-      <div class="panel" id="panel-bolos">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">🚓 BOLOs / Buscados</div>
-            <div class="sub">Personas o vehículos con búsqueda activa</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="bolos">⟳</button>
-            <button class="btn btn-sm" data-open="bolos">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="bolosPreview"><div class="muted">Cargando...</div></div>
-      </div>
+  <div id="toasts"></div>
 
-      <!-- ========================= PANEL: MULTAS ========================= -->
-      <div class="panel" id="panel-multas">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">💰 Multas y Sanciones</div>
-            <div class="sub">Registro y gestión de multas</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="multas">⟳</button>
-            <button class="btn btn-sm" data-open="multas">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="multasPreview"><div class="muted">Cargando...</div></div>
-      </div>
-
-      <!-- ========================= PANEL: ALERTAS ========================= -->
-      <div class="panel" id="panel-alertas">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">🚨 Alertas y Llamadas</div>
-            <div class="sub">Notificaciones y llamadas entrantes</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="alertas">⟳</button>
-            <button class="btn btn-sm" data-open="alertas">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="alertasPreview"><div class="muted">Cargando...</div></div>
-      </div>
-
-      <!-- ========================= PANEL: ENTORNOS (AUTOMÁTICO) ========================= -->
-      <div class="panel" id="panel-entornos">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">🗒️ Entornos Policiales</div>
-            <div class="sub">Registros automáticos del entorno — generan notificaciones</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="entornos">⟳</button>
-            <button class="btn btn-sm" data-open="entornos">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="entornosPreview"><div class="muted">Cargando...</div></div>
-      </div>
-
-      <!-- ========================= PANEL: VEHÍCULOS ========================= -->
-      <div class="panel" id="panel-vehiculos">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">🚗 Vehículos Registrados</div>
-            <div class="sub">Búsqueda por matrícula y control</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="vehiculos">⟳</button>
-            <button class="btn btn-sm" data-open="vehiculos">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="vehiculosPreview"><div class="muted">Cargando...</div></div>
-      </div>
-
-      <!-- ========================= PANEL: ARMAMENTO ========================= -->
-      <div class="panel" id="panel-armas">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">🔫 Armamento y Equipamiento</div>
-            <div class="sub">Control de armas asignadas y stock</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="armas">⟳</button>
-            <button class="btn btn-sm" data-open="armas">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="armasPreview"><div class="muted">Cargando...</div></div>
-      </div>
-
-      <!-- ========================= PANEL: PERSONAL ========================= -->
-      <div class="panel" id="panel-oficiales">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">👮‍♂️ Personal en Servicio</div>
-            <div class="sub">Estado y disponibilidad del personal</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="oficiales">⟳</button>
-            <button class="btn btn-sm" data-open="oficiales">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="oficialesPreview"><div class="muted">Cargando...</div></div>
-      </div>
-
-      <!-- ========================= PANEL: INFORMES ========================= -->
-      <div class="panel" id="panel-informes">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">📂 Informes y Casos</div>
-            <div class="sub">Seguimiento y estado de investigaciones</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="informes">⟳</button>
-            <button class="btn btn-sm" data-open="informes">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="informesPreview"><div class="muted">Cargando...</div></div>
-      </div>
-
-      <!-- ========================= PANEL: HISTORIAL ========================= -->
-      <div class="panel" id="panel-historial">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">🕓 Historial de Notificaciones</div>
-            <div class="sub">Registro automático de notificaciones enviadas</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="historial">⟳</button>
-            <button class="btn btn-sm" data-open="historial">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="historialPreview"><div class="muted">Cargando...</div></div>
-      </div>
-      <!-- ========================= PANEL: BOLOS / BUSCADOS ========================= -->
-      <div class="panel" id="panel-bolos">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">🚓 BOLOs / Buscados</div>
-            <div class="sub">Personas o vehículos con búsqueda activa</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="bolos">⟳</button>
-            <button class="btn btn-sm" data-open="bolos">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="bolosPreview"><div class="muted">Cargando...</div></div>
-      </div>
-
-      <!-- ========================= PANEL: MULTAS ========================= -->
-      <div class="panel" id="panel-multas">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">💰 Multas y Sanciones</div>
-            <div class="sub">Registro y gestión de multas</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="multas">⟳</button>
-            <button class="btn btn-sm" data-open="multas">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="multasPreview"><div class="muted">Cargando...</div></div>
-      </div>
-
-      <!-- ========================= PANEL: ALERTAS ========================= -->
-      <div class="panel" id="panel-alertas">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">🚨 Alertas y Llamadas</div>
-            <div class="sub">Notificaciones y llamadas entrantes</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="alertas">⟳</button>
-            <button class="btn btn-sm" data-open="alertas">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="alertasPreview"><div class="muted">Cargando...</div></div>
-      </div>
-
-      <!-- ========================= PANEL: ENTORNOS (AUTOMÁTICO) ========================= -->
-      <div class="panel" id="panel-entornos">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">🗒️ Entornos Policiales</div>
-            <div class="sub">Registros automáticos del entorno — generan notificaciones</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="entornos">⟳</button>
-            <button class="btn btn-sm" data-open="entornos">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="entornosPreview"><div class="muted">Cargando...</div></div>
-      </div>
-
-      <!-- ========================= PANEL: VEHÍCULOS ========================= -->
-      <div class="panel" id="panel-vehiculos">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">🚗 Vehículos Registrados</div>
-            <div class="sub">Búsqueda por matrícula y control</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="vehiculos">⟳</button>
-            <button class="btn btn-sm" data-open="vehiculos">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="vehiculosPreview"><div class="muted">Cargando...</div></div>
-      </div>
-
-      <!-- ========================= PANEL: ARMAMENTO ========================= -->
-      <div class="panel" id="panel-armas">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">🔫 Armamento y Equipamiento</div>
-            <div class="sub">Control de armas asignadas y stock</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="armas">⟳</button>
-            <button class="btn btn-sm" data-open="armas">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="armasPreview"><div class="muted">Cargando...</div></div>
-      </div>
-
-      <!-- ========================= PANEL: PERSONAL ========================= -->
-      <div class="panel" id="panel-oficiales">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">👮‍♂️ Personal en Servicio</div>
-            <div class="sub">Estado y disponibilidad del personal</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="oficiales">⟳</button>
-            <button class="btn btn-sm" data-open="oficiales">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="oficialesPreview"><div class="muted">Cargando...</div></div>
-      </div>
-
-      <!-- ========================= PANEL: INFORMES ========================= -->
-      <div class="panel" id="panel-informes">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">📂 Informes y Casos</div>
-            <div class="sub">Seguimiento y estado de investigaciones</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="informes">⟳</button>
-            <button class="btn btn-sm" data-open="informes">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="informesPreview"><div class="muted">Cargando...</div></div>
-      </div>
-
-      <!-- ========================= PANEL: HISTORIAL ========================= -->
-      <div class="panel" id="panel-historial">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <div>
-            <div class="title">🕓 Historial de Notificaciones</div>
-            <div class="sub">Registro automático de notificaciones enviadas</div>
-          </div>
-          <div class="panel-actions">
-            <button class="btn-ghost btn-sm" data-refresh="historial">⟳</button>
-            <button class="btn btn-sm" data-open="historial">Abrir</button>
-          </div>
-        </div>
-        <div class="list" id="historialPreview"><div class="muted">Cargando...</div></div>
-      </div>
+  <script>
+  const $=s=>document.querySelector(s);const $$=s=>document.querySelectorAll(s);
+  const STATE={bolos:[],multas:[],alertas:[],entornos:[],vehiculos:[],armas:[],oficiales:[],informes:[],historial:[]};
+  function notif(t="info",m="",ttl=4500){const n=document.createElement("div");n.className="toast";n.innerHTML=`<div class="t-body">${m}</div><button class="t-close">×</button>`;$("#toasts").prepend(n);n.querySelector(".t-close").onclick=()=>n.remove();if(ttl>0)setTimeout(()=>n.remove(),ttl);}
+  function makeMuted(t){const d=document.createElement("div");d.className="muted";d.textContent=t;return d;}
+  function renderPanel(id,arr,typ){const c=$(`#${id}Preview`);if(!c)return;c.innerHTML="";if(!arr.length){c.appendChild(makeMuted("Sin registros"));return;}arr.slice(0,6).forEach(x=>{const d=document.createElement("div");d.className="item";d.innerHTML=`<div class="item-left"><div class="item-title">${x.nombre||x.infractor||x.tipo||x.autor||x.titulo||'—'}</div><div class="item-meta">${x.motivo||x.detalle||x.descripcion||x.cantidad||''}</div></div>`;c.appendChild(d);});}
+  function refreshAll(){Object.keys(STATE).forEach(k=>renderPanel(k,STATE[k]||[],k));notif("info","Paneles actualizados");}
+  async function newBolo(){const n=prompt("Nombre del sujeto:");if(!n)return;const m=prompt("Motivo:")||"";STATE.bolos.unshift({nombre:n,motivo:m});renderPanel("bolos",STATE.bolos,"bolos");notif("success","BOLO añadido");}
+  async function newMulta(){const n=prompt("Infractor:");if(!n)return;const m=prompt("Motivo:")||"";const c=parseFloat(prompt("Importe (€):")||"0");STATE.multas.unshift({infractor:n,motivo:m,cantidad:c});renderPanel("multas",STATE.multas,"multas");notif("success","Multa creada");}
+  async function newAlerta(){const t=prompt("Título:");if(!t)return;const d=prompt("Descripción:")||"";STATE.alertas.unshift({tipo:t,detalle:d});renderPanel("alertas",STATE.alertas,"alertas");notif("warn","Alerta enviada");}
+  function openPanel(name){notif("info","Panel abierto",name);}
+  window.addEventListener("DOMContentLoaded",()=>{$$("[data-refresh]").forEach(b=>b.onclick=e=>{const k=e.target.dataset.refresh;renderPanel(k,STATE[k]||[],k);notif("info","Refrescado "+k)});$$("[data-open]").forEach(b=>b.onclick=e=>openPanel(e.target.dataset.open));$("#refreshAll").onclick=refreshAll;$("#exportBtn").onclick=()=>{const blob=new Blob([JSON.stringify(STATE,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="pda_export.json";a.click();notif("success","Exportado JSON");};$("#btnLogin").onclick=()=>$("#loginModal").style.display="flex";$("#closeLoginModal").onclick=()=>$("#loginModal").style.display="none";$("#guestBtnModal").onclick=()=>{$("#loginModal").style.display="none";$("#userDisplay").textContent="Invitado";notif("info","Modo invitado activo");};$("#loginBtnModal").onclick=()=>{const u=$("#loginUser").value.trim();const p=$("#loginPass").value.trim();if(!u||!p){$("#loginError").textContent="Introduce usuario y contraseña";$("#loginError").style.display="block";return;}$("#loginModal").style.display="none";$("#userDisplay").textContent=u;notif("success","Bienvenido "+u);};
+    STATE.bolos=[{nombre:"John Doe",motivo:"Robo a mano armada"},{nombre:"Jane S.",motivo:"Fuga de tráfico"}];
+    STATE
