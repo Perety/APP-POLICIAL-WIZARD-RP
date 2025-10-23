@@ -1,8 +1,8 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Daynight RP — Sistema Policial</title>
   <style>
     :root {
@@ -91,135 +91,7 @@
       50% { background-position: 50% 0, 50% 0 }
       100% { background-position: 0 0, 100% 0 }
     }
-
-    .wrap {
-      max-width: 1150px;
-      margin: 22px auto;
-      padding: 20px;
-      display: grid;
-      grid-template-rows: auto 1fr;
-      gap: 18px;
-      position: relative;
-      z-index: 2;
-    }
-    header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 18px;
-    }
-    .brand {
-      display: flex;
-      gap: 12px;
-      align-items: center;
-    }
-    .logo {
-      width: 60px;
-      height: 60px;
-      border-radius: 12px;
-      background: linear-gradient(135deg,var(--accent-2),var(--accent));
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 900;
-      color: #031018;
-    }
-    h1 {
-      margin: 0;
-      font-size: 18px;
-    }
-    .subtitle {
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .top-right {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
-    .pill {
-      background: var(--glass);
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-weight: 700;
-      color: var(--muted);
-    }
-    .btn {
-      background: linear-gradient(90deg,var(--accent),var(--accent-2));
-      color: #031018;
-      padding: 8px 12px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      font-weight: 800;
-      box-shadow: 0 8px 24px rgba(20,10,40,0.12);
-    }
-    .btn-ghost {
-      background: transparent;
-      border: 1px solid rgba(255,255,255,0.04);
-      color: var(--muted);
-      padding: 7px 10px;
-      border-radius: 10px;
-      cursor: pointer;
-    }
-    .notif-pill {
-      background: linear-gradient(90deg,var(--accent-2),var(--accent));
-      padding: 6px 10px;
-      border-radius: 999px;
-      font-weight: 800;
-      color: #031018;
-      cursor: pointer;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(3,1fr);
-      gap: 16px;
-    }
-    @media (max-width:980px){ .grid{grid-template-columns:repeat(2,1fr)} }
-    @media (max-width:640px){ .grid{grid-template-columns:1fr} }
-
-    .card {
-      background: var(--card-grad);
-      border-radius: var(--radius);
-      padding: 18px;
-      border: 1px solid rgba(255,255,255,0.04);
-      box-shadow: var(--shadow);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      min-height: 120px;
-      transition: transform .18s, box-shadow .18s, border-color .18s;
-      position: relative;
-      overflow: hidden;
-    }
-    .card .card-head {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .card .title {
-      font-weight: 900;
-      font-size: 16px;
-    }
-    .card .desc {
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .card:hover {
-      transform: translateY(-8px);
-      box-shadow: 0 30px 60px rgba(0,0,0,0.7);
-      border-color: rgba(79,70,229,0.12);
-    }
-    .card.active {
-      outline: 2px solid rgba(79,70,229,0.18);
-      transform: translateY(-6px) scale(1.01);
-    }
-
-    footer {
-      margin-top  </style>
+  </style>
 </head>
 <body>
   <div class="bg" aria-hidden="true">
@@ -228,7 +100,6 @@
     <div class="gridOverlay"></div>
     <div class="stripes"></div>
   </div>
-
   <div class="wrap" role="main">
     <header>
       <div class="brand">
@@ -298,144 +169,151 @@
       </div>
     </div>
   </div>
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
-    import {
-      getFirestore, collection, getDocs, addDoc, setDoc, doc, deleteDoc, updateDoc,
-      onSnapshot, query, where, orderBy
-    } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-app.js";
+  import {
+    getFirestore, collection, getDocs, addDoc, query, where
+  } from "https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore.js";
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyCskczYgGtlPPBEIZiE5PuY7s_cfE_3Chg",
-      authDomain: "wizard-rp.firebaseapp.com",
-      projectId: "wizard-rp",
-      storageBucket: "wizard-rp.firebasestorage.app",
-      messagingSenderId: "479456044047",
-      appId: "1:479456044047:web:65c52e2430bcb6ca586f7a",
-      measurementId: "G-KX5Y56CG0R"
-    };
+  const firebaseConfig = {
+    apiKey: "AIzaSyCskczYgGtlPPBEIZiE5PuY7s_cfE_3Chg",
+    authDomain: "wizard-rp.firebaseapp.com",
+    projectId: "wizard-rp",
+    storageBucket: "wizard-rp.firebasestorage.app",
+    messagingSenderId: "479456044047",
+    appId: "1:479456044047:web:65c52e2430bcb6ca586f7a",
+    measurementId: "G-KX5Y56CG0R"
+  };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const COL = name => collection(db, name);
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+  const COL = name => collection(db, name);
 
-    const STATE = {
-      currentUser: null,
-      adminMode: false,
-      selectedCard: null,
-      unsub: {},
-      lastAlertCount: 0
-    };
+  const STATE = {
+    currentUser: null
+  };
 
-    const $ = (sel, root=document) => root.querySelector(sel);
-    const escapeHtml = s => (s||'').replace(/[&<>"']/g, c=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const $ = (sel, root = document) => root.querySelector(sel);
 
-    async function pushLog(msg){
-      try{ await addDoc(COL('logs'), { t: Date.now(), msg }); }catch(e){ console.warn('pushLog', e); }
+  // Login
+  $('#btnLogin').addEventListener('click', () => {
+    $('#loginModal').style.display = 'flex';
+    $('#loginError').style.display = 'none';
+  });
+
+  $('#loginBtnModal').addEventListener('click', async () => {
+    const username = $('#loginUser').value.trim();
+    const password = $('#loginPass').value.trim();
+    if (!username || !password) {
+      $('#loginError').textContent = 'Rellena usuario y contraseña';
+      $('#loginError').style.display = 'block';
+      return;
     }
 
-    const cardsRoot = $('#cardsRoot');
-    const expandedRoot = $('#expandedRoot');
-    const userDisplay = $('#userDisplay');
-    const dutyStatus = $('#dutyStatus');
-    const btnLogin = $('#btnLogin');
-    const btnExport = $('#btnExport');
-    const adminModeWrap = $('#adminModeWrap');
-    const adminModePill = $('#adminModePill');
-    const notifPill = $('#notifPill');
-
-    const CARDS = [
-      { id:'pda', title:'Fichas PDA', desc:'Buscar y crear fichas', icon:'👤🔒' },
-      { id:'calls', title:'Llamadas', desc:'Crear y asignar llamadas', icon:'📟' },
-      { id:'reports', title:'Informes', desc:'Crear y consultar informes', icon:'📝' },
-      { id:'wanted', title:'Buscados / BOLO', desc:'Personas buscadas', icon:'🚔' },
-      { id:'fines', title:'Multas', desc:'Generar sanciones', icon:'💰' },
-      { id:'service', title:'Servicio', desc:'Entrar / Salir de servicio', icon:'🦺' },
-      { id:'alerts', title:'Alertas', desc:'Crear y gestionar alertas', icon:'📢' },
-      { id:'radio', title:'Radio', desc:'Chat por canales', icon:'📡' },
-      { id:'admin', title:'Administración', desc:'Roles y usuarios', icon:'⚙️' },
-      { id:'logs', title:'Auditoría', desc:'Historial de acciones', icon:'📜' }
-    ];
-
-    function renderCards(){
-      cardsRoot.innerHTML = '';
-      const isAdmin = STATE.currentUser && STATE.currentUser.role === 'admin';
-      CARDS.forEach(c=>{
-        if((c.id === 'admin' || c.id === 'logs') && !isAdmin) return;
-        const el = document.createElement('div');
-        el.className = 'card';
-        el.dataset.id = c.id;
-        el.innerHTML = `<div class="card-head">
-          <div><div class="title">${c.title}</div><div class="desc">${c.desc}</div></div>
-          <div style="display:flex;flex-direction:column;align-items:flex-end">
-            <div style="font-size:26px">${c.icon}</div>
-            <button class="btn-ghost open-btn" data-open="${c.id}" style="margin-top:8px">Abrir</button>
-          </div>
-        </div>`;
-        el.addEventListener('click', (e)=> {
-          if(e.target && e.target.matches('button')) return;
-          openCard(c.id, el);
-        });
-        el.querySelector('.open-btn').addEventListener('click', (e)=> { e.stopPropagation(); openCard(c.id, el); });
-        cardsRoot.appendChild(el);
-      });
-    }
-
-    function setActiveCard(el){
-      document.querySelectorAll('.card').forEach(c=>c.classList.remove('active'));
-      if(el) el.classList.add('active');
-    }
-
-    function clearExpanded(){
-      if(STATE.unsub.currentPanel && typeof STATE.unsub.currentPanel === 'function') {
-        try{ STATE.unsub.currentPanel(); } catch(e){}
-        STATE.unsub.currentPanel = null;
+    try {
+      const snap = await getDocs(query(COL('users'), where('username', '==', username), where('password', '==', password)));
+      if (snap.empty) {
+        $('#loginError').textContent = 'Usuario o contraseña incorrectos';
+        $('#loginError').style.display = 'block';
+        return;
       }
-      expandedRoot.innerHTML = '';
-      setActiveCard(null);
+
+      let userData;
+      snap.forEach(doc => userData = { id: doc.id, ...doc.data() });
+      STATE.currentUser = userData;
+
+      $('#loginModal').style.display = 'none';
+      $('#userDisplay').textContent = userData.display || userData.username;
+      $('#userDisplay').classList.add('pill');
+      renderCards();
+    } catch (e) {
+      console.error('Error en login', e);
+      $('#loginError').textContent = 'Error al conectar con Firestore';
+      $('#loginError').style.display = 'block';
     }
+  });
 
-    async function openCard(id, cardEl=null){
-      clearExpanded();
-      setActiveCard(cardEl);
-      const panel = document.createElement('div');
-      panel.className = 'expanded';
-      expandedRoot.appendChild(panel);
-      switch(id){
-        case 'pda': await renderPDA(panel); break;
-        case 'calls': await renderCalls(panel); break;
-        case 'reports': await renderReports(panel); break;
-        case 'wanted': await renderWanted(panel); break;
-        case 'fines': await renderFines(panel); break;
-        case 'service': await renderService(panel); break;
-        case 'alerts': await renderAlerts(panel); break;
-        case 'radio': await renderRadio(panel); break;
-        case 'admin': await renderAdmin(panel); break;
-        case 'logs': await renderLogs(panel); break;
-        default: panel.textContent = 'Panel no implementado'; break;
-      }
-      panel.scrollIntoView({ behavior:'smooth', block:'start' });
-    }
-
-    async function hasPerm(perm){
-      if(!STATE.currentUser) return perm === 'create_call' ? true : false;
-      try{
-        const rSnap = await getDocs(query(COL('roles'), where('__name__','==', STATE.currentUser.role)));
-        let role = null; rSnap.forEach(d=> role = d.data());
-        if(!role) return false;
-        if(Array.isArray(role.permissions) && role.permissions.includes('all')){
-          const sensitive = ['delete_reports','delete_alerts','manage_users','manage_roles','delete_all_alerts','impersonate','view_logs','all'];
-          if(sensitive.includes(perm)) return STATE.adminMode === true;
-          return true;
-        }
-        return role.permissions && role.permissions.includes(perm);
-      }catch(e){ console.warn('hasPerm error', e); return false; }
-    }
-
-    // Aquí irían las funciones renderPDA, renderCalls, renderReports, renderWanted, renderFines, renderAlerts, etc.
-    // Ya las tienes implementadas en tu código original y en las partes anteriores.
-
+  $('#guestBtn').addEventListener('click', () => {
+    STATE.currentUser = { username: 'Invitado', display: 'Invitado', role: 'guest' };
+    $('#loginModal').style.display = 'none';
+    $('#userDisplay').textContent = 'Invitado';
     renderCards();
-  </script>
+  });
+
+  $('#showReg').addEventListener('click', () => {
+    $('#registerBlock').style.display = 'block';
+  });
+
+  $('#regCancel').addEventListener('click', () => {
+    $('#registerBlock').style.display = 'none';
+  });
+
+  $('#regCreate').addEventListener('click', async () => {
+    const name = $('#regName').value.trim();
+    const username = $('#regUser').value.trim();
+    const password = $('#regPass').value.trim();
+    const role = $('#regRole').value;
+
+    if (!name || !username || !password || !role) {
+      $('#regMsg').textContent = 'Completa todos los campos';
+      return;
+    }
+
+    try {
+      const existing = await getDocs(query(COL('users'), where('username', '==', username)));
+      if (!existing.empty) {
+        $('#regMsg').textContent = 'Ese usuario ya existe';
+        return;
+      }
+
+      await addDoc(COL('users'), {
+        display: name,
+        username,
+        password,
+        role,
+        badge: 'SIN-ASIGNAR',
+        onDuty: false
+      });
+
+      $('#regMsg').textContent = 'Cuenta creada correctamente';
+      $('#registerBlock').style.display = 'none';
+    } catch (e) {
+      console.error('Error en registro', e);
+      $('#regMsg').textContent = 'Error al crear cuenta';
+    }
+  });
+
+  // Paneles
+  const CARDS = [
+    { id: 'pda', title: 'Fichas PDA', desc: 'Buscar y crear fichas', icon: '👤🔒' },
+    { id: 'wanted', title: 'Buscados / BOLO', desc: 'Personas buscadas', icon: '🚔' },
+    { id: 'fines', title: 'Multas', desc: 'Generar sanciones', icon: '💰' },
+    { id: 'alerts', title: 'Alertas', desc: 'Crear y gestionar alertas', icon: '📢' }
+  ];
+
+  function renderCards() {
+    const cardsRoot = $('#cardsRoot');
+    cardsRoot.innerHTML = '';
+    CARDS.forEach(c => {
+      const el = document.createElement('div');
+      el.className = 'card';
+      el.innerHTML = `
+        <div class="card-head">
+          <div>
+            <div class="title">${c.title}</div>
+            <div class="desc">${c.desc}</div>
+          </div>
+          <div style="font-size:26px">${c.icon}</div>
+        </div>
+      `;
+      el.addEventListener('click', () => {
+        alert(`Panel "${c.title}" abierto (demo).`);
+      });
+      cardsRoot.appendChild(el);
+    });
+  }
+
+  renderCards();
+</script>
 </body>
 </html>
